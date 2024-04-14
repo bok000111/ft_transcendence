@@ -19,18 +19,26 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
+
+# TODO: 나중에 환경변수로 변경
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-bhb3@-^i==hy=0@6-i+(i%*#^m9u&r^cus@1s6ih-g88t+eq%c'
 
+# TODO: 배포시 False로 변경
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# TODO: 나중에 환경변수로 변경
 ALLOWED_HOSTS = []
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'ft_transcendence',
+    'pong',
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -69,11 +77,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ft_transcendence.wsgi.application'
 
+ASGI_APPLICATION = 'ft_transcendence.asgi.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-# 나중에 환경변수로 변경
+# TODO: 나중에 환경변수로 변경
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -110,7 +120,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -125,4 +135,4 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
