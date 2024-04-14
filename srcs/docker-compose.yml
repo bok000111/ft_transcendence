@@ -5,6 +5,7 @@ services:
     image: postgres:13
     container_name: postgres
     shm_size: 256mb
+    # TODO: 환경변수로 설정
     environment:
       POSTGRES_DB: ft_transcendence
       POSTGRES_USER: postgres
