@@ -1,1 +1,2 @@
-/backend/.venv
+srcs/requirements/django/venv
+srcs/postgres_data

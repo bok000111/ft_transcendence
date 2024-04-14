@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: postgres
+    shm_size: 256mb
+    environment:
+      POSTGRES_DB: ft_transcendence
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - intra
+    restart: always
+
+  # 개발중이면 도커 사용 안함
+  # django:
+  #   build: ./backend/.
+  #   container_name: django
+  #   command: python manage.py runserver
+  #   networks:
+  #     - intra
+  #   ports:
+  #     - "8000:8000"
+  #   depends_on:
+  #     - postgres
+  #   restart: always
+
+volumes:
+  postgres_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./postgres_data
+
+networks:
+  intra:
+    driver: bridge
