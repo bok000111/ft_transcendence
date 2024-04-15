@@ -1,7 +1,7 @@
 NAME = ft_transcendence
 
 COMPOSE_FILE = ./srcs/docker-compose.yml
-DB_DIR = ./srcs/postgres_data/
+DB_DIR = /goinfre/$(USER)/postgres_data
 
 all: $(NAME)
 
@@ -12,6 +12,7 @@ clean:
 	docker compose -f $(COMPOSE_FILE) down
 
 fclean: clean
+	# docker system prune -a -f
 	docker compose -f $(COMPOSE_FILE) down --volumes --remove-orphans
 	rm -rf $(DB_DIR)
 

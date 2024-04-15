@@ -1,3 +1,4 @@
 srcs/postgres_data
 srcs/requirements/django/venv
 srcs/requirements/django/*/__pycache__
+srcs/requirements/django/*/migrations/__pycache__
