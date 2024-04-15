@@ -2,7 +2,8 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:13
+    image: postgres:latest
+    # build: ./requirements/postgres/. - 배포시 스크립트 수정해서 사용
     container_name: postgres
     shm_size: 256mb
     # TODO: 환경변수로 설정
@@ -37,7 +38,7 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./postgres_data
+      device: /goinfre/${USER}/postgres_data
 
 networks:
   intra:
