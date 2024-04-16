@@ -16,7 +16,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from . import views
+
 urlpatterns = [
-    path("pong/", include("pong.urls")),
+	path('', views.index, name='index'),
     path('admin/', admin.site.urls),
+    # path ("", include("api.urls")),
+    # path("pong/", include("pong.urls")),
+    # path("api/", include("api.urls")),
 ]
