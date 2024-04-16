@@ -21,13 +21,14 @@ $(NAME): mkdir venv
 
 venv:
 	python3 -m venv $(VENV_DIR)
+	$(VENV_DIR)/bin/pip install --upgrade pip
 	$(VENV_DIR)/bin/pip install -r $(REQUIREMENTS)
 
 clean:
 	docker compose -f $(COMPOSE_FILE) down
 
 fclean: clean
-	# docker system prune -a -f
+	docker system prune -a -f
 	docker compose -f $(COMPOSE_FILE) down --volumes --remove-orphans
 	rm -rf $(DB_DIR) $(VENV_DIR)
 
