@@ -2,8 +2,8 @@ NAME = ft_transcendence
 
 COMPOSE_FILE = ./srcs/docker-compose.yml
 DB_DIR = /goinfre/$(USER)/postgres_data
-REQUIREMENTS = /workspaces/ft_transcendence/srcs/requirements.txt
-MANAGE_PY = /workspaces/ft_transcendence/srcs/manage.py
+REQUIREMENTS = ./srcs/requirements.txt
+MANAGE_PY = ./srcs/manage.py
 
 all: $(NAME)
 
