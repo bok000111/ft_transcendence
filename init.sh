@@ -9,5 +9,4 @@ echo 'if [ -z "$SSH_AUTH_SOCK" ]; then
    fi
    eval `cat $HOME/.ssh/ssh-agent`
 fi' >> ~/.zshrc
-
-source ~/.zshrc
+echo 호스트 터미널에서 '"ssh-add $HOME/.ssh/id_rsa && eval "$(ssh-agent -s)"' 를 실행해면 바로 github에 접근할 수 있습니다.
