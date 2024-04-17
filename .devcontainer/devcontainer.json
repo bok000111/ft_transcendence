@@ -17,7 +17,7 @@
 			"configureZshAsDefaultShell": true
 		}
 	},
-	"postCreateCommand": "pip3 install --user -r /workspaces/ft_transcendence/srcs/requirements.txt && echo alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\" >> /home/vscode/.zshrc && sudo apt-get update",
+	"postCreateCommand": "sudo apt-get update && pip3 install --user -r /workspaces/ft_transcendence/srcs/requirements.txt && echo 'alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\"' >> /home/vscode/.zshrc",
 	
 	"customizations": {
 		"vscode": {
