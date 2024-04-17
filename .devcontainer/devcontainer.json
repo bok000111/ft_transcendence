@@ -13,18 +13,13 @@
 			"version": "latest",
 			"dockerDashComposeVersion": "latest"
 		},
-		"ghcr.io/devcontainers-contrib/features/zsh-plugins:0": {
-			"plugins": "ssh-agent npm",
-			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions",
-			"username": "root"
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"configureZshAsDefaultShell": true
 		}
 	},
-	"postCreateCommand": "pip3 install --user -r /workspaces/ft_transcendence/srcs/requirements.txt && echo alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\" >> /home/vscode/.zshrc && sudo apt-get update && sudo apt-get install -y openssh-server",
-	
+	"postCreateCommand": "pip3 install --user -r /workspaces/ft_transcendence/srcs/requirements.txt && echo alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\" >> /home/vscode/.zshrc && sudo apt-get update",
 	
 	"customizations": {
-		// "preCreateCommand": "sudo apt-get update && sudo apt-get install -y openssh-server",
-		// "postCreateCommand": "echo alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\" >> /home/vscode/.zshrc",
 		"vscode": {
 			"extensions": [
 				"ms-python.python",
@@ -41,6 +36,7 @@
 			"settings": {
 				"editor.tabSize": 4,
 				"editor.insertSpaces": true,
+				"terminal.integrated.shell.osx": "/bin/zsh",
 				"terminal.integrated.shell.linux": "/bin/zsh",
 				"python.defaultInterpreterPath": "/usr/local/bin/python",
 				"python.languageServer": "Pylance",
