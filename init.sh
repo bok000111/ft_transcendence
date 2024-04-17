@@ -1,4 +1,4 @@
-echo 'alias manage="python /workspaces/ft_transcendence/srcs/requirements/django/manage.py" >> /home/vscode/.zshrc'
+echo 'alias manage="python /workspaces/ft_transcendence/srcs/requirements/django/manage.py"' >> ~/.zshrc
 
 echo 'if [ -z "$SSH_AUTH_SOCK" ]; then
    # Check for a currently running instance of the agent
@@ -9,3 +9,5 @@ echo 'if [ -z "$SSH_AUTH_SOCK" ]; then
    fi
    eval `cat $HOME/.ssh/ssh-agent`
 fi' >> ~/.zshrc
+
+source ~/.zshrc

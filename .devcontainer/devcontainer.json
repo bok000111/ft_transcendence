@@ -29,7 +29,8 @@
 				"GitHub.vscode-pull-request-github",
 				"ms-python.vscode-pylance",
 				"ms-python.black-formatter",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"ms-vscode.makefile-tools"
 			],
 			"settings": {
 				"editor.tabSize": 4,
