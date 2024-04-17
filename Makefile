@@ -11,8 +11,7 @@ $(NAME): mkdir
 	docker compose -f $(COMPOSE_FILE) up --build -d
 	
 	@pip install -r $(REQUIREMENTS) --user -q
-	@echo "run \"echo alias manage=\"python /workspaces/ft_transcendence/srcs/requirements/django/manage.py\" >> /home/vscode/.zshrc/ to add manage.py alias\""
-	@echo "일단은 이렇게 해놓고 나중에 수정, alias 설정해야 편함"
+	@echo "init.sh 실행해서 alias 설정해주세요"
 	@echo
 	@echo "run \"'pip install -r $(REQUIREMENTS)'\"		to install the requirements"
 	@echo "run \"'pip freeze > $(REQUIREMENTS)'\"			to update the requirements.txt file"
