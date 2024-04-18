@@ -1,20 +1,7 @@
 const cnvs = document.querySelector(".pong canvas");
 let ctx = cnvs.getContext("2d");
 
-const paddleInfo = {
-    width: 70,
-    height: 10,
-    space: 10,
-    speed: 10
-}
-
-const ballInfo = {
-    radius: 5,
-    diffX: 5,
-    diffY: 5
-}
-
-const CONFLICT = {
+export const CONFLICT = {
     NONE: 0x0,
     HORIZONTAL: 0x1,
     VERTICAL: 0x2,
@@ -24,10 +11,14 @@ const CONFLICT = {
     WALL_PLAYER4: 0x20,
     WALL_PLAYER_MASK: 0x3c
 };
-Object.freeze(CONFLICT);
 
 class AObject
 {
+    _posX;
+    _posY;
+    _diffX;
+    _diffY;
+
     constructor(posX, posY, diffX, diffY)
     {
         this._posX = posX;
@@ -60,8 +51,13 @@ class AObject
     draw() {}
 };
 
-class Paddle extends AObject
+export class Paddle extends AObject
 {
+    _widthX;
+    _widthY;
+    _movingLeft;
+    _movingRight;
+
     constructor(widthX, widthY, posX, posY, diffX, diffY)
     {
         super(posX, posY, diffX, diffY);
@@ -165,8 +161,10 @@ class Paddle extends AObject
     }
 };
 
-class Ball extends AObject
+export class Ball extends AObject
 {
+    _radius;
+
     constructor(posX, posY, diffX, diffY, radius)
     {
         super(posX, posY, diffX, diffY);
@@ -189,7 +187,7 @@ class Ball extends AObject
         const afterY = this._posY + this._diffY;
         let conflictResult = CONFLICT.NONE;
 
-        for (i = 0; i < players.length; ++i) {
+        for (let i = 0; i < players.length; ++i) {
             if (players[i].paddle.inside(afterX + this._radius, afterY)
                 || players[i].paddle.inside(afterX - this._radius, afterY)) {
                 conflictResult |= CONFLICT.HORIZONTAL;
@@ -253,26 +251,11 @@ class Ball extends AObject
     }
 };
 
-const initPaddles = [
-    new Paddle(paddleInfo.height, paddleInfo.width, paddleInfo.space + paddleInfo.height / 2, cnvs.height / 2, 0, 10),
-    new Paddle(paddleInfo.height, paddleInfo.width, cnvs.width - paddleInfo.space - paddleInfo.height / 2, cnvs.height / 2, 0, -10),
-    new Paddle(paddleInfo.width, paddleInfo.height, cnvs.width / 2, cnvs.height - paddleInfo.space - paddleInfo.height / 2, 10, 0),
-    new Paddle(paddleInfo.width, paddleInfo.height, cnvs.width / 2, paddleInfo.space + paddleInfo.height / 2, -10, 0)
-]
-
-const initKeys = [
-    { leftKey: "w", rightKey: "s" },
-    { leftKey: "ArrowDown", rightKey: "ArrowUp" },
-    { leftKey: "c", rightKey: "v" },
-    { leftKey: ".", rightKey: "," }
-]
-
-const initBalls = [
-    new Ball(cnvs.width / 2, cnvs.height / 2, ballInfo.diffX, ballInfo.diffY, ballInfo.radius)
-]
-
 class Score
 {
+    _tag;
+    _score;
+
     constructor()
     {
         this._tag = document.createElement("h1");
@@ -299,8 +282,13 @@ class Score
     }
 };
 
-class Player
+export class Player
 {
+    _paddle;
+    _keydownHandler;
+    _keyupHandler;
+    _score;
+
     constructor(paddle, leftKey, rightKey)
     {
         this._paddle = new Paddle(paddle.widthX, paddle.widthY, paddle.posX, paddle.posY, paddle.diffX, paddle.diffY);
@@ -354,6 +342,29 @@ class Player
     }
 };
 
+const initPaddles = [
+    new Paddle(paddleInfo.height, paddleInfo.width, paddleInfo.space + paddleInfo.height / 2, canvasInfo.height / 2, 0, 10),
+    new Paddle(paddleInfo.height, paddleInfo.width, canvasInfo.width - paddleInfo.space - paddleInfo.height / 2, canvasInfo.height / 2, 0, -10),
+    new Paddle(paddleInfo.width, paddleInfo.height, canvasInfo.width / 2, canvasInfo.height - paddleInfo.space - paddleInfo.height / 2, 10, 0),
+    new Paddle(paddleInfo.width, paddleInfo.height, canvasInfo.width / 2, paddleInfo.space + paddleInfo.height / 2, -10, 0)
+]
+
+const initKeys = [
+    { leftKey: "w", rightKey: "s" },
+    { leftKey: "ArrowDown", rightKey: "ArrowUp" },
+    { leftKey: "c", rightKey: "v" },
+    { leftKey: ".", rightKey: "," }
+]
+
+const initBalls = [
+    new Ball(canvasInfo.width / 2, canvasInfo.height / 2, ballInfo.diffX, ballInfo.diffY, ballInfo.radius)
+]
+
+function clearAll()
+{
+    ctx.clearRect(0, 0, cnvs.width, cnvs.height);
+}
+
 function scoreCalc(players, moveResult)
 {
     players.forEach((elem) =>
@@ -376,10 +387,10 @@ function scoreCalc(players, moveResult)
 
 function resetGame(players, balls)
 {
-    for (i = 0; i < players.length; ++i) {
+    for (let i = 0; i < players.length; ++i) {
         players[i].paddle.reset(initPaddles[i]);
     }
-    for (i = 0; i < balls.length; ++i) {
+    for (let i = 0; i < balls.length; ++i) {
         balls[i].reset(initBalls[i]);
     }
 }
@@ -412,22 +423,20 @@ function drawAll(players, balls)
 
 function show(players, balls)
 {
-    ctx.clearRect(0, 0, cnvs.width, cnvs.height);
+    clearAll();
     moveAll(players, balls);
     drawAll(players, balls);
 }
 
-function startGame(playerNum)
+export function startGame(playerNum)
 {
     const players = [];
     const balls = [];
     balls.push(new Ball(initBalls[0].posX, initBalls[0].posY, initBalls[0].diffX, initBalls[0].diffY, initBalls[0].radius));
 
-    for (i = 0; i < playerNum; ++i) {
+    for (let i = 0; i < playerNum; ++i) {
         players.push(new Player(initPaddles[i], initKeys[i].leftKey, initKeys[i].rightKey));
     }
 
     setInterval(show, 50, players, balls);
 }
-
-startGame(4);
