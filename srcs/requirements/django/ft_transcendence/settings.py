@@ -37,12 +37,12 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     "ft_transcendence",  # 프로젝트 설정
-    "api",  # api 라우팅용
-    "ws",  # websocket 라우팅용
+    "api",  # api 라우팅
+    "ws",  # websocket 라우팅
     "user",  # 유저 관리
     "pong",  # 게임 관리
-    "daphne",
-    "channels",
+    "daphne",  # daphne - ASGI 서버
+    "channels",  # channels - websocket
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -120,11 +120,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTH_USER_MODEL = "user.User"
 
+SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ko-kr"
 
 TIME_ZONE = "Asia/Seoul"
 
