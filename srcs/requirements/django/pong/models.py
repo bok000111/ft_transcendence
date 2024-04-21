@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.utils import timezone
 
-from ft_transcendence.models import User
+from user.models import User
 
 
 # Pong 게임의 플레이어 정보
