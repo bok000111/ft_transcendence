@@ -10,9 +10,9 @@ all: $(NAME)
 $(NAME): mkdir
 	docker compose -f $(COMPOSE_FILE) up --build -d
 	
-	@echo "run \"manage makemigrations\"	to make migrations"
-	@echo "run \"manage migrate\"			to apply migrations"
-	@echo "run \"manage runserver\"			to start the server"
+	@echo "run \"manage makemigrations\" to make migrations"
+	@echo "run \"manage migrate\" to apply migrations"
+	@echo "run \"manage runserver\" to start the server"
 
 clean:
 	docker compose -f $(COMPOSE_FILE) down
