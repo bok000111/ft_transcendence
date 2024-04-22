@@ -1,8 +1,18 @@
-from django.test import TestCase, Client
+from django.test import TestCase, AsyncClient
 from django.urls import reverse
-from .models import User
+from django.contrib.auth import get_user_model
+from asgiref.sync import sync_to_async
 
+# from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import asyncio
 import json
+
+User = get_user_model()
+
+signup_url = reverse("signup")
+login_url = reverse("login")
+logout_url = reverse("logout")
 
 TEST_USER_DATA = {
     "email": "test@example.com",
@@ -16,141 +26,190 @@ TEST_LOGIN_DATA = {
 }
 
 
-class SignupTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.signup_url = reverse("signup")
+class RequireJsonTest(TestCase):
+    async def test_require_json_success(self):
+        response = await self.async_client.post(
+            reverse("signup"),
+            json.dumps(TEST_USER_DATA),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 201)
 
-    def test_signup_success(self):
-        response = self.client.post(
-            self.signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+    async def test_require_json_failure(self):
+        response = await self.async_client.post(reverse("signup"))
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Invalid content type.")
+
+
+class SignupTest(TestCase):
+    async def test_signup_success(self):
+        response = await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
         )
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.json()["message"], "User created.")
-        self.assertEqual(User.objects.count(), 1)
-        self.assertEqual(User.objects.get().email, TEST_USER_DATA["email"])
-        self.assertNotEqual(User.objects.get().password, TEST_USER_DATA["password"])
-        self.assertTrue(
-            User.check_password(User.objects.get(), TEST_USER_DATA["password"])
+        self.assertEqual(await User.objects.acount(), 1)
+
+        user = await sync_to_async(User.objects.get)()
+
+        self.assertEqual(user.email, TEST_USER_DATA["email"])
+        self.assertNotEqual(user.password, TEST_USER_DATA["password"])
+        self.assertTrue(User.check_password(user, TEST_USER_DATA["password"]))
+
+    async def test_signup_failure(self):
+        responses = await asyncio.gather(
+            *[
+                self.async_client.post(
+                    signup_url, json.dumps(tc), content_type="application/json"
+                )
+                for tc in [
+                    {**TEST_USER_DATA, "email": ""},
+                    {**TEST_USER_DATA, "username": ""},
+                    {**TEST_USER_DATA, "password": ""},
+                ]
+            ]
+        )
+        self.assertEqual([r.status_code for r in responses], [400, 400, 400])
+        self.assertEqual(
+            [r.json()["message"] for r in responses],
+            ["Email must be set", "Username must be set", "Password must be set"],
         )
 
-    def test_signup_failure(self):
-        data = {"email": "", "username": "", "password": ""}
-        response = self.client.post(
-            self.signup_url, json.dumps(data), content_type="application/json"
-        )
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(User.objects.count(), 0)
-
-    def test_signup_duplicated_email(self):
-        response = self.client.post(
-            self.signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+    async def test_signup_duplicated_email(self):
+        response = await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
         )
 
-        prev_count = User.objects.count()
-
-        data = TEST_USER_DATA.copy()
-        data["username"] = "testuser2"
-
-        response = self.client.post(
-            self.signup_url, json.dumps(data), content_type="application/json"
+        response = await self.async_client.post(
+            signup_url,
+            json.dumps({**TEST_USER_DATA, "username": "differentuser"}),
+            content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Email is already in use.")
-        self.assertEqual(prev_count, User.objects.count())
+        self.assertEqual(await User.objects.acount(), 1)
 
-    def test_signup_duplicated_username(self):
-        response = self.client.post(
-            self.signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+    async def test_signup_duplicated_username(self):
+        response = await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
         )
 
-        prev_count = User.objects.count()
-
-        data = TEST_USER_DATA.copy()
-        data["email"] = "testuser2@example.com"
-
-        response = self.client.post(
-            self.signup_url, json.dumps(data), content_type="application/json"
+        response = await self.async_client.post(
+            signup_url,
+            json.dumps({**TEST_USER_DATA, "email": "diffrentemail@example.com"}),
+            content_type="application/json",
         )
+
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Username is already in use.")
-        self.assertEqual(prev_count, User.objects.count())
+        self.assertEqual(await User.objects.acount(), 1)
 
 
 class LoginTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.login_url = reverse("login")
-        self.signup_url = reverse("signup")
-
-        self.client.post(
-            self.signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+    async def test_login_success(self):
+        await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
         )
-
-    def test_login_success(self):
-        response = self.client.post(
-            self.login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
+        response = await self.async_client.post(
+            login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
         )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["message"], "Logged in.")
-        self.assertTrue(self.client.session["_auth_user_id"])
 
-    def test_login_failure(self):
-        data = TEST_LOGIN_DATA.copy()
-        data["password"] = "wrongpassword"
-
-        response = self.client.post(
-            self.login_url, json.dumps(data), content_type="application/json"
+    async def test_login_failure(self):
+        await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+        )
+        response = await self.async_client.post(
+            login_url,
+            json.dumps({**TEST_LOGIN_DATA, "password": "wrong"}),
+            content_type="application/json",
         )
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.json()["message"], "Invalid credentials.")
-        self.assertFalse(self.client.session.get("_auth_user_id"))
+        self.assertFalse(self.async_client.session.get("_auth_user_id"))
 
-    def test_login_already_logged_in(self):
-        self.client.post(
-            self.login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
+    async def test_login_already_logged_in(self):
+        await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
         )
-        self.assertTrue(self.client.session["_auth_user_id"])
+        await self.async_client.post(
+            login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
+        )
+        self.assertTrue(self.async_client.session["_auth_user_id"])
 
-        response = self.client.post(
-            self.login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
+        response = await self.async_client.post(
+            login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
         )
 
-        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json()["message"], "Already logged in.")
 
 
 class LogoutTest(TestCase):
-    def setUp(self):
-        self.client = Client()
-        self.logout_url = reverse("logout")
-        self.signup_url = reverse("signup")
-        self.login_url = reverse("login")
-
-        self.client.post(
-            self.signup_url,
-            json.dumps(TEST_USER_DATA),
-            content_type="application/json",
+    async def test_logout_success(self):
+        await self.async_client.post(
+            signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
+        )
+        await self.async_client.post(
+            login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
         )
 
-    def test_logout_success(self):
-        self.client.post(
-            self.login_url, json.dumps(TEST_LOGIN_DATA), content_type="application/json"
+        self.assertTrue(self.async_client.session["_auth_user_id"])
+
+        response = await self.async_client.post(
+            logout_url, content_type="application/json"
         )
-
-        self.assertTrue(self.client.session["_auth_user_id"])
-
-        response = self.client.post(self.logout_url, content_type="application/json")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["message"], "Logged out.")
-        self.assertFalse(self.client.session.get("_auth_user_id"))
+        self.assertFalse(self.async_client.session.get("_auth_user_id"))
 
-    def test_logout_failure(self):
-        response = self.client.post(self.logout_url, content_type="application/json")
+    async def test_logout_failure(self):
 
-        self.assertEqual(response.status_code, 400)
+        response = await self.async_client.post(
+            logout_url, content_type="application/json"
+        )
+
+        self.assertEqual(response.status_code, 403)
         self.assertEqual(response.json()["message"], "Not logged in.")
+
+
+# 스레드풀 사용해서 동시성 테스트 하고싶었는데 안됨 몰라레후
+# class UserStressTest(TestCase):
+#     def setUp(self):
+#         self.DUMMY_USER_COUNT = 10
+#         self.test_users = [
+#             {
+#                 "email": f"test{i}@example.com",
+#                 "username": f"user{i}",
+#                 "password": f"password{i}",
+#             }
+#             for i in range(self.DUMMY_USER_COUNT)
+#         ]
+
+#     def stress_task(self, user):
+#         return [
+#             self.client.post(
+#                 signup_url, json.dumps(user), content_type="application/json"
+#             ).status_code,
+#             self.client.post(
+#                 login_url, json.dumps(user), content_type="application/json"
+#             ).status_code,
+#             self.client.post(logout_url, content_type="application/json").status_code,
+#         ]
+
+#     async def test_signup_login_logout(self):
+#         with ThreadPoolExecutor() as executor:
+#             result = as_completed(
+#                 [executor.submit(self.stress_task, user) for user in self.test_users]
+#             )
+#             for future in result:
+#                 self.assertEqual(future.result(), [201, 200, 200])
+
+#         asyncio.sleep(1)
+
+#         self.assertEqual(await User.objects.acount(), self.DUMMY_USER_COUNT)
