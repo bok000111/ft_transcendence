@@ -1,40 +1,45 @@
 from django.http import JsonResponse
-from django.contrib.auth import authenticate, login, logout
-from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
-
-# from asgiref.sync import sync_to_async
+from django.contrib.auth import aauthenticate, alogin, alogout, get_user_model
+from django.conf import settings
 import json
 
-from .models import User
+# decorator
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from api.utils import need_json
+from user.utils import need_auth, need_not_auth
+
+# model
+User = get_user_model()
 
 
-# Create your views here.
 @csrf_exempt
 @require_http_methods(["POST"])
-def signup_view(request):
+@need_json
+async def signup_view(request):
     data = json.loads(request.body)
     email = data.get("email", None)
     username = data.get("username", None)
     password = data.get("password", None)
 
-    if not email or not username or not password:
-        return JsonResponse({"message": "Invalid request."}, status=400)
-
     try:
-        User.objects.create_user(email, username, password)
+        user = await User.objects.create_user(
+            email=email, username=username, password=password
+        )
+        return JsonResponse({"message": "User created."}, status=201)
+    except ValueError as e:
+        return JsonResponse({"message": f"{e}"}, status=400)
     except Exception as e:
-        return JsonResponse({"message": str(e)}, status=400)
-
-    return JsonResponse({"message": "User created."}, status=201)
+        if settings.DEBUG:
+            return JsonResponse({"message": f"{e}"}, status=500)
+        return JsonResponse({"message": "Something went wrong."}, status=500)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def login_view(request):
-    if request.user.is_authenticated:
-        return JsonResponse({"message": "Already logged in."}, status=400)
-
+@need_not_auth
+@need_json
+async def login_view(request):
     data = json.loads(request.body)
     email = data.get("email", None)
     password = data.get("password", None)
@@ -42,22 +47,21 @@ def login_view(request):
     if not email or not password:
         return JsonResponse({"message": "Invalid request."}, status=400)
 
-    user = authenticate(request, email=email, password=password)
+    user = await aauthenticate(request, email=email, password=password)
     if user is None:
         return JsonResponse({"message": "Invalid credentials."}, status=400)
 
-    login(request, user)
+    await alogin(request, user)
 
     return JsonResponse({"message": "Logged in."}, status=200)
 
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def logout_view(request):
-    if not request.user.is_authenticated:
-        return JsonResponse({"message": "Not logged in."}, status=400)
-
-    logout(request)
+@need_auth
+@need_json
+async def logout_view(request):
+    await alogout(request)
 
     return JsonResponse({"message": "Logged out."}, status=200)
 
