@@ -1,13 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
-from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 
 
 # 사용자 매니저
 class UserManager(BaseUserManager):
 
-    async def create_user(self, email, username, password, **extra_fields):
+    @database_sync_to_async
+    def create_user(self, email, username, password, **extra_fields):
         if not email:
             raise ValueError("Email must be set")
         if not username:
@@ -17,21 +17,22 @@ class UserManager(BaseUserManager):
 
         email = self.normalize_email(email)
 
-        if await sync_to_async(self.filter(email=email).exists)():
+        if self.filter(email=email).exists():
             raise ValueError("Email is already in use.")
-        if await sync_to_async(self.filter(username=username).exists)():
+        if self.filter(username=username).exists():
             raise ValueError("Username is already in use.")
 
         user = self.model(email=email, username=username, **extra_fields)
         user.set_password(password)
-        await user.asave(using=self._db)
+        user.save(using=self._db)
         return user
 
-    async def create_superuser(self, email, username, password, **extra_fields):
+    @database_sync_to_async
+    def create_superuser(self, email, username, password, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
 
-        return await self.create_user(email, username, password, **extra_fields)
+        return self.create_user(email, username, password, **extra_fields)
 
 
 # 기본 사용자 TODO: 추후에 확장할 수 있음
@@ -45,9 +46,11 @@ class User(AbstractUser):
 
     objects = UserManager()
 
+    @database_sync_to_async
     def get_email(self):
         return self.email
 
+    @database_sync_to_async
     def get_username(self):
         return self.username
 

@@ -1,12 +1,14 @@
-from django.test import TestCase, AsyncClient
+from django.test import TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from asgiref.sync import sync_to_async
 
-# from concurrent.futures import ThreadPoolExecutor, as_completed
+from channels.db import database_sync_to_async, close_old_connections
+
+from concurrent.futures import ThreadPoolExecutor
 
 import asyncio
 import json
+import time
 
 User = get_user_model()
 
@@ -26,7 +28,7 @@ TEST_LOGIN_DATA = {
 }
 
 
-class RequireJsonTest(TestCase):
+class RequireJsonTest(TransactionTestCase):
     async def test_require_json_success(self):
         response = await self.async_client.post(
             reverse("signup"),
@@ -41,7 +43,7 @@ class RequireJsonTest(TestCase):
         self.assertEqual(response.json()["message"], "Invalid content type.")
 
 
-class SignupTest(TestCase):
+class SignupTest(TransactionTestCase):
     async def test_signup_success(self):
         response = await self.async_client.post(
             signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
@@ -50,7 +52,7 @@ class SignupTest(TestCase):
         self.assertEqual(response.json()["message"], "User created.")
         self.assertEqual(await User.objects.acount(), 1)
 
-        user = await sync_to_async(User.objects.get)()
+        user = await database_sync_to_async(User.objects.get)()
 
         self.assertEqual(user.email, TEST_USER_DATA["email"])
         self.assertNotEqual(user.password, TEST_USER_DATA["password"])
@@ -106,7 +108,7 @@ class SignupTest(TestCase):
         self.assertEqual(await User.objects.acount(), 1)
 
 
-class LoginTest(TestCase):
+class LoginTest(TransactionTestCase):
     async def test_login_success(self):
         await self.async_client.post(
             signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
@@ -149,7 +151,7 @@ class LoginTest(TestCase):
         self.assertEqual(response.json()["message"], "Already logged in.")
 
 
-class LogoutTest(TestCase):
+class LogoutTest(TransactionTestCase):
     async def test_logout_success(self):
         await self.async_client.post(
             signup_url, json.dumps(TEST_USER_DATA), content_type="application/json"
@@ -178,38 +180,55 @@ class LogoutTest(TestCase):
         self.assertEqual(response.json()["message"], "Not logged in.")
 
 
-# 스레드풀 사용해서 동시성 테스트 하고싶었는데 안됨 몰라레후
-# class UserStressTest(TestCase):
-#     def setUp(self):
-#         self.DUMMY_USER_COUNT = 10
-#         self.test_users = [
-#             {
-#                 "email": f"test{i}@example.com",
-#                 "username": f"user{i}",
-#                 "password": f"password{i}",
-#             }
-#             for i in range(self.DUMMY_USER_COUNT)
-#         ]
+class UserStressTest(TransactionTestCase):
+    def setUp(self):
+        self.DUMMY_USER_COUNT = 10
+        self.test_users = [
+            {
+                "email": f"test{i}@example.com",
+                "username": f"user{i}",
+                "password": f"password{i}",
+            }
+            for i in range(self.DUMMY_USER_COUNT)
+        ]
 
-#     def stress_task(self, user):
-#         return [
-#             self.client.post(
-#                 signup_url, json.dumps(user), content_type="application/json"
-#             ).status_code,
-#             self.client.post(
-#                 login_url, json.dumps(user), content_type="application/json"
-#             ).status_code,
-#             self.client.post(logout_url, content_type="application/json").status_code,
-#         ]
+    def signup(self, user):
+        return self.client.post(
+            signup_url, json.dumps(user), content_type="application/json"
+        ).status_code
 
-#     async def test_signup_login_logout(self):
-#         with ThreadPoolExecutor() as executor:
-#             result = as_completed(
-#                 [executor.submit(self.stress_task, user) for user in self.test_users]
-#             )
-#             for future in result:
-#                 self.assertEqual(future.result(), [201, 200, 200])
+    def login(self, user):
+        status = self.client.post(
+            login_url, json.dumps(user), content_type="application/json"
+        ).status_code
+        close_old_connections()
+        return status
 
-#         asyncio.sleep(1)
+    def logout(self):
+        status = self.client.post(
+            logout_url, content_type="application/json"
+        ).status_code
+        close_old_connections()
+        return status
 
-#         self.assertEqual(await User.objects.acount(), self.DUMMY_USER_COUNT)
+    async def test_signup_login_logout(self):
+        with ThreadPoolExecutor() as executor:
+            start = time.time()
+            result = executor.map(self.signup, self.test_users)
+            for status in result:
+                self.assertEqual(status, 201)
+
+            print(
+                f"Elapsed time for {self.DUMMY_USER_COUNT} signup: {time.time() - start:.2f}s"
+            )
+
+            await asyncio.sleep(1)
+
+            start = time.time()
+            result = executor.map(self.login, self.test_users)
+            for status in result:
+                self.assertEqual(status, 200)
+            print(
+                f"Elapsed time for {self.DUMMY_USER_COUNT} login: {time.time() - start:.2f}s"
+            )
+        self.assertEqual(await User.objects.acount(), self.DUMMY_USER_COUNT)
