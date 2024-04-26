@@ -5,53 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <link rel="stylesheet" href="css/style.css" type="text/css" />
 </head>
 <body>
-    <div class="login">
-        <form>
-            <h1>로그인</h1>
-            <input type="text" placeholder="id">
-            <input type="text" placeholder="pw">
-            <input type="submit" value="로그인">
-        </form>
-    </div>
-    <div class="header none">
-        <button>
-            <h1>메인화면</h1>
-        </button>
-        <button>
-            <h1>로그아웃</h1>
-        </button>
-    </div>
-    <div class="main none">
-        <div class="match">
-            <button>
-                <h1>AI 대전</h1>
-            </button>
-            <button>
-                <h1>PVP 대전</h1>
-            </button>
-        </div>
-        <div class="tournament">
-            <button>
-                <h1>토너먼트 개최</h1>
-            </button>
-            <button>
-                <h1>토너먼트 결과</h1>
-            </button>
-        </div>
-    </div>
-    <div class="pong none">
-        <div class="scoreboard">
-            <h1></h1>
-            <h1></h1>
-            <h1 class="none"></h1>
-            <h1 class="none"></h1>
-        </div>
-        <canvas width="500" height="500"></canvas>
-    </div>
-    <script src="js/login.js" type="module"></script>
-    <script src="js/pong.js" type="module"></script>
+    <script src="src/store.js" type="module"></script>
 </body>
 </html>
