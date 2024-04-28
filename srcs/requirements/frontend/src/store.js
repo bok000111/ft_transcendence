@@ -1,4 +1,4 @@
- import { observe, observer } from "../core/Observer.js";
+import { observe, observer } from "../core/Observer.js";
 import { Store } from "../core/Store.js";
 
 const store = new Store({
