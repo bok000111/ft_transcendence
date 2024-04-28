@@ -32,6 +32,7 @@ DEBUG = True
 # TODO: 나중에 환경변수로 변경
 ALLOWED_HOSTS = [
     "localhost",
+    "localhost:5500",
 ]
 
 
