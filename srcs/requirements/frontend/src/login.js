@@ -32,9 +32,12 @@ class Login {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            credentials: "include"
         });
 
         if (!response.ok) {
@@ -77,9 +80,12 @@ class Signup {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
+            credentials: "include"
         });
 
         if (!response.ok) {
