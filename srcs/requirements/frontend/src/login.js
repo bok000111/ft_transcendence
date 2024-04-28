@@ -18,13 +18,12 @@ class Login {
     }
 
     setEvent() {
-        this.$loginForm.querySelector("input:nth-child(3)").addEventListener("submit", (event) => {
+        this.$loginForm.addEventListener("submit", (event) => {
             event.preventDefault();
             this.postLoginInfo({
                 email: this.$loginForm.querySelector("input:first-child").value,
                 password: this.$loginForm.querySelector("input:nth-child(2)").value
             });
-            this.$loginForm.classList.add("none");
         })
     }
 
@@ -42,8 +41,11 @@ class Login {
         }
         else {
             const res = await response.json();
-            if (res.success)
+            if (res.success) {
                 this.inputId = res.data.username;
+                this.$loginForm.classList.add("none");
+                $main.classList.remove("none");
+            }
             else
                 alert("Wrong Id or Password!");
         }
