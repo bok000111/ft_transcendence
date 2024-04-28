@@ -1,34 +1,21 @@
-<!-- 디렉터리 앞에 "static/" 을 추가해 주어야 한다. -->
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pong</title>
-    <link rel="stylesheet" href="./css/style.css" type="text/css">
+    <title>Document</title>
+    <link rel="stylesheet" href="static/style.css" type="text/css" />
 </head>
-
 <body>
-    <h1>Pong</h1>
-    <form class="login-class">
-        <input type="text" placeholder="email">
-        <input type="text" placeholder="password">
-        <input type="submit" value="Login">
-    </form>
-    <button>Signup</button>
-    <form class="signup none">
-        <input type="text" placeholder="email">
-        <input type="text" placeholder="password">
-        <input type="text" placeholder="username">
-        <input type="submit" value="signup">
-    </form>
-    <div class="main none">
-        <button>토너먼트 개최</button>
-        <button>토너먼트 결과</button>
-        <button>게임 시작</button>
+    <div class="pong">
+        <div class="scoreboard">
+            <h1></h1>
+            <h1></h1>
+            <h1 class="none"></h1>
+            <h1 class="none"></h1>
+        </div>
+        <canvas width="500" height="500"></canvas>
     </div>
-    <script src="src/login.js" type="module"></script>
+    <script src="static/pong.js"></script>
 </body>
-
 </html>
