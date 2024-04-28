@@ -3,12 +3,13 @@ from django.urls import path
 
 from . import views
 
-
 urlpatterns = [
-    path("create/", views.create_view, name="create_game_room"),
-    path("<int:room_id>/", views.by_id_view, name="get_room_by_id"),
-    # path("join/", views.join_view, name="join"),
-    # path("leave/", views.leave_view, name="leave"), # Not implemented
+    # path("<int:room_id>/", views.GameRoomView, name="room"),
+    # path("<str:room_name>/", views.room_by_name_view, name="get_room_by_name"),
+    # path("list/", views.room_list_view, name="get_room_list"),
+    # path("create/", views.create_view, name="create_game_room"),
+    # path("join/", views.join_view, name="join_game_room"),
+    # path("leave/", views.leave_view, name="leave_game_room"),
     # path("ready/", views.ready_view, name="ready"),
     # path("start/", views.start_view, name="start"),
     # path("observe/", views.observe_view, name="observe"),

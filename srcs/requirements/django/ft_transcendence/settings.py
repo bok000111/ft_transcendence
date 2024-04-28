@@ -30,18 +30,20 @@ SECRET_KEY = "django-insecure-bhb3@-^i==hy=0@6-i+(i%*#^m9u&r^cus@1s6ih-g88t+eq%c
 DEBUG = True
 
 # TODO: 나중에 환경변수로 변경
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # daphne - ASGI 서버
     "ft_transcendence",  # 프로젝트 설정
     "api",  # api 라우팅
     "ws",  # websocket 라우팅
     "user",  # 유저 관리
     "pong",  # 게임 관리
-    "daphne",  # daphne - ASGI 서버
     "channels",  # channels - websocket
     "django.contrib.admin",
     "django.contrib.auth",
@@ -62,6 +64,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "ft_transcendence.urls"
+CHANNEL_URLCONF = "ft_transcendence.routing"
 
 TEMPLATES = [
     {
@@ -148,3 +151,12 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
