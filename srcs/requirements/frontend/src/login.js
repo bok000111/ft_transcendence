@@ -31,6 +31,7 @@ class Login {
         const response = await fetch("http://localhost:8000/api/login/", {
             method: "POST",
             headers: {
+                "Host": "localhost:8000",
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(data)
@@ -72,34 +73,26 @@ class Signup {
     }
 
     postSignupInfo = async (data) => {
-        try {
-            const response = await fetch("https://localhost:8000/api/register", {
-                method: "POST", // POST 요청을 사용
-                headers: {
-                    "Content-Type": "application/json" // 요청 데이터가 JSON 형식임을 지정
-                },
-                body: JSON.stringify(data) // 객체를 JSON 문자열로 변환하여 전송
-            });
+        const response = await fetch("http://localhost:8000/api/signup/", {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-            if (!response.ok) { // 응답이 정상적인지 확인
-                throw new Error(`HTTP 오류: ${response.status}`); // 오류가 발생하면 예외를 발생시킴
-            }
-
-            const result = await response.json(); // 응답을 JSON으로 파싱
-
-            if (result.status === "success") {
-                alert("signup success");
+        if (!response.ok) {
+            alert("`HTTP Error : ${response.status}`");
+        }
+        else {
+            const res = await response.json();
+            if (res.success) {
                 this.$signup.classList.add("none");
                 $main.classList.remove("none");
-                return true;
             }
-            else {
-                alert("signup failed");
-                return false;
-            }
-        } catch (error) {
-            alert("signup failed");
-            return false;
+            else
+                alert("Wrong Id or Password!");
         }
     };
 };
