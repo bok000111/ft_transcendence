@@ -1,9 +1,8 @@
 import PageShifter from "./PageShifter.js";
+import Component from "./Component.js";
 
-export default class Page {
-    $elem;
-    constructor(elem, pageName) {
-        this.$elem = elem;
+export default class Page extends Component {
+    setup() {
         PageShifter.mount(pageName, this.$elem, this.init.bind(this), this.fini.bind(this));
     }
     shift(nextPage) {
