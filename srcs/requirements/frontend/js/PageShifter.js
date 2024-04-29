@@ -6,7 +6,7 @@
 
 export default class PageShifter {
     static #pages = {};
-    static #$current_page;
+    static $current_page; // !??!
 
     static mount(pageName, elem, initFunc, finiFunc) {
         this.#pages[pageName] = {
@@ -15,7 +15,7 @@ export default class PageShifter {
             fini: finiFunc,
         };
         if (pageName === "login_page") {
-            this.#$current_page = this.#pages[pageName];
+            this.$current_page = this.#pages[pageName];
         }
     }
 
@@ -25,9 +25,9 @@ export default class PageShifter {
      */
     static shift(nextPage) {
         this.#pages[nextPage].init();
-        this.#$current_page.$elem.classList.add("none");
+        this.$current_page.$elem.classList.add("none");
         this.#pages[nextPage].$elem.classList.remove("none");
-        this.#$current_page.fini();
-        this.#$current_page = this.#pages[nextPage];
+        this.$current_page.fini();
+        this.$current_page = this.#pages[nextPage];
     }
 };

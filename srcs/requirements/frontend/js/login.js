@@ -1,4 +1,4 @@
-import PageShifter from "./PageShifter.js";
+import Page from "./Page.js";
 
 const $login = document.querySelector(".login-class");
 const $signupBtn = document.querySelector("button");
@@ -9,6 +9,19 @@ $signupBtn.addEventListener("click", () => {
     $signupBtn.classList.add("none");
     $signup.classList.remove("none");
 });
+
+class Login extends Page {
+    $loginForm;
+    $signupForm;
+    $signupBtn;
+
+    constructor(elem, pageName) {
+        super(elem, pageName);
+        this.$loginForm = this.$elem.querySelector(".login form");
+        this.$signupForm = this.$elem.querySelector(".signup form");
+        this.$signupBtn = this.$elem.querySelector(".signup button");
+    }
+};
 
 class Login {
     $loginForm;
