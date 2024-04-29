@@ -1,3 +1,5 @@
+import PageShifter from "./PageShifter.js";
+
 const $login = document.querySelector(".login-class");
 const $signupBtn = document.querySelector("button");
 const $signup = document.querySelector(".signup");
@@ -41,7 +43,7 @@ class Login {
         });
 
         if (!response.ok) {
-            alert("`HTTP Error : ${response.status}`");
+            alert(`HTTP Error : ${response.status}`);
         }
         else {
             const res = await response.json();
@@ -89,7 +91,7 @@ class Signup {
         });
 
         if (!response.ok) {
-            alert("`HTTP Error : ${response.status}`");
+            alert(`HTTP Error : ${response.status}`);
         }
         else {
             const res = await response.json();
@@ -102,6 +104,3 @@ class Signup {
         }
     };
 };
-
-const login = new Login($login);
-const signup = new Signup($signup);

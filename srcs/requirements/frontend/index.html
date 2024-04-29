@@ -10,25 +10,54 @@
 </head>
 
 <body>
-    <h1>Pong</h1>
-    <form class="login-class">
-        <input type="text" placeholder="email">
-        <input type="text" placeholder="password">
-        <input type="submit" value="Login">
-    </form>
-    <button>Signup</button>
-    <form class="signup none">
-        <input type="text" placeholder="email">
-        <input type="text" placeholder="password">
-        <input type="text" placeholder="username">
-        <input type="submit" value="signup">
-    </form>
-    <div class="main none">
+    <!-- 타이틀 -->
+    <div class="title">
+        <h1>Pong</h1>
+    </div>
+
+    <!-- 로그인 페이지 -->
+    <div class="login-page">
+        <div class="login">
+            <form>
+                <input type="text" placeholder="email">
+                <input type="text" placeholder="password">
+                <input type="submit" value="login">
+            </form>
+        </div>
+        <div class="signup none">
+            <button>signup</button>
+            <form>
+                <input type="text" placeholder="email">
+                <input type="text" placeholder="password">
+                <input type="text" placeholder="username">
+                <input type="submit" value="signup">
+            </form>
+        </div>
+    </div>
+
+    <!-- 메인 페이지 -->
+    <div class="main-page none">
         <button>토너먼트 개최</button>
         <button>토너먼트 결과</button>
         <button>게임 시작</button>
     </div>
-    <script src="src/login.js" type="module"></script>
+
+    <!-- 토너먼트 대기방 페이지 -->
+    <div class="tour-room-page none">
+
+    </div>
+
+    <!-- 토너먼트 결과 페이지 -->
+    <div class="tour-result-page none">
+
+    </div>
+
+    <!-- 퐁 게임 페이지 -->
+    <div class="game-page none">
+
+    </div>
+
+    <script src="js/login.js" type="module"></script>
 </body>
 
 </html>

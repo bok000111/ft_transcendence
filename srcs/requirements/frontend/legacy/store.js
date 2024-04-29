@@ -1,5 +1,5 @@
-import { observe, observer } from "../core/Observer.js";
-import { Store } from "../core/Store.js";
+import { observe, observer } from "./core/Observer.js";
+import { Store } from "./core/Store.js";
 
 const store = new Store({
     state: new observer({
