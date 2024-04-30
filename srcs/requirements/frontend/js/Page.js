@@ -2,7 +2,10 @@ import PageShifter from "./PageShifter.js";
 import Component from "./Component.js";
 
 export default class Page extends Component {
-    setup() {
+    /**
+     * 자식 클래스 setup() 메소드에서  mount() 함수를 호출해야 한다.
+     */
+    mount(pageName) {
         PageShifter.mount(pageName, this.$elem, this.init.bind(this), this.fini.bind(this));
     }
     shift(nextPage) {
