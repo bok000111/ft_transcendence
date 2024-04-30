@@ -23,7 +23,7 @@ class MainPage extends Page {
             this.shift("tour_room_page");
         });
         this.$tournamentResultBtn.addEventListener("click", () => {
-            this.shift("tourn_result_page");
+            this.shift("tour_result_page");
         });
         this.$matchmakingBtn.addEventListener("click", () => {
             this.shift("match_making_page");
