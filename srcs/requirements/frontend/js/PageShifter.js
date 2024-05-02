@@ -24,8 +24,8 @@ export default class PageShifter {
      * 내부 함수호출 순서는 나름대로 렌더링 순서를 고려해서 짜긴 했음..
      */
     static shift(nextPage) {
-        this.#pages[nextPage].init();
         this.$current_page.$elem.classList.add("none");
+        this.#pages[nextPage].init();
         this.#pages[nextPage].$elem.classList.remove("none");
         this.$current_page.fini();
         this.$current_page = this.#pages[nextPage];
