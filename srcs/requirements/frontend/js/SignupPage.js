@@ -1,4 +1,5 @@
 import Page from "./Page.js";
+import signupInfo from "./signupInfo.js";
 
 class SignupPage extends Page {
     $form;
@@ -14,48 +15,31 @@ class SignupPage extends Page {
         this.$button.addEventListener("click", () => {
             this.shift("login_page");
         });
-        this.$form.addEventListener("submit", (event) => {
+        this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
             this.postSignupInfo({
-                email: this.$form.querySelector("[placeholder=email]").value,
-                password: this.$form.querySelector("[placeholder=password]").value,
-                username: this.$form.querySelector("[placeholder=username]").value,
+                email: this.$form.querySelector("#email").value,
+                password: this.$form.querySelector("#password").value,
+                username: this.$form.querySelector("#username").value,
             });
-        });
-    }
-
-    postSignupInfo = async (data) => {
-        const response = await fetch("http://localhost:8000/api/signup/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-            credentials: "include",
-        });
-
-        if (!response.ok) {
-            alert(`HTTP Error : ${response.status}`);
-        }
-        else {
-            const res = await response.json();
-            if (res.success)
+            // pseudo code
+            try {
+                await signupInfo.requestAPI();
                 this.shift("login_page");
-            else
-                alert("input is wrong!");
-        }
+            }
+            catch (e) {
+                alert(`Signup : ${e.message}`);
+            }
+        });
     }
-
+    
     init() {
 
     }
 
     fini() {
-        this.$form.querySelector("[placeholder=email]").value = "";
-        this.$form.querySelector("[placeholder=password]").value = "";
-        this.$form.querySelector("[placeholder=username]").value = "";
+        this.$form.querySelector("#email").value = "";
+        this.$form.querySelector("#password").value = "";
+        this.$form.querySelector("#username").value = "";
     }
 };

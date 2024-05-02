@@ -1,13 +1,5 @@
 import Page from "./Page.js";
-
-/**
- * 성공 시 어떤 정보를 수신하고 저장해야 하는지에 대한 논의 필요.
- * Login 클래스가 그 정보를 저장하는 역할을 한다.
- * 정보를 저장하는 클래스는 Component와 별개로 동작.
- */
-class Login {
-    #username;
-};
+import loginInfo from "./LoginInfo.js";
 
 class LoginPage extends Page {
     $form;
@@ -23,40 +15,21 @@ class LoginPage extends Page {
         this.$button.addEventListener("click", () => {
             this.shift("signup_page");
         });
-        this.$form.addEventListener("submit", (event) => {
+        this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            this.postLoginInfo({
-                email: this.$form.querySelector("[placeholder=email]").value,
-                password: this.$form.querySelector("[placeholder=password]").value,
+            this.postSignupInfo({
+                email: this.$form.querySelector("#email").value,
+                password: this.$form.querySelector("#password").value,
             });
-        });
-    }
-
-    postLoginInfo = async (data) => {
-        const response = await fetch("http://localhost:8000/api/login/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-            credentials: "include",
-        });
-
-        if (!response.ok) {
-            alert(`HTTP Error : ${response.status}`);
-        }
-        else {
-            const res = await response.json();
-            if (res.success) {
-                this.inputId = res.data.username; // 수정 필요.
+            // pseudo code
+            try {
+                await loginInfo.requestAPI();
                 this.shift("main_page");
             }
-            else
-                alert("Wrong Id or Password!");
-        }
+            catch (e) {
+                alert(`Login : ${e.message}`);
+            }
+        });
     }
 
     init() {
@@ -64,7 +37,7 @@ class LoginPage extends Page {
     }
 
     fini() {
-        this.$form.querySelector("[placeholder=email]").value = "";
-        this.$form.querySelector("[placeholder=password]").value = "";
+        this.$form.querySelector("#email").value = "";
+        this.$form.querySelector("#password").value = "";
     }
 };
