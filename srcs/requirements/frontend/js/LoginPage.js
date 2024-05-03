@@ -17,13 +17,11 @@ class LoginPage extends Page {
         });
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            this.postSignupInfo({
-                email: this.$form.querySelector("#email").value,
-                password: this.$form.querySelector("#password").value,
-            });
-            // pseudo code
             try {
-                await loginInfo.requestAPI();
+                await loginInfo.requestAPI({
+                    email: this.$form.querySelector("#email").value,
+                    password: this.$form.querySelector("#password").value,
+                });
                 this.shift("main_page");
             }
             catch (e) {
