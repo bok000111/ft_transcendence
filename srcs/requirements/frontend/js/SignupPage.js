@@ -18,15 +18,16 @@ class SignupPage extends Page {
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
             try {
-                await signupInfo.requestAPI({
+                signupInfo.sendData = {
                     email: this.$form.querySelector("#email").value,
                     password: this.$form.querySelector("#password").value,
                     username: this.$form.querySelector("#username").value,
-                });
+                };
+                await signupInfo.requestAPI();
                 this.shift("login_page");
             }
             catch (e) {
-                alert(`Signup : ${e.message}`);
+                alert(`Signup: ${e.message}`);
             }
         });
     }

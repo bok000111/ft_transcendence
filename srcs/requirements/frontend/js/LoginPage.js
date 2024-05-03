@@ -18,14 +18,15 @@ class LoginPage extends Page {
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
             try {
-                await loginInfo.requestAPI({
+                loginInfo.sendData = {
                     email: this.$form.querySelector("#email").value,
                     password: this.$form.querySelector("#password").value,
-                });
+                };
+                await loginInfo.requestAPI();
                 this.shift("main_page");
             }
             catch (e) {
-                alert(`Login : ${e.message}`);
+                alert(`Login: ${e.message}`);
             }
         });
     }

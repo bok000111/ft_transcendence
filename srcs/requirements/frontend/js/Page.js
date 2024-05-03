@@ -12,6 +12,10 @@ export default class Page extends Component {
     shift(nextPage) {
         PageShifter.shift(nextPage);
     }
+    startInterval(callback, time) {
+        callback();
+        setInterval(callback, time);
+    }
     init() {}
     fini() {}
 };
