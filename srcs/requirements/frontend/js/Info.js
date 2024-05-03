@@ -1,4 +1,4 @@
-export default class Info {
+class Info {
     data = {};
     // API 전송 / 수신하는 함수
     requestAPI;
@@ -7,6 +7,55 @@ export default class Info {
         this.requestAPI = requestAPI.bind(this);
     }
 };
+
+export const loginInfo = new Info(
+    async (obj, data) => {
+        const response = await fetch("http://localhost:8000/api/login/", {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+            credentials: "include",
+        });
+        if (!response.ok)
+            throw new Error("HTTP Error");
+        obj.data = await response.json();
+        if (!response.success)
+            throw new Error("Input Error");
+        else
+            return obj.data;
+    }
+);
+
+export const signupInfo = new Info(
+    async (obj, data) => {
+        const response = await fetch("http://localhost:8000/api/signup/", {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+            credentials: "include",
+        });
+        if (!response.ok)
+            throw new Error("HTTP Error");
+        obj.data = await response.json();
+        if (!response.success)
+            throw new Error("Input Error");
+        else
+            return obj.data;
+    }
+);
+
+export const tourListInfo = new Info();
+export const tourRoomInfo = new Info();
 
 /**
  * 아마 위 클래스를 상속받아서 사용할 듯.

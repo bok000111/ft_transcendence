@@ -1,5 +1,5 @@
 import Page from "./Page.js";
-import loginInfo from "./LoginInfo.js";
+import { loginInfo } from "./Info.js";
 
 class LoginPage extends Page {
     $form;
