@@ -31,7 +31,7 @@ class TourListPage extends Page{
                  * 그래야 TourRoomPage에서 init() 해 줄 때 바뀐 roomNum을 기반으로
                  * API 요청 후 room에 대한 정보를 가져올 수 있다.
                  */
-                tourRoomInfo.sendData.roomNum = elem.roonNum;
+                tourRoomInfo.sendData.roomNum = elem.roonNum; // 이렇게 써도 되나? 아직도 클로저 잘 모르겠음..
                 this.shift("tour_room_page");
             });
             ul.appendChild(newNode);
