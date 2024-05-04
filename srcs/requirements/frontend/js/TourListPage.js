@@ -43,7 +43,7 @@ class TourListPage extends Page{
         this.startInterval(async () => {
             try {
                 await tourListInfo.requestAPI();
-                this.renderList(tourListInfo.data);
+                this.renderList(tourListInfo.recvData);
             }
             catch (e) {
                 alert(`Tournament List: ${e.message}`);
