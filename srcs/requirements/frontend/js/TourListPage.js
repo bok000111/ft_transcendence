@@ -1,15 +1,17 @@
 import Page from "./Page.js";
 import { tourListInfo, tourRoomInfo } from "./Info.js";
 
-class TourListPage extends Page{
+class TourListPage extends Page {
+    $to_main;
     interval;
 
     setup() {
-        this.mount("tour_room_page");
+        this.mount("tour_list_page");
+        this.$to_main = this.$elem.querySelector("#to-main");
     }
 
     setEvent() {
-        this.$elem.querySelector("button").addEventListener("click", () => {
+        this.$to_main.addEventListener("click", () => {
             this.shift("main_page");
         });
     }
@@ -31,8 +33,8 @@ class TourListPage extends Page{
                  * 그래야 TourRoomPage에서 init() 해 줄 때 바뀐 roomNum을 기반으로
                  * API 요청 후 room에 대한 정보를 가져올 수 있다.
                  */
-                tourRoomInfo.sendData.roomNum = elem.roonNum; // 이렇게 써도 되나? 아직도 클로저 잘 모르겠음..
-                this.shift("tour_room_page");
+                tourRoomInfo.sendData.roomNum = elem.roomNum; // 이렇게 써도 되나? 아직도 클로저 잘 모르겠음..
+                this.shift("tour_entry_page");
             });
             ul.appendChild(newNode);
         }
@@ -48,7 +50,7 @@ class TourListPage extends Page{
             catch (e) {
                 alert(`Tournament List: ${e.message}`);
             }
-        }, 3000);
+        }, 3000, this.interval);
     }
 
     fini() {
