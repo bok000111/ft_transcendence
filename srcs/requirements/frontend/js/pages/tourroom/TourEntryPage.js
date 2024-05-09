@@ -1,4 +1,4 @@
-import Page from "./Page.js";
+import Page from "../Page.js";
 
 class TourEntryPage extends Page {
     $to_main;

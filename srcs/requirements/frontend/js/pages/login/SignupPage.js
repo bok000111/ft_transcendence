@@ -1,36 +1,37 @@
-import Page from "./Page.js";
-import { loginInfo } from "./Info.js";
+import Page from "../Page.js";
+import { signupInfo } from "../../models/Info.js";
 
-class LoginPage extends Page {
+class SignupPage extends Page {
     $form;
     $button;
 
     setup() {
-        this.mount("login_page");
+        this.mount("signup_page");
         this.$form = this.$elem.querySelector("form");
         this.$button = this.$elem.querySelector("button");
     }
 
     setEvent() {
         this.$button.addEventListener("click", () => {
-            this.shift("signup_page");
+            this.shift("login_page");
         });
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            loginInfo.sendData = {
+            signupInfo.sendData = {
                 email: this.$form.querySelector("#email").value,
                 password: this.$form.querySelector("#password").value,
+                username: this.$form.querySelector("#username").value,
             };
             try {
-                await loginInfo.requestAPI();
-                this.shift("main_page");
+                await signupInfo.requestAPI();
+                this.shift("login_page");
             }
             catch (e) {
-                alert(`Login: ${e.message}`);
+                alert(`Signup: ${e.message}`);
             }
         });
     }
-
+    
     init() {
 
     }
@@ -38,5 +39,6 @@ class LoginPage extends Page {
     fini() {
         this.$form.querySelector("#email").value = "";
         this.$form.querySelector("#password").value = "";
+        this.$form.querySelector("#username").value = "";
     }
 };

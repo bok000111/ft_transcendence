@@ -1,37 +1,36 @@
-import Page from "./Page.js";
-import { signupInfo } from "./Info.js";
+import Page from "../Page.js";
+import { loginInfo } from "../../models/Info.js";
 
-class SignupPage extends Page {
+class LoginPage extends Page {
     $form;
     $button;
 
     setup() {
-        this.mount("signup_page");
+        this.mount("login_page");
         this.$form = this.$elem.querySelector("form");
         this.$button = this.$elem.querySelector("button");
     }
 
     setEvent() {
         this.$button.addEventListener("click", () => {
-            this.shift("login_page");
+            this.shift("signup_page");
         });
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            signupInfo.sendData = {
+            loginInfo.sendData = {
                 email: this.$form.querySelector("#email").value,
                 password: this.$form.querySelector("#password").value,
-                username: this.$form.querySelector("#username").value,
             };
             try {
-                await signupInfo.requestAPI();
-                this.shift("login_page");
+                await loginInfo.requestAPI();
+                this.shift("main_page");
             }
             catch (e) {
-                alert(`Signup: ${e.message}`);
+                alert(`Login: ${e.message}`);
             }
         });
     }
-    
+
     init() {
 
     }
@@ -39,6 +38,10 @@ class SignupPage extends Page {
     fini() {
         this.$form.querySelector("#email").value = "";
         this.$form.querySelector("#password").value = "";
-        this.$form.querySelector("#username").value = "";
     }
 };
+
+// import { page_shifter } from "s;;;"
+// const loginPage = new LoginPage(page_shifter, "login_page");
+
+// const loginPage = new LoginPage(login_shifter, "login_sub_page");

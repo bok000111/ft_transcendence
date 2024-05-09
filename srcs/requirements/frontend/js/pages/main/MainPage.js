@@ -1,5 +1,4 @@
-import Page from "./Page.js";
-import Component from "./Component.js";
+import Page from "../Page.js";
 
 class MainPage extends Page {
     $logoutBtn;

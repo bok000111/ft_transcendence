@@ -1,5 +1,5 @@
-import Page from "./Page.js";
-import { tourListInfo, tourRoomInfo } from "./Info.js";
+import Page from "../Page.js";
+import { tourListInfo, tourRoomInfo } from "../../models/Info.js";
 
 class TourListPage extends Page {
     $to_main;
