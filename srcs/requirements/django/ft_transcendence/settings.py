@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from corsheaders.defaults import default_methods, default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,18 +31,51 @@ SECRET_KEY = "django-insecure-bhb3@-^i==hy=0@6-i+(i%*#^m9u&r^cus@1s6ih-g88t+eq%c
 DEBUG = True
 
 # TODO: 나중에 환경변수로 변경
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:5500",
+    "http://localhost:8000",
+    "http://localhost:8080",
+]
+CSRF_COOKIE_SECURE = False  # 개발시에는 False로 설정
+CSRF_COOKIE_SAMESITE = "None"  # 개발시에는 "None"으로 설정
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost",
+    "http://localhost:3000",
+    "http://localhost:5500",
+    "http://localhost:8000",
+    "http://localhost:8080",
+]
+
+CORS_ALLOW_METHODS = [
+    *default_methods,
+]
+
+CORS_ALLOW_HEADERS = (
+    *default_headers,
+    "access-control-allow-origin",
+    "origin",
+)
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",  # daphne - ASGI 서버
+    "corsheaders",  # cors - cross-origin resource sharing
     "ft_transcendence",  # 프로젝트 설정
     "api",  # api 라우팅
     "ws",  # websocket 라우팅
     "user",  # 유저 관리
     "pong",  # 게임 관리
-    "daphne",  # daphne - ASGI 서버
+    "lobby",  # 로비 관리
     "channels",  # channels - websocket
     "django.contrib.admin",
     "django.contrib.auth",
@@ -52,16 +86,18 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
+    # "django.middleware.csrf.CsrfViewMiddleware", - 임시로 CSRF 보안 비활성화
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = "ft_transcendence.urls"
+CHANNEL_URLCONF = "ft_transcendence.routing"
 
 TEMPLATES = [
     {
@@ -122,6 +158,9 @@ AUTH_USER_MODEL = "user.User"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
+SESSION_COOKIE_SAMESITE = "None"  # 개발시에는 "None"으로 설정
+SESSION_COOKIE_SECURE = False  # 개발시에는 False로 설정
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -148,3 +187,13 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
+CHANNEL_LAYERS = {
+    "default": {
+        # "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+        },
+    },
+}
