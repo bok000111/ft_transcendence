@@ -74,7 +74,7 @@ INSTALLED_APPS = [
     "api",  # api 라우팅
     "ws",  # websocket 라우팅
     "user",  # 유저 관리
-    "pong",  # 게임 관리
+    # "pong",  # 게임 관리
     "lobby",  # 로비 관리
     "channels",  # channels - websocket
     "django.contrib.admin",
