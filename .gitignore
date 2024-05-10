@@ -1,3 +1,5 @@
 srcs/requirements/django/*/__pycache__
 srcs/requirements/django/*/migrations/*
 !srcs/requirements/django/*/migrations/__init__.py
+srcs/requirements/.env
+srcs/.env
