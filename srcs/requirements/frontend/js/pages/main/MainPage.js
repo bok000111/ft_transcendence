@@ -1,4 +1,6 @@
 import Page from "../Page.js";
+import { PageShifter, page_shifter } from "../../shifters/PageShifter.js"
+import { main_shifter } from "../../shifters/SubpageShifter.js";
 
 class MainPage extends Page {
     $logoutBtn;
@@ -29,3 +31,7 @@ class MainPage extends Page {
         });
     }
 }
+
+let mainPage = new MainPage(page_shifter, "main_page");
+
+mainPage = new MainPage(main_shifter, "main_sub_page");

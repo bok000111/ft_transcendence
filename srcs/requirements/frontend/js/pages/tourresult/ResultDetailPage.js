@@ -1,7 +1,9 @@
 import Page from "../Page.js"
 import { resultDetailInfo } from "../../models/Info.js"
+import { PageShifter } from "../../shifters/PageShifter.js";
+import { tour_res_shifter } from "../../shifters/SubpageShifter.js";
 
-class resultDetail extends Page {
+class resultDetailPage extends Page {
     $detailList;
     $homeBtn;
 
@@ -28,3 +30,5 @@ class resultDetail extends Page {
         this.detailList.innerHTML = ``;
     }
 }
+
+resultDetailPage = TourResultPage(tour_res_shifter, "res_detail_sub_page");

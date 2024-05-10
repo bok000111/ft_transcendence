@@ -4,7 +4,7 @@
  * 페이지가 바뀔 때 마다 등록되어 있는 함수들이 같이 호출된다.
  */
 
-class PageShifter {
+export class PageShifter {
     pages = {};
     initPage;
     $currentPage; // !??!
