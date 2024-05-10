@@ -3,7 +3,8 @@ NAME = ft_transcendence
 COMPOSE_FILE = ./srcs/docker-compose.yml
 DB_DIR = /goinfre/$(USER)/postgres_data
 REQUIREMENTS = ./srcs/requirements.txt
-MANAGE_PY = ./srcs/manage.py
+MANAGE_PY = ./srcs/requirements/django/manage.py
+TESTS = ./srcs/requirements/django
 
 all: $(NAME)
 
@@ -28,9 +29,19 @@ mkdir:
 	sudo mkdir -p $(DB_DIR)
 
 req:
-	pip install -r $(REQUIREMENTS) --user -q
+	pip install -r $(REQUIREMENTS) --user -q --no-cache-dir
 
 freeze:
 	pip freeze > $(REQUIREMENTS)
 
-.PHONY: all clean fclean re mkdir venv
+dev: mkdir
+	docker compose -f $(COMPOSE_FILE) up --build -d --scale redis=0
+
+dbc:
+	docker exec -it postgres psql -U postgres -c "DROP DATABASE ft_transcendence;"
+	docker exec -it postgres psql -U postgres -c "CREATE DATABASE ft_transcendence;"
+
+test:
+	$(MANAGE_PY) test $(TESTS) --parallel
+
+.PHONY: all clean fclean re mkdir req freeze dev dbc test
