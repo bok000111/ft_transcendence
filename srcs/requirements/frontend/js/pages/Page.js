@@ -4,11 +4,9 @@ import Component from "../models/Component.js";
 
 export default class Page extends Component {
     pageShifter;
-    /**
-     * 자식 클래스 setup() 메소드에서  mount() 함수를 호출해야 한다.
-     * ex) this.mount("login_page");
-     */
-    constructor(pageShifter, pageName) {
+
+    constructor(elem, pageShifter, pageName) {
+        super(elem);
         this.pageShifter = pageShifter;
         this.pageShifter.mount(pageName, this.$elem, this.init.bind(this), this.fini.bind(this));
     }

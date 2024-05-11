@@ -1,6 +1,60 @@
 import Page from "../Page.js";
 import { tourListInfo, tourRoomInfo } from "../../models/Info.js";
 
+class TourRoomPage extends Page {
+    $mainBtn;
+    subPage;
+
+    setup() {
+        this.$mainBtn = this.$elem.querySelector("#to-main");
+    }
+    setEvent() {
+        this.$mainBtn.addEventListener("click", () => {
+            this.pageShifter.shift("main_page");
+        });
+    }
+    shift(nextPage) {
+
+    }
+    init() {
+        this.subPage.init();
+    }
+    fini() {
+        this.subPage.fini();
+        this.subPage = defaultSubPage;
+    }
+}
+
+class TourListSubpage {
+    parent;
+
+    subShift(nextPage) {
+        this.fini();
+        nextPage.init();
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class TourListPage extends Page {
     $to_main;
     interval;
@@ -54,7 +108,7 @@ class TourListPage extends Page {
     }
 
     fini() {
-        clearInterval(interval);
+        clearInterval(this.interval);
         this.$elem.lastChild.remove();
     }
 };
