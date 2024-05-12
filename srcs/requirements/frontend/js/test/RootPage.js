@@ -1,45 +1,48 @@
 //ex) tournament room page
 export default class RootPage extends Component {
     parent; // object
-    initSubpageName; // string
-    curSubpage; // object
-    subpage = {};
+    initChildName; // string
+    curChild; // object
+    child = {};
 
-    constructor(elem, parent, initSubpageName, pageName, eventInfo) {
+    constructor(elem, parent, initChildName, selfName) {
         super(elem);
-        this.initSubpageName = initSubpageName;
+        this.initChildName = initChildName;
         if (parent)
-            parent.mount(pageName, this.init.bind(this), this.fini.bind(this), eventInfo);
+            parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
     }
 
-    mount(subpageName, initFunc, finiFunc, eventInfo) {
-        this.subpage[subpageName] = {
+    mount(childName, initFunc, finiFunc) {
+        this.child[childName] = {
             init: initFunc,
             fini: finiFunc,
         }
-        if (eventInfo) {
-            eventInfo.forEach(({ $elem, event, handler }) => {
-                $elem.addEventListener(event, handler);
-            });
-        }
-        if (subpageName === this.initSubpageName)
-            this.curSubpage = this.subpage[subpageName];
+        if (childName === this.initChildName)
+            this.curChild = this.child[childName];
     }
 
-    shift(nextSubpage) {
-        this.curSubpage.$elem.classList.add("none");
-        this.curSubpage.fini();
-        this.curSubpage = this.subpage[nextSubpage];
-        this.curSubpage.init();
-        this.curSubpage.$elem.classList.remove("none");
-    }
+    requestShift(nextChild) {}
 
+    childShift(nextChild) {
+        this.curChild.$elem.classList.add("none");
+        this.curChild.fini();
+        this.curChild = this.child[nextChild];
+        this.curChild.init();
+        this.curChild.$elem.classList.remove("none");
+    }
+    
     init() {
-        this.initSubpageName.init();
+        this.child[initChildName].init();
     }
-    fini() {
-        this.shift(initSubpageName);
-    }
+
+    fini() {}
 };
 
-export const rootPage = new RootPage(document.body, null, "admin", null);
+// we should call rootPage.init(); in main.js
+export const rootPage = new RootPage(document.body, null, "auth_page", "root");
+
+// rootPage 초기화
+// page 초기화
+// subPage 초기화
+// rootpage에 page mount
+// 각 페이지에 gak subpage mount

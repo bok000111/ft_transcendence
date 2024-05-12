@@ -3,9 +3,9 @@ export default class Component {
 
     constructor(elem) {
         this.$elem = elem;
-        this.setup();
+        // this.setup();
         this.setEvent();
     }
-    setup() {}
+    // setup() {}
     setEvent() {}
 };
