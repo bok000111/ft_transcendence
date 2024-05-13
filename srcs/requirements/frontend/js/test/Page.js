@@ -1,4 +1,4 @@
-import { RootPage, rootPage } from "./RootPage.js";
+import RootPage from "./RootPage.js";
 
 export default class Page extends RootPage {
     requestShift(nextChild) {
