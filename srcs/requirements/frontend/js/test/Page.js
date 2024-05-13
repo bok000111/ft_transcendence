@@ -6,9 +6,14 @@ export default class Page extends RootPage {
     }
 
     childShift(nextChild) {
-        this.curChild.fini();
-        this.curChild = this.child[nextChild];
-        this.curChild.init();
+        if (nextChild.endsWith("_page")) {
+            this.requestShift(nextChild);
+        }
+        else {
+            this.curChild.fini();
+            this.curChild = this.child[nextChild];
+            this.curChild.init();
+        }
     }
 
     fini() {
