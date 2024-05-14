@@ -1,5 +1,4 @@
-import Component from "../../models/Component.js"
-import { RootPage, rootPage } from "../RootPage.js"
+import { rootPage } from "../RootPage.js"
 import Page from "../Page.js"
 
 // 추가로 다른 "페이지" 추가해야함. (for shift)
@@ -10,17 +9,12 @@ export default class MainPage extends Page {
     $tournamentResultBtn;
     $matchmakingBtn;
 
-    constructor(elem, parent, initChildName, selfName) {
+    constructor(elem, parent, selfName) {
         super(elem);
-        this.initChildName = initChildName;
+        this.setEvent();
         if (parent)
             parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
-        this.setEvent();
     }
-
-    mount(childName, initFunc, finiFunc) {} // MainPage has no child.
-
-    childShift(nextChild) {} // MainPage has no child.
 
     init() {} // no need to init
 
@@ -42,6 +36,5 @@ export default class MainPage extends Page {
 export const mainPage = new MainPage(
     rootPage.$elem.querySelector("main-page"),
     rootPage,
-    null,
     "main_page",
 );
