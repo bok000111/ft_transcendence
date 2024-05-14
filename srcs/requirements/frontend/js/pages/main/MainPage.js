@@ -1,6 +1,7 @@
-import Page from "../Page.js";
-import { PageShifter, page_shifter } from "../../shifters/PageShifter.js"
-import { main_shifter } from "../../shifters/SubpageShifter.js";
+import { rootPage } from "../RootPage.js"
+import Page from "../Page.js"
+
+// 추가로 다른 "페이지" 추가해야함. (for shift)
 
 class MainPage extends Page {
     $logoutBtn;
@@ -8,30 +9,31 @@ class MainPage extends Page {
     $tournamentResultBtn;
     $matchmakingBtn;
 
-    setup() {
-        this.mount("main_page");
-        this.$logoutBtn = this.$elem.querySelector("#logout");
-        this.$participateBtn = this.$elem.querySelector("#participate");
-        this.$tournamentResultBtn = this.$elem.querySelector("#tournamentResult");
-        this.$matchmakingBtn = this.$elem.querySelector("#matchmaking");
+    constructor(elem, parent, selfName) {
+        super(elem);
+        if (parent)
+            parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
     }
 
+    init() {} // no need to init
+
+    fini() {} // no need to deinit
+
     setEvent() {
-        this.$logoutBtn.addEventListener("click", () => {
-            this.shift("login_page");
-        });
-        this.$participateBtn.addEventListener("click", () => {
-            this.shift("tour_room_page");
-        });
-        this.$tournamentResultBtn.addEventListener("click", () => {
-            this.shift("tour_result_page");
-        });
-        this.$matchmakingBtn.addEventListener("click", () => {
-            this.shift("match_making_page");
-        });
+        this.$logoutBtn = document.querySelector("#logout");
+        this.$participateBtn = document.querySelector("#participate");
+        this.$tournamentResultBtn = document.querySelector("#tournamentResult");
+        this.$matchmakingBtn = document.querySelector("#matchmaking");
+
+        this.$logoutBtn.addEventListener("click", ); // logoutAPI sending func should be added
+        this.$participateBtn.addEventListener("click", this.requestShift("tour_room_page")); // 나중에 인자 이름 체킹 필요
+        this.$tournamentResultBtn.addEventListener("click", this.requestShift("tour_result_page")); // 나중에 인자 이름 체킹 필요
+        this.$matchmakingBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요
     }
 }
 
-let mainPage = new MainPage(page_shifter, "main_page");
-
-mainPage = new MainPage(main_shifter, "main_sub_page");
+export const mainPage = new MainPage(
+    rootPage.$elem.querySelector(".main-page"),
+    rootPage,
+    "main_page",
+);

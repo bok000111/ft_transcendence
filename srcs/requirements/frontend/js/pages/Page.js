@@ -1,22 +1,22 @@
-import { PageShifter } from "../shifters/PageShifter.js";
-import { SubpageShifter } from "../shifters/SubpageShifter.js";
-import Component from "../models/Component.js";
+import RootPage from "./RootPage.js";
 
-export default class Page extends Component {
-    pageShifter;
+export default class Page extends RootPage {
+    requestShift(nextChildName) {
+        this.parent.childShift(nextChildName);
+    }
 
-    constructor(elem, pageShifter, pageName) {
-        super(elem);
-        this.pageShifter = pageShifter;
-        this.pageShifter.mount(pageName, this.$elem, this.init.bind(this), this.fini.bind(this));
+    childShift(nextChildName) {
+        if (nextChildName.endsWith("_page")) {
+            this.requestShift(nextChildName);
+        }
+        else {
+            this.curChild.fini();
+            this.curChild = this.child[nextChildName];
+            this.curChild.init();
+        }
     }
-    shift(nextPage) {
-        this.pageShifter.shift(nextPage);
+
+    fini() {
+        this.childShift(initChildName);
     }
-    startInterval(callback, time, interval) {
-        callback();
-        interval = setInterval(callback, time);
-    }
-    init() {}
-    fini() {}
 };
