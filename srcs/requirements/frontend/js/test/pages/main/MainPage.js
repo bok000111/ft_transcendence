@@ -3,7 +3,7 @@ import Page from "../Page.js"
 
 // 추가로 다른 "페이지" 추가해야함. (for shift)
 
-export default class MainPage extends Page {
+class MainPage extends Page {
     $logoutBtn;
     $participateBtn;
     $tournamentResultBtn;
@@ -11,7 +11,6 @@ export default class MainPage extends Page {
 
     constructor(elem, parent, selfName) {
         super(elem);
-        this.setEvent();
         if (parent)
             parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
     }
@@ -27,14 +26,14 @@ export default class MainPage extends Page {
         this.$matchmakingBtn = document.querySelector("#matchmaking");
 
         this.$logoutBtn.addEventListener("click", ); // logoutAPI sending func should be added
-        this.$participateBtn.addEventListener("click", requestShift(tourRoom)); // 나중에 인자 이름 체킹 필요
-        this.$tournamentResultBtn.addEventListener("click", requestShift(tourResult)); // 나중에 인자 이름 체킹 필요
-        this.$matchmakingBtn.addEventListener("click", requestShift(matchMaking)); // 나중에 인자 이름 체킹 필요
+        this.$participateBtn.addEventListener("click", this.requestShift("tour_room_page")); // 나중에 인자 이름 체킹 필요
+        this.$tournamentResultBtn.addEventListener("click", this.requestShift("tour_result_page")); // 나중에 인자 이름 체킹 필요
+        this.$matchmakingBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요
     }
 }
 
 export const mainPage = new MainPage(
-    rootPage.$elem.querySelector("main-page"),
+    rootPage.$elem.querySelector(".main-page"),
     rootPage,
     "main_page",
 );
