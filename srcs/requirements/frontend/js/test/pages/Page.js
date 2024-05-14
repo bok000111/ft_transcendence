@@ -1,17 +1,17 @@
 import RootPage from "./RootPage.js";
 
 export default class Page extends RootPage {
-    requestShift(nextChild) {
-        this.parent.childShift(nextChild);
+    requestShift(nextChildName) {
+        this.parent.childShift(nextChildName);
     }
 
-    childShift(nextChild) {
-        if (nextChild.endsWith("_page")) {
-            this.requestShift(nextChild);
+    childShift(nextChildName) {
+        if (nextChildName.endsWith("_page")) {
+            this.requestShift(nextChildName);
         }
         else {
             this.curChild.fini();
-            this.curChild = this.child[nextChild];
+            this.curChild = this.child[nextChildName];
             this.curChild.init();
         }
     }

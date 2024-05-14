@@ -1,7 +1,7 @@
 import Page from "./Page.js";
 
 export default class SubPage extends Page {
-    childShift(nextChild) {}
+    childShift(nextChildName) {}
 
     mount(childName, initFunc, finiFunc) {}
 
