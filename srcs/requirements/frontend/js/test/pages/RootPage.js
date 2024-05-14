@@ -21,12 +21,12 @@ export default class RootPage extends Component {
             this.curChild = this.child[childName];
     }
 
-    requestShift(nextChild) {}
+    requestShift(nextChildName) {}
 
-    childShift(nextChild) {
+    childShift(nextChildName) {
         this.curChild.$elem.classList.add("none");
         this.curChild.fini();
-        this.curChild = this.child[nextChild];
+        this.curChild = this.child[nextChildName];
         this.curChild.init();
         this.curChild.$elem.classList.remove("none");
     }
