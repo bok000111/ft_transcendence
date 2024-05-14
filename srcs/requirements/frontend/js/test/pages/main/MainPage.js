@@ -32,14 +32,14 @@ export default class MainPage extends Page {
         this.$tournamentResultBtn = document.querySelector("#tournamentResult");
         this.$matchmakingBtn = document.querySelector("#matchmaking");
 
-        this.$logoutBtn.addEventListener("click", ); // logoutAPI sending
+        this.$logoutBtn.addEventListener("click", ); // logoutAPI sending func should be added
         this.$participateBtn.addEventListener("click", requestShift(tourRoom)); // 나중에 인자 이름 체킹 필요
         this.$tournamentResultBtn.addEventListener("click", requestShift(tourResult)); // 나중에 인자 이름 체킹 필요
         this.$matchmakingBtn.addEventListener("click", requestShift(matchMaking)); // 나중에 인자 이름 체킹 필요
     }
 }
 
-const mainPage = new MainPage(
+export const mainPage = new MainPage(
     rootPage.$elem.querySelector("main-page"),
     rootPage,
     null,
