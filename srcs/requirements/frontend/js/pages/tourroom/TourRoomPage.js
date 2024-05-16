@@ -1,5 +1,5 @@
-import Page from "./Page.js";
-import { rootPage } from "./RootPage.js";
+import Page from "../Page.js";
+import { rootPage } from "../RootPage.js";
 
 class TourRoomPage extends Page {
     $btn;

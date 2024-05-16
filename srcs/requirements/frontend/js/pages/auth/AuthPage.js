@@ -1,4 +1,4 @@
-import { rootPage } from "./RootPage.js";
+import { rootPage } from "../RootPage.js";
 
 const authPage = new Page(
     rootPage.$elem.querySelector(".auth-page"),

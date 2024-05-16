@@ -78,3 +78,10 @@ export const tourMakeInfo = new Info();
  * recvData = { success, failureMsg, roomID, roomName, players(자료구조 논의 필요) }
  */
 export const tourRoomInfo = new Info();
+
+/**
+ * 아직 미완성.
+ * sendData = { type: { one/two/three/four } }
+ * recvData = { ... }
+ */
+export const matchMakingInfo = new Info();
