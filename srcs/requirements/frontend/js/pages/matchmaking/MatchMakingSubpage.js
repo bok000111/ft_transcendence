@@ -1,4 +1,4 @@
-import Subpage from "../SubPage.js";
+import SubPage from "../SubPage.js";
 
 class MatchMakingSubpage extends SubPage {
     init() {
