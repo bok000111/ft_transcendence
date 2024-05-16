@@ -55,5 +55,26 @@ export const signupInfo = new Info(
     }
 );
 
+/**
+ * sendData = {}
+ * recvData = { success, failureMsg, roomID, roomName, curNum, maxNum }
+ */
 export const tourListInfo = new Info();
+
+/**
+ * sendData = { roomID, nickname }
+ * recvData = { success, failureMsg, roomID, nickname }
+ */
+export const tourEntryInfo = new Info();
+
+/**
+ * sendData = { roomName, nickname }
+ * recvData = { success, failureMsg, roomID, nickname }
+ */
+export const tourMakeInfo = new Info();
+
+/**
+ * sendData = { roomID, nickname }
+ * recvData = { success, failureMsg, roomID, roomName, players(자료구조 논의 필요) }
+ */
 export const tourRoomInfo = new Info();

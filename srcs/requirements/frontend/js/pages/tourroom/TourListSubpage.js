@@ -62,7 +62,7 @@ class TourListSubpage extends SubPage {
         });
 
         this.$btn.addEventListener("click", () => {
-            this.requestShift("tour_make_room_subpage");
+            this.requestShift("tour_make_subpage");
         });
     }
 

@@ -1,16 +1,17 @@
 import SubPage from "../SubPage.js";
-import { tourEntryInfo, tourRoomInfo } from "../../models/Info.js";
+import { tourMakeInfo, tourRoomInfo } from "../../models/Info.js";
 
-class TourEntrySubpage extends SubPage {
+class TourMakeSubpage extends SubPage {
     $form;
     $btn;
 
     init() {
         this.$elem.innerHTML = `
-            <h2>닉네임 입력</h2>
+            <h2>방 생성</h2>
             <form>
+                <input id="room-name" type="text" placeholder="room-name">
                 <input id="nickname" type="text" placeholder="nickname">
-                <input type="submit" value="입력">
+                <input type="submit" value="생성"
             </form>
             <button>뒤로 가기</button>
         `;
@@ -20,17 +21,17 @@ class TourEntrySubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            tourEntryInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
+            tourMakeInfo.sendData[roomName] = this.$form.querySelector("#room-name").value;
+            tourMakeInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourEntryInfo.requestAPI();
-                // 받은 데이터에서 roomID, nickname에 해당하는 내용을 tourRoomInfo에 미리 저장해 놓는다.
-                // 나중에 TourRoom에서 API를 보낼 때 이 때 저장된 정보를 바탕으로 전송한다.
-                tourRoomInfo.sendData[roomID] = tourEntryInfo.recvData[roomID];
-                tourRoomInfo.sendData[nickname] = tourEntryInfo.recvData[nickname];
+                await tourRoomInfo.requestAPI();
+                tourRoomInfo.sendData[roomID] = tourMakeInfo.recvData[roomID];
+                tourRoomInfo.sendData[nickname] = tourMakeInfo.recvData[nickname];
                 this.requestShift("tour_room_subpage");
             }
             catch (e) {
-                alert(`Tournament Entry: ${e.message}`);
+                alert(`Tournament Make Room: ${e.message}`);
+                this.$form.querySelector("#room-name").value = "";
                 this.$form.querySelector("#nickname").value = "";
             }
         });
