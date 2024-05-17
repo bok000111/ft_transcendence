@@ -1,5 +1,6 @@
 import { rootPage } from "../RootPage.js"
 import Page from "../Page.js"
+import { logoutInfo } from "../../models/Info.js"
 
 // 추가로 다른 "페이지" 추가해야함. (for shift)
 
@@ -25,7 +26,16 @@ class MainPage extends Page {
         this.$tournamentResultBtn = document.querySelector("#tournamentResult");
         this.$matchmakingBtn = document.querySelector("#matchmaking");
 
-        this.$logoutBtn.addEventListener("click", ); // logoutAPI sending func should be added
+        this.$logoutBtn.addEventListener("click" , async() => {
+            logoutInfo.sendData = null;
+            try {
+                await logoutInfo.requestAPI();
+                this.requestShift("auth_page");
+            }
+            catch (e) {
+                alert(`Logout: ${e.message}`);
+            }
+        });
         this.$participateBtn.addEventListener("click", this.requestShift("tour_room_page")); // 나중에 인자 이름 체킹 필요
         this.$tournamentResultBtn.addEventListener("click", this.requestShift("tour_result_page")); // 나중에 인자 이름 체킹 필요
         this.$matchmakingBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요

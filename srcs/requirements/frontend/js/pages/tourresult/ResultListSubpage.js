@@ -1,23 +1,51 @@
 import SubPage from "../SubPage.js"
 import { tourResultPage } from "./TourResultPage.js"
+import { resultListInfo, resultDetailInfo } from "../../models/Info.js"
 
 class ResultListSubpage extends SubPage {
+    $dv;
+
     init() {
-        /*
-        let resultFromServer = (); // 서버로부터 리스트 가져옴.
         this.$elem.innerHTML = `
-            // 아직 명세에 관한 부분이 없어서 임시로 작성. 예외적으로 여기에서 eventListener 달아줘야할 것 같음.
-            // 어떻게 주는진 모르겠지만 확실히 개별 결과에 대해서 구분할 수있는 ID 등을 사용해서 리스트 요소에 넣어줘야함.
-            // 각각에 대해서 resultDetail 페이지로 넘어갈 수 있도록 addeventListener 추가예정.
-            // 받아와서 생성된 버튼에 대해서 각각 addEventListener를 어떻게 넣어줘야할지 모르겠음..
-            ${resultFromServer.map(item => `<li id="tmp"><button>${item}</button></li>`).join('')}
-            // 위 코드를 forEach나 for문으로 수정 후, addEventListener로 requestShift 호출하도록 해야함.
+            <h2>토너먼트 결과</h2>
+            <div id="result_sub_area"></div>
         `;
-        */
+
+        this.$dv = $elem.querySelector("#result_sub_area");
+        resultListInfo.sendData = null;
+        async () => {
+            try {
+                await resultListInfo.requestAPI();
+                // for(let i = 0; i < resultListInfo.recvData.length; i++)
+                // {
+                //     this.$dv.innerHTML += `
+                //     <div>
+                //      <button id=${resultListInfo.recvData[i].tournamentID}>${resultListInfo.recvData[i].date}</button>
+                //     </div>
+                //     `;
+                // }
+                this.setEvent();
+            }
+            catch (e) {
+                alert(`Result List: ${e.message}`);
+                this.requestShift("main_page");
+            }
+        }
     }
 
     fini() {
         this.$elem.innerHTML = ``;
+    }
+
+    setEvent() {
+        // for (let i = 0; i < resultListInfo.recvData.length; i++)
+        // {
+        //     let temp = this.$dv.querySelector("${resultListInfo.recvData[i].tournamentID}");
+        //     temp.addEventListener("click", () => {
+        //         resultDetailInfo.sendData.tournamentID = resultListInfo.recvData[i].tournamentID;
+        //         this.requestShift("result_detail_subpage");
+        //     });
+        // }
     }
 }
 
