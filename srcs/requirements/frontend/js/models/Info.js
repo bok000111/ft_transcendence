@@ -9,6 +9,10 @@ class Info {
     }
 };
 
+/**
+ * sendData = { email, password }
+ * recvData = {}
+ */
 export const loginInfo = new Info(
     async (sendData, recvData) => {
         const response = await fetch("http://localhost:8000/api/login/", {
@@ -32,6 +36,10 @@ export const loginInfo = new Info(
     }
 );
 
+/**
+ * sendData = { email, password, username }
+ * recvData = {}
+ */
 export const signupInfo = new Info(
     async (sendData, recvData) => {
         const response = await fetch("http://localhost:8000/api/signup/", {
@@ -46,18 +54,21 @@ export const signupInfo = new Info(
             credentials: "include",
         });
         if (!response.ok)
-        throw new Error("HTTP Error");
-    recvData = await JSON.parse(response);
-    if (!response.success)
-    throw new Error("Input Error");
-else
-return recvData;
-}
+            throw new Error("HTTP Error");
+        recvData = await JSON.parse(response);
+        if (!response.success)
+            throw new Error("Input Error");
+        else
+            return recvData;
+    }
 );
 
 /**
+ * POST
+ * /api/logout/
  * sendData = {} // 5.17 명세 기준 전송 데이터 X
  * recvData = { message } // 성공 메시지
+ *
 */
 export const logoutInfo = new Info()(
     async (sendData, recvData) => {
@@ -83,45 +94,55 @@ export const logoutInfo = new Info()(
 );
 
 /**
+ * GET
+ * /api/lobby/
  * sendData = {}
- * recvData = { success, failureMsg, roomID, roomName, curNum, maxNum }
+ * recvData = { statusCode, message, { lobbyID, lobbyName, curNum, maxNum }}
 */
 export const tourListInfo = new Info();
 
 /**
- * sendData = { roomID, nickname }
- * recvData = { success, failureMsg, roomID, nickname }
+ * POST
+ * /api/lobby/lobbyID/
+ * sendData = { nickname }
+ * recvData = { statusCode, message, {}}
 */
 export const tourEntryInfo = new Info();
 
 /**
- * sendData = { roomName, nickname }
- * recvData = { success, failureMsg, roomID, nickname }
+ * POST
+ * /api/lobby/
+ * sendData = { lobbyName, nickname }
+ * recvData = { statusCode, message, { lobbyID } }
  */
 export const tourMakeInfo = new Info();
 
 /**
- * sendData = { roomID, nickname }
- * recvData = { success, failureMsg, roomID, roomName, players(자료구조 논의 필요) }
+ * GET
+ * /api/lobby/lobbyID/
+ * sendData = {}
+ * recvData = { statusCode, message, lobbyID, lobbyName, players(자료구조 논의 필요) }
  */
 export const tourRoomInfo = new Info();
 
 /**
- * 아직 미완성.
- * sendData = { type: { one/two/three/four } }
- * recvData = { ... }
+ * GET
+ * /api/lobby/lobbyID/
+ * sendData = {}
+ * recvData = { statusCode, message, bracket(내부 구조: {번호(1 ~ 7), nickname(아직 안 한 경우 null), status(win, lose)}) }
  */
-export const matchMakingInfo = new Info();
-
+export const tourGameLoungeInfo = new Info();
 
 /**
+ * GET
+ * PATH 미정  (5.18 기준)
  * sendData = {} // 일단은 없을듯?
- * recvData = { Date&time, resultID }
+ * recvData = { date, time, tourID }
 */
 export const resultListInfo = new Info();
 
 /**
- * sendData = { resultID }
- * recvData = { [ "playerID" : "rank" ] }
+ * sendData = { tourID }
+ * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
  */
 export const resultDetailInfo = new Info();
