@@ -1,3 +1,14 @@
+/**
+ * 기본 http 통신의 경우,
+ * {
+ *     status,
+ *     message,
+ *     data: {}
+ * }
+ * 요런 식으로 들어온다.
+ * status code의 경우에는 http response의 status code로 들어온다. ( fail + error )
+ */
+
 class Info {
     sendData = {};
     recvData = {};
@@ -26,13 +37,10 @@ export const loginInfo = new Info(
             body: JSON.stringify(sendData),
             credentials: "include",
         });
-        if (!response.ok)
-            throw new Error("HTTP Error");
-        recvData = await JSON.parse(response);
-        if (!response.success)
-            throw new Error("Input Error");
-        else
-            return recvData;
+        recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(recvData.message);
+        }
     }
 );
 
@@ -53,13 +61,10 @@ export const signupInfo = new Info(
             body: JSON.stringify(sendData),
             credentials: "include",
         });
-        if (!response.ok)
-            throw new Error("HTTP Error");
-        recvData = await JSON.parse(response);
-        if (!response.success)
-            throw new Error("Input Error");
-        else
-            return recvData;
+        recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(recvData.message);
+        }
     }
 );
 
@@ -83,66 +88,73 @@ export const logoutInfo = new Info()(
             body: JSON.stringify(sendData),
             credentials: "include",
         });
-        if (!response.ok)
-            throw new Error("HTTP Error");
-        recvData = await JSON.parse(response);
-        if (!response.message)
-            throw new Error("Logout Error");
-        else
-            return recvData;
+        recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(recvData.message);
+        }
     }
 );
 
+// <*** TournamentLobby Object ***>
+// TournamentLobby: {
+// 	"id": number,
+// 	"name": string,
+// 	"players": PlayerInLobby[],
+// 	"player_count": number,
+// 	"max_players": number,
+// 	"end_score": number,
+// }
+
 /**
  * GET
- * /api/lobby/
+ * /api/tournament/
  * sendData = {}
- * recvData = { statusCode, message, { lobbyID, lobbyName, curNum, maxNum }}
+ * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
 export const tourListInfo = new Info();
 
 /**
  * POST
- * /api/lobby/lobbyID/
+ * /api/tournament/id/
  * sendData = { nickname }
- * recvData = { statusCode, message, {}}
+ * recvData = { status, message, data: { "lobby": TournamentLobby }}
 */
 export const tourEntryInfo = new Info();
 
 /**
  * POST
- * /api/lobby/
- * sendData = { lobbyName, nickname }
- * recvData = { statusCode, message, { lobbyID } }
+ * /api/tournament/
+ * sendData = { name, nickname }
+ * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
 export const tourMakeInfo = new Info();
 
 /**
  * GET
- * /api/lobby/lobbyID/
+ * /api/tournament/id/
  * sendData = {}
- * recvData = { statusCode, message, lobbyID, lobbyName, players(자료구조 논의 필요) }
+ * recvData = { statusCode, message, data: { "lobby": TournamentLobby } }
  */
-export const tourRoomInfo = new Info();
+export const tourLobbyInfo = new Info();
 
 /**
- * GET
- * /api/lobby/lobbyID/
+ * <*** WebSocket ***>
+ * /api/tournament/id/
  * sendData = {}
  * recvData = { statusCode, message, bracket(내부 구조: {번호(1 ~ 7), nickname(아직 안 한 경우 null), status(win, lose)}) }
  */
 export const tourGameLoungeInfo = new Info();
 
-/**
+/** 미정 Info
  * GET
  * PATH 미정  (5.18 기준)
  * sendData = {} // 일단은 없을듯?
  * recvData = { date, time, tourID }
 */
-export const resultListInfo = new Info();
+export const tourResultListInfo = new Info();
 
-/**
+/** 미정 Info
  * sendData = { tourID }
  * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
  */
-export const resultDetailInfo = new Info();
+export const tourResultDetailInfo = new Info();

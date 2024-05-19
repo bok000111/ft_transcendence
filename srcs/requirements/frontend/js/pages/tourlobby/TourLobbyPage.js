@@ -1,7 +1,7 @@
 import Page from "../Page.js";
 import { rootPage } from "../RootPage.js";
 
-class TourRoomPage extends Page {
+class TourLobbyPage extends Page {
     $btn;
 
     setup() {
@@ -15,9 +15,9 @@ class TourRoomPage extends Page {
     }
 };
 
-const tourRoomPage = new TourRoomPage(
-    rootPage.$elem.querySelector(".tour-room-page"),
+const tourLobbyPage = new TourLobbyPage(
+    rootPage.$elem.querySelector(".tour-lobby-page"),
     rootPage,
     "tour_list_subpage",
-    "tour_room_page"
+    "tour_lobby_page"
 );

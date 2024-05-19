@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourMakeInfo, tourRoomInfo } from "../../models/Info.js";
+import { tourMakeInfo, tourLobbyInfo } from "../../models/Info.js";
 
 class TourMakeSubpage extends SubPage {
     $form;
@@ -9,7 +9,7 @@ class TourMakeSubpage extends SubPage {
         this.$elem.innerHTML = `
             <h2>방 생성</h2>
             <form>
-                <input id="room-name" type="text" placeholder="room-name">
+                <input id="lobby-name" type="text" placeholder="lobby-name">
                 <input id="nickname" type="text" placeholder="nickname">
                 <input type="submit" value="생성"
             </form>
@@ -21,17 +21,17 @@ class TourMakeSubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            tourMakeInfo.sendData[roomName] = this.$form.querySelector("#room-name").value;
+            tourMakeInfo.sendData[name] = this.$form.querySelector("#lobby-name").value;
             tourMakeInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourRoomInfo.requestAPI();
-                tourRoomInfo.sendData[roomID] = tourMakeInfo.recvData[roomID];
-                tourRoomInfo.sendData[nickname] = tourMakeInfo.recvData[nickname];
-                this.requestShift("tour_room_subpage");
+                await tourLobbyInfo.requestAPI();
+                tourLobbyInfo.sendData[roomID] = tourMakeInfo.recvData[roomID];
+                tourLobbyInfo.sendData[nickname] = tourMakeInfo.recvData[nickname];
+                this.requestShift("tour_lobby_subpage");
             }
             catch (e) {
                 alert(`Tournament Make Room: ${e.message}`);
-                this.$form.querySelector("#room-name").value = "";
+                this.$form.querySelector("#lobby-name").value = "";
                 this.$form.querySelector("#nickname").value = "";
             }
         });

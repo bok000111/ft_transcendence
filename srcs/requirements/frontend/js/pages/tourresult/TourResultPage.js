@@ -20,6 +20,6 @@ export default class TourResultPage extends Page {
 export const tourResultPage = new TourResultPage(
     rootPage.$elem.querySelector(".tour-result-page"),
     rootPage,
-    "result_list_subpage",
+    "tour_result_list_subpage",
     "tour_result_page",
 )

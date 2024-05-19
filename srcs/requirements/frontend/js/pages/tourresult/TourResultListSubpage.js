@@ -1,8 +1,8 @@
 import SubPage from "../SubPage.js"
 import { tourResultPage } from "./TourResultPage.js"
-import { resultListInfo, resultDetailInfo } from "../../models/Info.js"
+import { tourResultListInfo, tourResultDetailInfo } from "../../models/Info.js"
 
-class ResultListSubpage extends SubPage {
+class TourResultListSubpage extends SubPage {
     $dv;
 
     init() {
@@ -12,15 +12,15 @@ class ResultListSubpage extends SubPage {
         `;
 
         this.$dv = $elem.querySelector("#result_sub_area");
-        resultListInfo.sendData = null;
+        tourResultListInfo.sendData = null;
         async () => {
             try {
-                await resultListInfo.requestAPI();
-                // for(let i = 0; i < resultListInfo.recvData.length; i++)
+                await tourResultListInfo.requestAPI();
+                // for(let i = 0; i < tourResultListInfo.recvData.length; i++)
                 // {
                 //     this.$dv.innerHTML += `
                 //     <div>
-                //      <button id=${resultListInfo.recvData[i].tournamentID}>${resultListInfo.recvData[i].date}</button>
+                //      <button id=${tourResultListInfo.recvData[i].tournamentID}>${tourResultListInfo.recvData[i].date}</button>
                 //     </div>
                 //     `;
                 // }
@@ -38,20 +38,20 @@ class ResultListSubpage extends SubPage {
     }
 
     setEvent() {
-        // for (let i = 0; i < resultListInfo.recvData.length; i++)
+        // for (let i = 0; i < tourResultListInfo.recvData.length; i++)
         // {
-        //     let temp = this.$dv.querySelector("${resultListInfo.recvData[i].tournamentID}");
+        //     let temp = this.$dv.querySelector("${tourResultListInfo.recvData[i].tournamentID}");
         //     temp.addEventListener("click", () => {
-        //         resultDetailInfo.sendData.tournamentID = resultListInfo.recvData[i].tournamentID;
-        //         this.requestShift("result_detail_subpage");
+        //         resultDetailInfo.sendData.tournamentID = tourResultListInfo.recvData[i].tournamentID;
+        //         this.requestShift("tour_result_detail_subpage");
         //     });
         // }
     }
 }
 
-export const resultListSubpage = new ResultListSubpage(
+export const resultListSubpage = new TourResultListSubpage(
     tourResultPage.$elem.querySelector("div"),
     tourResultPage,
     null,
-    "result_list_subpage",
+    "tour_result_list_subpage",
 )

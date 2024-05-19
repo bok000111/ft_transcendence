@@ -27,7 +27,7 @@ class MainPage extends Page {
         this.$matchmakingBtn = document.querySelector("#matchmaking");
 
         this.$logoutBtn.addEventListener("click" , async() => {
-            logoutInfo.sendData = null;
+            logoutInfo.sendData = {};
             try {
                 await logoutInfo.requestAPI();
                 this.requestShift("auth_page");

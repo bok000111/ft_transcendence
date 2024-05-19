@@ -32,6 +32,11 @@ export default class RootPage extends Component {
     }
     
     init() {
+        /**
+         * 로그인 세션이 유지되는 상태
+         * -> 토너먼트 진행중 : 토너먼트 화면
+         * -> 나머지 : 메인 화면
+         */
         this.child[initChildName].init();
     }
 
