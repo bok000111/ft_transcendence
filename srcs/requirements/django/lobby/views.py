@@ -16,7 +16,7 @@ from user.utils import need_auth
 from api.utils import need_json, AJsonMixin, AJsonAuthRequiredMixin
 
 from .models import GameLobby, PlayerInLobby
-from .forms import LobbyCreateModelForm
+from .forms import LobbyCreateModelForm, NicknameForm
 
 
 class GameLobbyView(AJsonMixin, AJsonAuthRequiredMixin, View):
@@ -64,6 +64,17 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
         if id is None:
             return self.jsend_bad_request({"message": "Invalid data"})
 
+        nickname_form = NicknameForm(request.json)
+        if nickname_form.is_valid():
+            nickname = nickname_form.cleaned_data["nickname"]
+        else:
+            return self.jsend_bad_request(
+                {
+                    "message": "Invalid nickname data",
+                    "data": nickname_form.errors.as_json(),
+                }
+            )
+
         try:
             lobby = await GameLobby.objects.aget(id=id)
         except GameLobby.DoesNotExist:
@@ -75,6 +86,13 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
             lobby.players.filter(id=(user := await request.auser()).id).exists
         )():
             return self.jsend_bad_request({"message": "Already in the lobby"})
+
+        existing_nickname_count = await database_sync_to_async(
+            lobby.players.filter(playerinlobby__nickname=nickname).count
+        )()
+        if existing_nickname_count > 0:
+            return self.jsend_bad_request({"message": "Nickname is already in use"})
+
         else:
             await lobby.join(user)
             return self.jsend_ok({"message": "Joined lobby"})

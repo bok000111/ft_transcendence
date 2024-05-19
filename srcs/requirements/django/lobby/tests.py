@@ -36,6 +36,10 @@ class LobbyTest(TransactionTestCase):
         self.client = Client()
         self.client.force_login(self.user)
 
+        self.user2 = UserFactory()
+        self.client2 = Client()
+        self.client2.force_login(self.user2)
+
     def test_create_lobby(self):
         response = self.client.post(
             lobby_url,
@@ -107,6 +111,7 @@ class LobbyTest(TransactionTestCase):
         response = self.client.post(
             reverse("lobby_detail", args=[lobby_id]),
             content_type="application/json",
+            data={"nickname": "testnick"},
         )
 
         self.assertContains(response, "Joined lobby", status_code=200)
@@ -143,6 +148,30 @@ class LobbyTest(TransactionTestCase):
         )
 
         self.assertContains(response, "Not found", status_code=404)
+
+    def test_dup_nickname(self):
+        response = self.host["client"].post(
+            lobby_url,
+            LobbyPostFactory(),
+            content_type="application/json",
+        )
+        lobby_id = response.json()["data"]["lobby"]["id"]
+
+        response = self.client.post(
+            reverse("lobby_detail", args=[lobby_id]),
+            content_type="application/json",
+            data={"nickname": "duptest"},
+        )
+        print(response.json())
+
+        response = self.client2.post(
+            reverse("lobby_detail", args=[lobby_id]),
+            content_type="application/json",
+            data={"nickname": "duptest"},
+        )
+
+        print(response.json())
+        self.assertContains(response, "Nickname is already in use", status_code=400)
 
 
 # class RoomWebSocketTest(TransactionTestCase):
