@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourEntryInfo, tourLobbyInfo } from "../../models/Info.js";
+import { tourEntryInfo } from "../../models/Info.js";
 
 class TourEntrySubpage extends SubPage {
     $form;
@@ -23,10 +23,6 @@ class TourEntrySubpage extends SubPage {
             tourEntryInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
                 await tourEntryInfo.requestAPI();
-                // // 받은 데이터에서 lobbyID, nickname에 해당하는 내용을 tourLobbyInfo에 미리 저장해 놓는다.
-                // // 나중에 TourLobby에서 API를 보낼 때 이 때 저장된 정보를 바탕으로 전송한다.
-                // tourLobbyInfo.sendData[lobbyID] = tourEntryInfo.recvData[lobbyID];
-                // tourLobbyInfo.sendData[nickname] = tourEntryInfo.recvData[nickname];
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {

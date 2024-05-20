@@ -2,14 +2,14 @@ import Page from "../Page.js";
 import { rootPage } from "../RootPage.js";
 
 class TourLobbyPage extends Page {
-    $btn;
+    $mainBtn;
 
     setup() {
-        this.$btn = this.$elem.querySelector("button");
+        this.$mainBtn = this.$elem.querySelector("button");
     }
 
     setEvent() {
-        this.$btn.addEventListener("click", () => {
+        this.$mainBtn.addEventListener("click", () => {
             this.requestShift("main_page");
         });
     }

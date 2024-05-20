@@ -28,6 +28,16 @@ class TourListSubpage extends SubPage {
         }
     }
 
+    async refresh() {
+        try {
+            await tourListInfo.requestAPI();
+            this.renderList(tourListInfo.recvData.data);
+        }
+        catch (e) {
+            alert(`Tournament List: ${e.message}`);
+        }
+    }
+
     init() {
         this.$elem.innerHTML = `
             <h2>토너먼트 목록</h2>
@@ -40,17 +50,12 @@ class TourListSubpage extends SubPage {
         this.$refreshBtn = this.$elem.querySelector("#refresh");
         this.$makeBtn = this.$elem.querySelector("#make");
 
-        this.$refreshBtn.addEventListener("click", async () => {
-            try {
-                await tourListInfo.requestAPI();
-                this.renderList(tourListInfo.recvData.data);
-            }
-            catch (e) {
-                alert(`Tournament List: ${e.message}`);
-            }
+        this.$refreshBtn.addEventListener("click", this.refresh);
+        this.$makeBtn.addEventListener("click", () => {
+            this.requestShift("tour_make_subpage");
         });
 
-        this.$makeBtn.addEventListener("click", this.requestShift("tour_make_subpage"));
+        this.refresh();
     }
 
     fini() {

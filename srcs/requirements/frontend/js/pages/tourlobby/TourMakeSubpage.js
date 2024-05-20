@@ -3,7 +3,7 @@ import { tourMakeInfo, tourLobbyInfo } from "../../models/Info.js";
 
 class TourMakeSubpage extends SubPage {
     $form;
-    $btn;
+    $backBtn;
 
     init() {
         this.$elem.innerHTML = `
@@ -17,16 +17,14 @@ class TourMakeSubpage extends SubPage {
         `;
 
         this.$form = this.$elem.querySelector("form");
-        this.$btn = this.$elem.querySelector("button");
+        this.$backBtn = this.$elem.querySelector("button");
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
             tourMakeInfo.sendData[name] = this.$form.querySelector("#lobby-name").value;
             tourMakeInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourLobbyInfo.requestAPI();
-                tourLobbyInfo.sendData[roomID] = tourMakeInfo.recvData[roomID];
-                tourLobbyInfo.sendData[nickname] = tourMakeInfo.recvData[nickname];
+                await tourMakeInfo.requestAPI();
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {
@@ -36,7 +34,7 @@ class TourMakeSubpage extends SubPage {
             }
         });
 
-        this.$btn.addEventListener("click", () => {
+        this.$backBtn.addEventListener("click", () => {
             this.requestShift("tour_list_subpage");
         });
     }

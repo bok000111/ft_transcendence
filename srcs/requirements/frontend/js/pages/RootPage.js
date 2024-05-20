@@ -37,7 +37,12 @@ export default class RootPage extends Component {
          * -> 토너먼트 진행중 : 토너먼트 화면
          * -> 나머지 : 메인 화면
          */
-        this.child[initChildName].init();
+        // if (session) {
+        //     this.child["main_page"].init();
+        // }
+        // else {
+            this.child[initChildName].init();
+        // }
     }
 
     fini() {}
