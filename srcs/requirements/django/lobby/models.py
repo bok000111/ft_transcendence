@@ -128,6 +128,3 @@ class PlayerInLobby(models.Model):
             ("lobby", "user"),
             ("lobby", "nickname"),
         )
-
-    def clean(self):
-        super.clean()
