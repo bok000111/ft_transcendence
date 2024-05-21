@@ -89,8 +89,8 @@ class GameLobby(models.Model):
 
     @database_sync_to_async
     @transaction.atomic
-    def join(self, user):
-        self.players.add(user)
+    def join(self, user, nickname):
+        self.players.add(user, through_defaults={'nickname': nickname})
         self.player_count += 1
         self.save()
 
@@ -124,4 +124,7 @@ class PlayerInLobby(models.Model):
     is_ready = models.BooleanField(default=False, help_text="Is the player ready")
 
     class Meta:
-        unique_together = ("user", "lobby")
+        unique_together = (
+            ("lobby", "user"),
+            ("lobby", "nickname"),
+        )
