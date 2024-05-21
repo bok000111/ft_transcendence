@@ -1,4 +1,5 @@
 import json
+from django.db import IntegrityError
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.generic import View
@@ -86,16 +87,17 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
             lobby.players.filter(id=(user := await request.auser()).id).exists
         )():
             return self.jsend_bad_request({"message": "Already in the lobby"})
+        
+        # 현재 서버에서 존재하는 로비들의 players에 해당하는 유저가 존재하는지?
+        # => playerInLobby에 현재 유저가 존재하는지?
 
-        existing_nickname_count = await database_sync_to_async(
-            lobby.players.filter(playerinlobby__nickname=nickname).count
-        )()
-        if existing_nickname_count > 0:
-            return self.jsend_bad_request({"message": "Nickname is already in use"})
-
-        else:
-            await lobby.join(user)
+        try:
+            await lobby.join(user, nickname=nickname)
             return self.jsend_ok({"message": "Joined lobby"})
+        except IntegrityError as e:
+            if 'lobby_playerinlobby_lobby_id_nickname' in str(e):
+                return self.jsend_bad_request({"message": "Nickname is already in use"})
+            return self.jsend_bad_request({"message": "Database integrity error"})
 
     # if the user is the host, delete the lobby
     # if the user is not the host, leave the lobby

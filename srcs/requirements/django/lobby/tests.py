@@ -162,17 +162,68 @@ class LobbyTest(TransactionTestCase):
             content_type="application/json",
             data={"nickname": "duptest"},
         )
-        print(response.json())
+        self.assertContains(response, "Joined lobby", status_code=200)
 
         response = self.client2.post(
             reverse("lobby_detail", args=[lobby_id]),
             content_type="application/json",
             data={"nickname": "duptest"},
         )
-
-        print(response.json())
         self.assertContains(response, "Nickname is already in use", status_code=400)
+        
+    def test_same_lobby(self):
+        response = self.host["client"].post(
+            lobby_url,
+            LobbyPostFactory(),
+            content_type="application/json",
+        )
+        lobby_id = response.json()["data"]["lobby"]["id"]
+        
+        response = self.client.post(
+            reverse("lobby_detail", args=[lobby_id]),
+            content_type="application/json",
+            data={"nickname": "testnick2"},
+        )
+        self.assertContains(response, "Joined lobby", status_code=200)
+        
+        response = self.client.post(
+            reverse("lobby_detail", args=[lobby_id]),
+            content_type="application/json",
+            data={"nickname": "testnick3"},
+        )
+        
+        self.assertContains(response, "Already in the lobby", status_code=400)
 
+    def test_user_already_in_another_lobby(self):
+        response = self.host["client"].post(
+            lobby_url,
+            LobbyPostFactory(),
+            content_type="application/json",
+        )
+        lobby_id1 = response.json()["data"]["lobby"]["id"]
+        
+        response = self.host["client"].post(
+            lobby_url,
+            LobbyPostFactory(),
+            content_type="application/json",
+        )
+        lobby_id2 = response.json()["data"]["lobby"]["id"]
+
+        response = self.client.post(
+            reverse("lobby_detail", args=[lobby_id1]),
+            content_type="application/json",
+            data={"nickname": "testnick2"},
+        )
+        self.assertContains(response, "Joined lobby", status_code=200)
+        
+        response = self.client.post(
+            reverse("lobby_detail", args=[lobby_id2]),
+            content_type="application/json",
+            data={"nickname": "testnick3"},
+        )
+        
+        print(response.json())
+        self.assertContains(response, "Database integrity error", status_code=400)
 
 # class RoomWebSocketTest(TransactionTestCase):
 #     async def asyncSetUp(self):
@@ -194,10 +245,10 @@ class LobbyTest(TransactionTestCase):
 #         )
 
 #         response = async_to_sync(self.async_client.post)(
+#         )
 #             create_room_url,
 #             json.dumps(TEST_ROOM_DATA),
 #             content_type="application/json",
-#         )
 #         self.room_id = response.json().get("room_id", None)
 
 #         asyncio.run(self.asyncSetUp())
