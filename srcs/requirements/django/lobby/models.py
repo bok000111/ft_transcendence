@@ -90,7 +90,7 @@ class GameLobby(models.Model):
     @database_sync_to_async
     @transaction.atomic
     def join(self, user, nickname):
-        self.players.add(user, through_defaults={'nickname': nickname})
+        self.players.add(user, through_defaults={"nickname": nickname})
         self.player_count += 1
         self.save()
 
@@ -128,3 +128,6 @@ class PlayerInLobby(models.Model):
             ("lobby", "user"),
             ("lobby", "nickname"),
         )
+
+    def clean(self):
+        super.clean()
