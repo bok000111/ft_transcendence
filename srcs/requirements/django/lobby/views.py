@@ -87,17 +87,23 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
             lobby.players.filter(id=(user := await request.auser()).id).exists
         )():
             return self.jsend_bad_request({"message": "Already in the lobby"})
-        
-        # 현재 서버에서 존재하는 로비들의 players에 해당하는 유저가 존재하는지?
-        # => playerInLobby에 현재 유저가 존재하는지?
 
-        try:
-            await lobby.join(user, nickname=nickname)
-            return self.jsend_ok({"message": "Joined lobby"})
-        except IntegrityError as e:
-            if 'lobby_playerinlobby_lobby_id_nickname' in str(e):
-                return self.jsend_bad_request({"message": "Nickname is already in use"})
-            return self.jsend_bad_request({"message": "Database integrity error"})
+        check_user = await database_sync_to_async(
+            PlayerInLobby.objects.filter(user=user).exists
+        )()
+        if check_user:
+            return self.jsend_bad_request(
+                {"message": "The user is already in some lobby"}
+            )
+
+        check_nickname = await database_sync_to_async(
+            PlayerInLobby.objects.filter(lobby=lobby, nickname=nickname).exists
+        )()
+        if check_nickname:
+            return self.jsend_bad_request({"message": "Nickname is already in use"})
+
+        await lobby.join(user, nickname=nickname)
+        return self.jsend_ok({"message": "Joined lobby"})
 
     # if the user is the host, delete the lobby
     # if the user is not the host, leave the lobby
