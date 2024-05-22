@@ -17,12 +17,12 @@ export default class Page extends RootPage {
     }
 
     init() {
-        this.$elem.classList.remove("none");
         this.curChild.init();
+        this.$elem.classList.remove("none");
     }
 
     fini() {
-        this.curChild = this.child[initChildName];
         this.$elem.classList.add("none");
+        this.curChild = this.child[this.initChildName];
     }
 };
