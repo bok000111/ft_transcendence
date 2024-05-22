@@ -1,4 +1,5 @@
-//ex) tournament room page
+import Component from "../models/Component.js";
+
 export default class RootPage extends Component {
     parent; // object
     initChildName; // string
@@ -41,7 +42,7 @@ export default class RootPage extends Component {
         //     this.child["main_page"].init();
         // }
         // else {
-            this.child[initChildName].init();
+            this.child[this.initChildName].init();
         // }
     }
 

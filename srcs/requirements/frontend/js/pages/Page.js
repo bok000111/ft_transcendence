@@ -17,7 +17,7 @@ export default class Page extends RootPage {
     }
 
     init() {
-        this.child[initChildName].init();
+        this.child[this.initChildName].init();
     }
 
     fini() {

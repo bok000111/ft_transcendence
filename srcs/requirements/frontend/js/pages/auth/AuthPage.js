@@ -1,6 +1,7 @@
 import { rootPage } from "../RootPage.js";
+import Page from "../Page.js";
 
-const authPage = new Page(
+export const authPage = new Page(
     rootPage.$elem.querySelector(".auth-page"),
     rootPage,
     "login_subpage",

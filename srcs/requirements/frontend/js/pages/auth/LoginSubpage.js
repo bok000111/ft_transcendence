@@ -1,4 +1,4 @@
-import { auth } from "../Page.js";
+import { authPage } from "./AuthPage.js";
 import { loginInfo } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -10,7 +10,7 @@ class LoginSubpage extends SubPage {
         this.$elem.innerHTML = `
             <form>
                 <input id="email" type="text" placeholder="email">
-                <input id="password" type="text" placeholder="password">
+                <input id="password" type="password" placeholder="password">
                 <input type="submit" value="login">
             </form>
             <button>signup</button>
@@ -44,9 +44,9 @@ class LoginSubpage extends SubPage {
     }
 };
 
-const loginSubpage = new LoginSubpage(
-    auth.$elem.querySelector("div"),
-    auth,
+export const loginSubpage = new LoginSubpage(
+    authPage.$elem.querySelector("div"),
+    authPage,
     null,
     "login_subpage"
 );

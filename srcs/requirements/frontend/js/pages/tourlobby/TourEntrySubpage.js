@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourEntryInfo } from "../../models/Info.js";
+import { tourEntryInfo, tourLobbyInfo } from "../../models/Info.js";
 
 class TourEntrySubpage extends SubPage {
     $form;
@@ -23,6 +23,7 @@ class TourEntrySubpage extends SubPage {
             tourEntryInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
                 await tourEntryInfo.requestAPI();
+                tourLobbyInfo.sendData[id] = tourEntryInfo.recvData.data.lobby[id];
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {

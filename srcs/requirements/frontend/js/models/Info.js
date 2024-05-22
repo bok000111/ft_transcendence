@@ -16,7 +16,7 @@ class Info {
     requestAPI;
 
     constructor(requestAPI) {
-        this.requestAPI = requestAPI.bind(this.sendData, this.recvData);
+        this.requestAPI = requestAPI.bind(this);
     }
 };
 
@@ -25,7 +25,7 @@ class Info {
  * recvData = {}
  */
 export const loginInfo = new Info(
-    async (sendData, recvData) => {
+    async function() {
         const response = await fetch("http://localhost:8000/api/login/", {
             method: "POST",
             headers: {
@@ -34,12 +34,12 @@ export const loginInfo = new Info(
                 "Access-Control-Allow-Origin": "http://localhost:5500",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(sendData),
+            body: JSON.stringify(this.sendData),
             credentials: "include",
         });
-        recvData = await response.json();
+        this.recvData = await response.json();
         if (!response.ok) {
-            throw new Error(recvData.message);
+            throw new Error(this.recvData.message);
         }
     }
 );
@@ -49,7 +49,7 @@ export const loginInfo = new Info(
  * recvData = {}
  */
 export const signupInfo = new Info(
-    async (sendData, recvData) => {
+    async function() {
         const response = await fetch("http://localhost:8000/api/signup/", {
             method: "POST",
             headers: {
@@ -58,12 +58,12 @@ export const signupInfo = new Info(
                 "Access-Control-Allow-Origin": "http://localhost:5500",
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify(sendData),
+            body: JSON.stringify(this.sendData),
             credentials: "include",
         });
-        recvData = await response.json();
+        this.recvData = await response.json();
         if (!response.ok) {
-            throw new Error(recvData.message);
+            throw new Error(this.recvData.message);
         }
     }
 );
@@ -75,9 +75,9 @@ export const signupInfo = new Info(
  * recvData = { message } // 성공 메시지
  *
 */
-export const logoutInfo = new Info()(
-    async (sendData, recvData) => {
-        const response = await(fetch("http://localhost::8000/api/logout/"), {
+export const logoutInfo = new Info(
+    async function() {
+        const response = await fetch("http://localhost::8000/api/logout/", {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -85,12 +85,12 @@ export const logoutInfo = new Info()(
                 "Access-Control-Allow-Origin": "http://localhost:5500",
                 "Content-Type": "applicatoin/json",
             },
-            body: JSON.stringify(sendData),
+            body: JSON.stringify(this.sendData),
             credentials: "include",
         });
-        recvData = await response.json();
+        this.recvData = await response.json();
         if (!response.ok) {
-            throw new Error(recvData.message);
+            throw new Error(this.recvData.message);
         }
     }
 );
@@ -111,7 +111,25 @@ export const logoutInfo = new Info()(
  * sendData = {}
  * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
-export const tourListInfo = new Info();
+export const tourListInfo = new Info(
+    async function() {
+        const response = await fetch("http://localhost::8000/api/tournament/", {
+            method: "GET",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                // "Content-Type": "applicatoin/json",
+            },
+            // body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);
 
 /**
  * POST
@@ -119,7 +137,27 @@ export const tourListInfo = new Info();
  * sendData = { nickname }
  * recvData = { status, message, data: { "lobby": TournamentLobby }}
 */
-export const tourEntryInfo = new Info();
+export const tourEntryInfo = new Info(
+    async function() {
+        const tournamentID = this.sendData.id;
+        delete this.sendData.id;
+        const response = await fetch(`http://localhost::8000/api/tournament/${tournamentID}/`, {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "applicatoin/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);
 
 /**
  * POST
@@ -127,7 +165,25 @@ export const tourEntryInfo = new Info();
  * sendData = { name, nickname }
  * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
-export const tourMakeInfo = new Info();
+export const tourMakeInfo = new Info(
+    async function() {
+        const response = await fetch(`http://localhost::8000/api/tournament/`, {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "applicatoin/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);
 
 /**
  * GET
@@ -135,7 +191,7 @@ export const tourMakeInfo = new Info();
  * sendData = {}
  * recvData = { statusCode, message, data: { "lobby": TournamentLobby } }
  */
-export const tourLobbyInfo = new Info();
+// export const tourLobbyInfo = new Info();
 
 /**
  * <*** WebSocket ***>
@@ -143,7 +199,7 @@ export const tourLobbyInfo = new Info();
  * sendData = {}
  * recvData = { statusCode, message, bracket(내부 구조: {번호(1 ~ 7), nickname(아직 안 한 경우 null), status(win, lose)}) }
  */
-export const tourGameLoungeInfo = new Info();
+// export const tourGameLoungeInfo = new Info();
 
 /** 미정 Info
  * GET
@@ -151,10 +207,10 @@ export const tourGameLoungeInfo = new Info();
  * sendData = {} // 일단은 없을듯?
  * recvData = { date, time, tourID }
 */
-export const tourResultListInfo = new Info();
+// export const tourResultListInfo = new Info();
 
 /** 미정 Info
  * sendData = { tourID }
  * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
  */
-export const tourResultDetailInfo = new Info();
+// export const tourResultDetailInfo = new Info();

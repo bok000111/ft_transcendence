@@ -6,10 +6,10 @@ class TourListSubpage extends SubPage {
     $refreshBtn;
     $makeBtn;
 
-    renderList({ lobbies }) {
+    renderList({ data }) {
         this.$lobbyList.innerHTML = ``;
 
-        for (lobby of lobbies) {
+        for (lobby of data.lobbies) {
             if (lobby.player_count === lobby.max_players)
                 continue;
 
@@ -31,7 +31,7 @@ class TourListSubpage extends SubPage {
     async refresh() {
         try {
             await tourListInfo.requestAPI();
-            this.renderList(tourListInfo.recvData.data);
+            this.renderList(tourListInfo.recvData);
         }
         catch (e) {
             alert(`Tournament List: ${e.message}`);

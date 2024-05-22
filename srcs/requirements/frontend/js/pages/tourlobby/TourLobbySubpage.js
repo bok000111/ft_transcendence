@@ -21,6 +21,10 @@ class TourLobbySubpage extends SubPage {
     $readyBtn;
     $startBtn;
 
+    render() {
+        
+    }
+
     init() {
         this.$elem.innerHTML = `
             <h2></h2>
