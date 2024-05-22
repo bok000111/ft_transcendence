@@ -1,21 +1,87 @@
+<!-- 디렉터리 앞에 "static/" 을 추가해 주어야 한다. -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="static/style.css" type="text/css" />
+    <title>Pong</title>
+    <link rel="stylesheet" href="./css/style.css" type="text/css">
 </head>
+
 <body>
-    <div class="pong">
-        <div class="scoreboard">
-            <h1></h1>
-            <h1></h1>
-            <h1 class="none"></h1>
-            <h1 class="none"></h1>
-        </div>
-        <canvas width="500" height="500"></canvas>
+    <!-- 타이틀 -->
+    <div class="title">
+        <h1>Pong</h1>
     </div>
-    <script src="static/pong.js"></script>
+
+    <!-- 로그인 페이지 -->
+    <div class="login-page">
+        <form>
+            <input id="email" type="text" placeholder="email">
+            <input id="password" type="text" placeholder="password">
+            <input type="submit" value="login">
+        </form>
+        <button>signup</button>
+    </div>
+
+    <!-- 회원가입 페이지 -->
+    <div class="signup-page none">
+        <form>
+            <input id="email" type="text" placeholder="email">
+            <input id="password" type="text" placeholder="password">
+            <input id="username" type="text" placeholder="username">
+            <input type="submit" value="signup">
+        </form>
+        <button>login</button>
+    </div>
+
+    <!-- 메인 페이지 -->
+    <div class="main-page none">
+        <div>
+            <button id="logout">Logout</button>
+        </div>
+        <div>
+            <button id="participate">Participate Tournament</button>
+        </div>
+        <div>
+            <button id="tournamentResult">Tournament Result</button>
+        </div>
+        <div>
+            <button id="matchmaking">Matchmaking</button>
+        </div>
+    </div>
+
+    <!-- 매치 메이킹 페이지 -->
+    <div class="match-making-page none">
+
+    </div>
+
+    <!-- 토너먼트 대기방 페이지 -->
+    <div class="tour-room-page none">
+        <div></div>
+    </div>
+
+    <!-- 토너먼트 결과 페이지 -->
+    <div class="tour-result-page none">
+        <h2>Tournament Result</h2>
+        <button id="home">HOME</button>
+        <div id="resultList"></div>
+    </div>
+
+    <!-- 토너먼트 결과 디테일 페이지 -->
+    <div class="result-detail-page none">
+        <button id="home">HOME</button>
+        <h2>Tournament Result</h2>
+        <div id="resultDetail"></div>
+    </div>
+
+    <!-- 퐁 게임 페이지 -->
+    <div class="game-page none">
+
+    </div>
+
+    <script src="js/login.js" type="module"></script>
 </body>
+
 </html>
