@@ -9,6 +9,7 @@ export default class RootPage extends Component {
     constructor(elem, parent, initChildName, selfName) {
         super(elem);
         this.initChildName = initChildName;
+        this.parent = parent;
         if (parent)
             parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
     }

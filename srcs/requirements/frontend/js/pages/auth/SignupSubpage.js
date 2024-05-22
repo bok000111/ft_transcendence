@@ -14,7 +14,7 @@ class SignupSubpage extends SubPage {
                 <input id="username" type="text" placeholder="username">
                 <input type="submit" value="signup">
             </form>
-            <button>signup</button>
+            <button>login</button>
         `;
 
         this.$form = this.$elem.querySelector("form");
