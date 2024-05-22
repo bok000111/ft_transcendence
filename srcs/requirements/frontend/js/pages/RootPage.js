@@ -11,26 +11,22 @@ export default class RootPage extends Component {
         this.initChildName = initChildName;
         this.parent = parent;
         if (parent)
-            parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
+            parent.mount(this, selfName);
     }
 
-    mount(childName, initFunc, finiFunc) {
-        this.child[childName] = {
-            init: initFunc,
-            fini: finiFunc,
-        }
-        if (childName === this.initChildName)
+    mount(child, childName) {
+        this.child[childName] = child;
+        if (childName === this.initChildName) {
             this.curChild = this.child[childName];
+        }
     }
 
     requestShift(nextChildName) {}
 
     childShift(nextChildName) {
-        this.curChild.$elem.classList.add("none");
         this.curChild.fini();
         this.curChild = this.child[nextChildName];
         this.curChild.init();
-        this.curChild.$elem.classList.remove("none");
     }
     
     init() {

@@ -6,21 +6,23 @@ export default class Page extends RootPage {
     }
 
     childShift(nextChildName) {
+        this.curChild.fini();
         if (nextChildName.endsWith("_page")) {
             this.requestShift(nextChildName);
         }
         else {
-            this.curChild.fini();
             this.curChild = this.child[nextChildName];
             this.curChild.init();
         }
     }
 
     init() {
-        this.child[this.initChildName].init();
+        this.$elem.classList.remove("none");
+        this.curChild.init();
     }
 
     fini() {
-        this.childShift(initChildName);
+        this.curChild = this.child[initChildName];
+        this.$elem.classList.add("none");
     }
 };
