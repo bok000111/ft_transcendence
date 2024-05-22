@@ -10,33 +10,17 @@
 </head>
 
 <body>
-    <!-- 타이틀 -->
+    <!-- Title -->
     <div class="title">
         <h1>Pong</h1>
     </div>
 
-    <!-- 로그인 페이지 -->
-    <div class="login-page">
-        <form>
-            <input id="email" type="text" placeholder="email">
-            <input id="password" type="text" placeholder="password">
-            <input type="submit" value="login">
-        </form>
-        <button>signup</button>
+    <!-- Auth Page -->
+    <div class="auth-page">
+        <div></div>
     </div>
 
-    <!-- 회원가입 페이지 -->
-    <div class="signup-page none">
-        <form>
-            <input id="email" type="text" placeholder="email">
-            <input id="password" type="text" placeholder="password">
-            <input id="username" type="text" placeholder="username">
-            <input type="submit" value="signup">
-        </form>
-        <button>login</button>
-    </div>
-
-    <!-- 메인 페이지 -->
+    <!-- Main Page -->
     <div class="main-page none">
         <div>
             <button id="logout">Logout</button>
@@ -52,36 +36,23 @@
         </div>
     </div>
 
-    <!-- 매치 메이킹 페이지 -->
-    <div class="match-making-page none">
-
-    </div>
-
-    <!-- 토너먼트 대기방 페이지 -->
-    <div class="tour-room-page none">
+    <!-- Tournament Lobby Page -->
+    <div class="tour-lobby-page none">
+        <button>메인 페이지로 가기</button>
         <div></div>
     </div>
 
-    <!-- 토너먼트 결과 페이지 -->
+    <!-- Tournament Result Page -->
     <div class="tour-result-page none">
-        <h2>Tournament Result</h2>
-        <button id="home">HOME</button>
-        <div id="resultList"></div>
+        <button>메인 페이지로 가기</button>
     </div>
 
-    <!-- 토너먼트 결과 디테일 페이지 -->
-    <div class="result-detail-page none">
-        <button id="home">HOME</button>
-        <h2>Tournament Result</h2>
-        <div id="resultDetail"></div>
-    </div>
-
-    <!-- 퐁 게임 페이지 -->
+    <!-- Pong Game Page -->
     <div class="game-page none">
 
     </div>
 
-    <script src="js/login.js" type="module"></script>
+    <script src="js/main.js" type="module"></script>
 </body>
 
 </html>
