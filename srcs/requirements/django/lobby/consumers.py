@@ -55,8 +55,8 @@ class AGameRoomConsumer(AsyncWebsocketConsumer):
             self.channel_layer.group_discard(
                 f"ws_game_lobby_{self.lobby.id}", self.channel_name
             )
-
-        await self.lobby.leave(self.user)
+        else:
+            await self.lobby.leave(self.user)
 
         await self.channel_layer.group_send(
             f"ws_game_lobby_{self.lobby.id}",
