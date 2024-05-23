@@ -10,15 +10,9 @@ class MainPage extends Page {
     $tournamentResultBtn;
     $matchmakingBtn;
 
-    constructor(elem, parent, selfName) {
-        super(elem);
-        if (parent)
-            parent.mount(selfName, this.init.bind(this), this.fini.bind(this));
+    init() {
+        //this.setEvent();
     }
-
-    init() {} // no need to init
-
-    fini() {} // no need to deinit
 
     setEvent() {
         this.$logoutBtn = document.querySelector("#logout");
@@ -29,7 +23,7 @@ class MainPage extends Page {
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {
-                await logoutAPI.request();
+                //await logoutAPI.request();
                 this.requestShift("auth_page");
             }
             catch (e) {
@@ -43,7 +37,8 @@ class MainPage extends Page {
 }
 
 export const mainPage = new MainPage(
-    rootPage.$elem.querySelector(".main-page"),
+    rootPage.querySelector(".main-page"),
     rootPage,
+    "main_subpage",
     "main_page",
 );
