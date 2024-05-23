@@ -26,7 +26,7 @@ class LoginSubpage extends SubPage {
                 password: this.$form.querySelector("#password").value,
             };
             try {
-                await loginAPI.requestAPI();
+                await loginAPI.request();
                 this.requestShift("main_page");
             }
             catch (e) {

@@ -29,7 +29,7 @@ class MainPage extends Page {
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {
-                await logoutAPI.requestAPI();
+                await logoutAPI.request();
                 this.requestShift("auth_page");
             }
             catch (e) {

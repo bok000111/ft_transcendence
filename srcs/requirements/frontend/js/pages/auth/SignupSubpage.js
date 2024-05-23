@@ -28,7 +28,7 @@ class SignupSubpage extends SubPage {
                 username: this.$form.querySelector("#username").value,
             };
             try {
-                await signupAPI.requestAPI();
+                await signupAPI.request();
                 this.requestShift("login_subpage");
             }
             catch (e) {

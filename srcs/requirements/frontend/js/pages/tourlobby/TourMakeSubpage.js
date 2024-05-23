@@ -24,7 +24,7 @@ class TourMakeSubpage extends SubPage {
             tourMakeAPI.sendData[name] = this.$form.querySelector("#lobby-name").value;
             tourMakeAPI.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourMakeAPI.requestAPI();
+                await tourMakeAPI.request();
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {

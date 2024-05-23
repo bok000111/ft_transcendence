@@ -30,7 +30,7 @@ class TourListSubpage extends SubPage {
 
     async refresh() {
         try {
-            await tourListAPI.requestAPI();
+            await tourListAPI.request();
             this.renderList(tourListAPI.recvData);
         }
         catch (e) {

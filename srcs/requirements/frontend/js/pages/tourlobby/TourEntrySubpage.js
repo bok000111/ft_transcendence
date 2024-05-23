@@ -22,7 +22,7 @@ class TourEntrySubpage extends SubPage {
             event.preventDefault();
             tourEntryAPI.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourEntryAPI.requestAPI();
+                await tourEntryAPI.request();
                 tourLobbyAPI.sendData[id] = tourEntryAPI.recvData.data.lobby[id];
                 this.requestShift("tour_lobby_subpage");
             }

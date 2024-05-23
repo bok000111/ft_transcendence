@@ -15,7 +15,7 @@ class TourResultListSubpage extends SubPage {
         tourResultListAPI.sendData = null;
         async () => {
             try {
-                await tourResultListAPI.requestAPI();
+                await tourResultListAPI.request();
                 // for(let i = 0; i < tourResultListAPI.recvData.length; i++)
                 // {
                 //     this.$dv.innerHTML += `

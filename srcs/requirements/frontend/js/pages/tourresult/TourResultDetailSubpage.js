@@ -13,7 +13,7 @@ class TourResultDetailSubpage extends SubPage {
         this.$dv = this.$elem.querySelector("#result_sub_area");
         async() => {
             try {
-                await tourResultDetailAPI.requestAPI();
+                await tourResultDetailAPI.request();
                 // for(let i = 0; i <tourResultDetailAPI.recvData.length; i++)
                 // {
                 //     this.$dv.innerHTML += `

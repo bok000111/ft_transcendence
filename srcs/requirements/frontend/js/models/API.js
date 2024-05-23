@@ -13,10 +13,10 @@ class API {
     sendData = {};
     recvData = {};
     // API 전송 / 수신하는 함수
-    requestAPI;
+    request;
 
-    constructor(requestAPI) {
-        this.requestAPI = requestAPI.bind(this);
+    constructor(request) {
+        this.request = request.bind(this);
     }
 };
 
