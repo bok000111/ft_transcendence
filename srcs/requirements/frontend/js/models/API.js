@@ -1,3 +1,5 @@
+import { info } from "./Info.js";
+
 /**
  * 기본 http 통신의 경우,
  * {
@@ -139,9 +141,7 @@ export const tourListAPI = new API(
 */
 export const tourEntryAPI = new API(
     async function() {
-        const tournamentID = this.sendData.id;
-        delete this.sendData.id;
-        const response = await fetch(`http://localhost::8000/api/tournament/${tournamentID}/`, {
+        const response = await fetch(`http://localhost::8000/api/tournament/${info.lobby.id}/`, {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",

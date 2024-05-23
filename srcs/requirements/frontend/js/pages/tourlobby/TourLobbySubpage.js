@@ -1,5 +1,6 @@
 import SubPage from "../SubPage.js";
 import { tourLobbyAPI } from "../../models/API.js";
+import { info } from "../../models/Info.js";
 
 /**
  * TourLobbySubpage -> TourGameLoungeSubpage
@@ -28,15 +29,12 @@ class TourLobbySubpage extends SubPage {
         this.$elem.innerHTML = `
             <h2></h2>
             <ol></ol>
-            <button id="tour-ready">준비</button>
-            <button id="tour-start">시작</button>
+            ${info.lobby.isHost ? `<button id="tour-start">시작</button>` : `<button id="tour-ready">준비</button>`}
             <button id="tour-exit">토너먼트 나가기</button>
         `;
 
         /**
-         * 만약 현재 플레이어가 방장이 아닌 경우 -> readyBtn 활성화시킴. (class="none")
          * readyBtn: 백에게 현재 준비상태가 완료되었다고 API 전송.
-         * 만약 현재 플레이어가 방장인 경우 -> startBtn 활성화시킴. (class="none")
          * startBtn: 모든 플레이어가 준비상태가 된 경우 백에서 이 버튼을 활성화시킴.
          * 활성화된 startBtn: 백에게 시작하라고 API 전송.
          * -> 백은 모든 플레이어들에게 시작한다는 API 전송.

@@ -1,5 +1,6 @@
 import SubPage from "../SubPage.js";
 import { tourListAPI, tourEntryAPI } from "../../models/API.js";
+import { info } from "../../models/Info.js";
 
 class TourListSubpage extends SubPage {
     $lobbyList;
@@ -21,7 +22,7 @@ class TourListSubpage extends SubPage {
             `;
             newNode.addEventListener("click", () => {
                 // 클로저의 성질을 잘 몰라서 얘는 될 지 모르겠다..
-                tourEntryAPI.sendData[id] = lobby.id;
+                info.lobby.id = lobby.id;
                 this.requestShift("tour_entry_subpage");
             });
             this.$lobbyList.appendChild(newNode);
