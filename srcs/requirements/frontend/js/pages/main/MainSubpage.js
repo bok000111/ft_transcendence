@@ -1,7 +1,7 @@
 import { mainPage } from "./MainPage.js"
 import SubPage from "../SubPage.js"
 
-class MainSubpage extends Subpage {
+class MainSubpage extends SubPage {
     init() {}
     fini() {}
 }
