@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourMakeInfo, tourLobbyInfo } from "../../models/Info.js";
+import { tourMakeAPI, tourLobbyAPI } from "../../models/API.js";
 
 class TourMakeSubpage extends SubPage {
     $form;
@@ -21,10 +21,10 @@ class TourMakeSubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            tourMakeInfo.sendData[name] = this.$form.querySelector("#lobby-name").value;
-            tourMakeInfo.sendData[nickname] = this.$form.querySelector("#nickname").value;
+            tourMakeAPI.sendData[name] = this.$form.querySelector("#lobby-name").value;
+            tourMakeAPI.sendData[nickname] = this.$form.querySelector("#nickname").value;
             try {
-                await tourMakeInfo.requestAPI();
+                await tourMakeAPI.requestAPI();
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {

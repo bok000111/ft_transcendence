@@ -9,7 +9,7 @@
  * status code의 경우에는 http response의 status code로 들어온다. ( fail + error )
  */
 
-class Info {
+class API {
     sendData = {};
     recvData = {};
     // API 전송 / 수신하는 함수
@@ -24,7 +24,7 @@ class Info {
  * sendData = { email, password }
  * recvData = {}
  */
-export const loginInfo = new Info(
+export const loginAPI = new API(
     async function() {
         const response = await fetch("http://localhost:8000/api/login/", {
             method: "POST",
@@ -48,7 +48,7 @@ export const loginInfo = new Info(
  * sendData = { email, password, username }
  * recvData = {}
  */
-export const signupInfo = new Info(
+export const signupAPI = new API(
     async function() {
         const response = await fetch("http://localhost:8000/api/signup/", {
             method: "POST",
@@ -75,7 +75,7 @@ export const signupInfo = new Info(
  * recvData = { message } // 성공 메시지
  *
 */
-export const logoutInfo = new Info(
+export const logoutAPI = new API(
     async function() {
         const response = await fetch("http://localhost::8000/api/logout/", {
             method: "POST",
@@ -111,7 +111,7 @@ export const logoutInfo = new Info(
  * sendData = {}
  * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
-export const tourListInfo = new Info(
+export const tourListAPI = new API(
     async function() {
         const response = await fetch("http://localhost::8000/api/tournament/", {
             method: "GET",
@@ -137,7 +137,7 @@ export const tourListInfo = new Info(
  * sendData = { nickname }
  * recvData = { status, message, data: { "lobby": TournamentLobby }}
 */
-export const tourEntryInfo = new Info(
+export const tourEntryAPI = new API(
     async function() {
         const tournamentID = this.sendData.id;
         delete this.sendData.id;
@@ -165,7 +165,7 @@ export const tourEntryInfo = new Info(
  * sendData = { name, nickname }
  * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
-export const tourMakeInfo = new Info(
+export const tourMakeAPI = new API(
     async function() {
         const response = await fetch(`http://localhost::8000/api/tournament/`, {
             method: "POST",

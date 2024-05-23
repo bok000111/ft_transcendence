@@ -1,6 +1,6 @@
 import SubPage from "../SubPage.js"
 import { tourResultPage } from "./TourResultPage.js"
-import { tourResultDetailInfo } from "../../models/Info.js"
+import { tourResultDetailAPI } from "../../models/API.js"
 
 class TourResultDetailSubpage extends SubPage {
     $dv;
@@ -13,12 +13,12 @@ class TourResultDetailSubpage extends SubPage {
         this.$dv = this.$elem.querySelector("#result_sub_area");
         async() => {
             try {
-                await tourResultDetailInfo.requestAPI();
-                // for(let i = 0; i <tourResultDetailInfo.recvData.length; i++)
+                await tourResultDetailAPI.requestAPI();
+                // for(let i = 0; i <tourResultDetailAPI.recvData.length; i++)
                 // {
                 //     this.$dv.innerHTML += `
                 //         <div>
-                //             <button>$tourResultDetailInfo.recvData[i].rank} : $tourResultDetailInfo.recvData[i].playerName}</button>
+                //             <button>$tourResultDetailAPI.recvData[i].rank} : $tourResultDetailAPI.recvData[i].playerName}</button>
                 //         </div>
                 //     `;
                 // }

@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-// import { TourGameLoungeInfo } from "../../models/Info.js";
+// import { TourGameLoungeAPI } from "../../models/API.js";
 
 class TourGameLoungeSubpage extends SubPage {
     $canvas;
@@ -20,7 +20,7 @@ class TourGameLoungeSubpage extends SubPage {
 
         this.$canvas = this.$elem.querySelector("canvas");
 
-        this.draw(tourGameLoungeInfo.recvData);
+        this.draw(tourGameLoungeAPI.recvData);
     }
 
     fini() {

@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourLobbyInfo } from "../../models/Info.js";
+import { tourLobbyAPI } from "../../models/API.js";
 
 /**
  * TourLobbySubpage -> TourGameLoungeSubpage
@@ -14,7 +14,6 @@ import { tourLobbyInfo } from "../../models/Info.js";
  */
 
 class TourLobbySubpage extends SubPage {
-    sock;
     $title;
     $players;
     $exitBtn;
@@ -63,7 +62,8 @@ class TourLobbySubpage extends SubPage {
          * this.sock.addEventListener("message", (event) => {
          *     
          * })
-         * window.addEventListener("beforeunload", this.sock.close);
+         * if (this.sock)
+         *     window.addEventListener("beforeunload", this.sock.close);
          */
 
         this.$exitBtn.addEventListener("click", () => {
@@ -72,11 +72,11 @@ class TourLobbySubpage extends SubPage {
     }
 
     fini() {
-        /**
-         * 윗 주석에 상세 설명 적혀있음.
-         * if문으로 sock.close()를 해야 할 지 결정해야 할 듯.
-         * this.sock.close();
-         */
+        if (this.sock) {
+            // 소켓에 남은 데이터가 있는지 확인..?
+            this.sock.close();
+            this.sock = null;
+        }
         this.$elem.innerHTML = ``;
     }
 };

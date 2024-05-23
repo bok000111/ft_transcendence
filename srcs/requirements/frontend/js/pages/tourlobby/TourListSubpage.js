@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourListInfo, tourEntryInfo } from "../../models/Info.js";
+import { tourListAPI, tourEntryAPI } from "../../models/API.js";
 
 class TourListSubpage extends SubPage {
     $lobbyList;
@@ -21,7 +21,7 @@ class TourListSubpage extends SubPage {
             `;
             newNode.addEventListener("click", () => {
                 // 클로저의 성질을 잘 몰라서 얘는 될 지 모르겠다..
-                tourEntryInfo.sendData[id] = lobby.id;
+                tourEntryAPI.sendData[id] = lobby.id;
                 this.requestShift("tour_entry_subpage");
             });
             this.$lobbyList.appendChild(newNode);
@@ -30,8 +30,8 @@ class TourListSubpage extends SubPage {
 
     async refresh() {
         try {
-            await tourListInfo.requestAPI();
-            this.renderList(tourListInfo.recvData);
+            await tourListAPI.requestAPI();
+            this.renderList(tourListAPI.recvData);
         }
         catch (e) {
             alert(`Tournament List: ${e.message}`);

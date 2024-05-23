@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { signupInfo } from "../../models/Info.js";
+import { signupAPI } from "../../models/API.js";
 import SubPage from "../SubPage.js";
 
 class SignupSubpage extends SubPage {
@@ -22,13 +22,13 @@ class SignupSubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            signupInfo.sendData = {
+            signupAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
                 password: this.$form.querySelector("#password").value,
                 username: this.$form.querySelector("#username").value,
             };
             try {
-                await signupInfo.requestAPI();
+                await signupAPI.requestAPI();
                 this.requestShift("login_subpage");
             }
             catch (e) {

@@ -1,6 +1,6 @@
 import SubPage from "../SubPage.js"
 import { tourResultPage } from "./TourResultPage.js"
-import { tourResultListInfo, tourResultDetailInfo } from "../../models/Info.js"
+import { tourResultListAPI, tourResultDetailAPI } from "../../models/API.js"
 
 class TourResultListSubpage extends SubPage {
     $dv;
@@ -12,15 +12,15 @@ class TourResultListSubpage extends SubPage {
         `;
 
         this.$dv = $elem.querySelector("#result_sub_area");
-        tourResultListInfo.sendData = null;
+        tourResultListAPI.sendData = null;
         async () => {
             try {
-                await tourResultListInfo.requestAPI();
-                // for(let i = 0; i < tourResultListInfo.recvData.length; i++)
+                await tourResultListAPI.requestAPI();
+                // for(let i = 0; i < tourResultListAPI.recvData.length; i++)
                 // {
                 //     this.$dv.innerHTML += `
                 //     <div>
-                //      <button id=${tourResultListInfo.recvData[i].tournamentID}>${tourResultListInfo.recvData[i].date}</button>
+                //      <button id=${tourResultListAPI.recvData[i].tournamentID}>${tourResultListAPI.recvData[i].date}</button>
                 //     </div>
                 //     `;
                 // }
@@ -38,11 +38,11 @@ class TourResultListSubpage extends SubPage {
     }
 
     setEvent() {
-        // for (let i = 0; i < tourResultListInfo.recvData.length; i++)
+        // for (let i = 0; i < tourResultListAPI.recvData.length; i++)
         // {
-        //     let temp = this.$dv.querySelector("${tourResultListInfo.recvData[i].tournamentID}");
+        //     let temp = this.$dv.querySelector("${tourResultListAPI.recvData[i].tournamentID}");
         //     temp.addEventListener("click", () => {
-        //         resultDetailInfo.sendData.tournamentID = tourResultListInfo.recvData[i].tournamentID;
+        //         resultDetailAPI.sendData.tournamentID = tourResultListAPI.recvData[i].tournamentID;
         //         this.requestShift("tour_result_detail_subpage");
         //     });
         // }

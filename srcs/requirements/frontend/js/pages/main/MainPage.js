@@ -1,6 +1,6 @@
 import { rootPage } from "../RootPage.js"
 import Page from "../Page.js"
-import { logoutInfo } from "../../models/Info.js"
+import { logoutAPI } from "../../models/API.js"
 
 // 추가로 다른 "페이지" 추가해야함. (for shift)
 
@@ -27,9 +27,9 @@ class MainPage extends Page {
         this.$matchmakingBtn = document.querySelector("#matchmaking");
 
         this.$logoutBtn.addEventListener("click" , async() => {
-            logoutInfo.sendData = {};
+            logoutAPI.sendData = {};
             try {
-                await logoutInfo.requestAPI();
+                await logoutAPI.requestAPI();
                 this.requestShift("auth_page");
             }
             catch (e) {
