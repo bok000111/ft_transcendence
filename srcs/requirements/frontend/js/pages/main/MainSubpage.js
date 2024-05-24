@@ -31,7 +31,7 @@ class MainSubpage extends SubPage {
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {
-                //await logoutAPI.request();
+                await logoutAPI.request();
                 this.requestShift("auth_page");
             }
             catch (e) {

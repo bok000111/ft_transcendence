@@ -77,7 +77,7 @@ export const signupAPI = new API(
 */
 export const logoutAPI = new API(
     async function() {
-        const response = await fetch("http://localhost::8000/api/logout/", {
+        const response = await fetch("http://localhost:8000/api/logout/", {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
