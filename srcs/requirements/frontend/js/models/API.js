@@ -113,7 +113,7 @@ export const logoutAPI = new API(
 */
 export const tourListAPI = new API(
     async function() {
-        const response = await fetch("http://localhost::8000/api/tournament/", {
+        const response = await fetch("http://localhost:8000/api/tournament/", {
             method: "GET",
             headers: {
                 "Host": "localhost:8000",
@@ -141,7 +141,7 @@ export const tourEntryAPI = new API(
     async function() {
         const tournamentID = this.sendData.id;
         delete this.sendData.id;
-        const response = await fetch(`http://localhost::8000/api/tournament/${tournamentID}/`, {
+        const response = await fetch(`http://localhost:8000/api/tournament/${tournamentID}/`, {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -167,7 +167,7 @@ export const tourEntryAPI = new API(
  */
 export const tourMakeAPI = new API(
     async function() {
-        const response = await fetch(`http://localhost::8000/api/tournament/`, {
+        const response = await fetch(`http://localhost:8000/api/tournament/`, {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -209,7 +209,7 @@ export const tourMakeAPI = new API(
 */
 export const tourResultListAPI = new API(
     async function() {
-        const response = await fetch(`http://localhost::8000/api/result/`, {
+        const response = await fetch(`http://localhost:8000/api/result/`, {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -233,7 +233,7 @@ export const tourResultListAPI = new API(
  */
 export const tourResultDetailAPI = new API(
     async function() {
-        const response = await fetch(`http://localhost::8000/api/tournament/`, {
+        const response = await fetch(`http://localhost:8000/api/tournament/`, {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
