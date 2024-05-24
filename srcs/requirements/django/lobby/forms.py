@@ -77,3 +77,24 @@ class LobbyCreateModelForm(forms.ModelForm):
     @database_sync_to_async
     def asave(self):
         return self.save()
+
+
+class NicknameForm(forms.Form):
+    nickname = forms.CharField(
+        label="Nickname",
+        max_length=12,
+        min_length=2,
+        error_messages={
+            "required": "Nickname is required",
+            "min_length": "Nickname must be at least 2 characters long",
+            "max_length": "Nickname must be at most 12 characters long",
+        },
+    )
+
+    def clean_nickname(self):
+        nickname = self.cleaned_data["nickname"]
+        if not nickname.isalnum():
+            raise forms.ValidationError(
+                "Nickname must contain only letters and numbers"
+            )
+        return nickname
