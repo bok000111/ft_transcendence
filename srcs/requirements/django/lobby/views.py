@@ -1,4 +1,5 @@
 import json
+from django.db import IntegrityError
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.views.generic import View
@@ -16,7 +17,7 @@ from user.utils import need_auth
 from api.utils import need_json, AJsonMixin, AJsonAuthRequiredMixin
 
 from .models import GameLobby, PlayerInLobby
-from .forms import LobbyCreateModelForm
+from .forms import LobbyCreateModelForm, NicknameForm
 
 
 class GameLobbyView(AJsonMixin, AJsonAuthRequiredMixin, View):
@@ -64,6 +65,17 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
         if id is None:
             return self.jsend_bad_request({"message": "Invalid data"})
 
+        nickname_form = NicknameForm(request.json)
+        if nickname_form.is_valid():
+            nickname = nickname_form.cleaned_data["nickname"]
+        else:
+            return self.jsend_bad_request(
+                {
+                    "message": "Invalid nickname data",
+                    "data": nickname_form.errors.as_json(),
+                }
+            )
+
         try:
             lobby = await GameLobby.objects.aget(id=id)
         except GameLobby.DoesNotExist:
@@ -75,9 +87,23 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
             lobby.players.filter(id=(user := await request.auser()).id).exists
         )():
             return self.jsend_bad_request({"message": "Already in the lobby"})
-        else:
-            await lobby.join(user)
-            return self.jsend_ok({"message": "Joined lobby"})
+
+        check_user = await database_sync_to_async(
+            PlayerInLobby.objects.filter(user=user).exists
+        )()
+        if check_user:
+            return self.jsend_bad_request(
+                {"message": "The user is already in some lobby"}
+            )
+
+        check_nickname = await database_sync_to_async(
+            PlayerInLobby.objects.filter(lobby=lobby, nickname=nickname).exists
+        )()
+        if check_nickname:
+            return self.jsend_bad_request({"message": "Nickname is already in use"})
+
+        await lobby.join(user, nickname=nickname)
+        return self.jsend_ok({"message": "Joined lobby"})
 
     # if the user is the host, delete the lobby
     # if the user is not the host, leave the lobby

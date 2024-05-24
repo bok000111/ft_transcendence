@@ -89,8 +89,8 @@ class GameLobby(models.Model):
 
     @database_sync_to_async
     @transaction.atomic
-    def join(self, user):
-        self.players.add(user)
+    def join(self, user, nickname):
+        self.players.add(user, through_defaults={"nickname": nickname})
         self.player_count += 1
         self.save()
 
@@ -107,15 +107,24 @@ class PlayerInLobby(models.Model):
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         help_text="User ID",
+        # unique=True,
     )
     lobby = models.ForeignKey(
         GameLobby,
         on_delete=models.CASCADE,
         help_text="Lobby ID",
     )
+    nickname = models.CharField(
+        max_length=12,
+        default="Default",
+        help_text="Player's nickname in the lobby",
+    )
     score = models.IntegerField(default=0, help_text="Player's score")
     is_host = models.BooleanField(default=False, help_text="Is the player the host")
     is_ready = models.BooleanField(default=False, help_text="Is the player ready")
 
     class Meta:
-        unique_together = ("user", "lobby")
+        unique_together = (
+            ("lobby", "user"),
+            ("lobby", "nickname"),
+        )
