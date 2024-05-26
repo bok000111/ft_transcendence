@@ -63,7 +63,8 @@ def need_json(view):
                 return JsonResponse(
                     {
                         "status": "fail",
-                        "data": {"content_type": "Invalid content type"},
+                        "data": {"content_type": "invalid content type"},
+                        "message": "invalid content type",
                     },
                     status=400,
                 )
@@ -79,7 +80,8 @@ def need_json(view):
                 return JsonResponse(
                     {
                         "status": "fail",
-                        "data": {"content_type": "Invalid content type"},
+                        "data": {"content_type": "invalid content type"},
+                        "message": "invalid content type",
                     },
                     status=400,
                 )
@@ -93,7 +95,8 @@ class AJsonAuthRequiredMixin(AccessMixin):
         return JsonResponse(
             {
                 "status": "fail",
-                "data": {"auth": "Authentication required"},
+                "data": {"auth": "authentication required"},
+                "message": "authentication required",
             },
             status=401,
         )
@@ -109,48 +112,52 @@ class AJsonMixin:
         match request.method:
             case "POST" | "PUT" | "PATCH":
                 if request.content_type != "application/json":
-                    return self.jsend_bad_request({"message": "Invalid content type"})
+                    return self.jsend_bad_request(
+                        {"content_type": "invalid content type"}, "invalid content type"
+                    )
                 try:
                     request.json = json.loads(request.body)
                 except json.JSONDecodeError:
-                    return self.json_response_bad_request({"message": "Invalid body"})
+                    return self.jsend_bad_request(
+                        {"content": "invalid json"}, "invalid json"
+                    )
         return await super().dispatch(request, *args, **kwargs)
 
-    def json_response(self, data, **kwargs):
-        return JsonResponse(data, **kwargs)
+    def json_response(
+        self, status="success", data=None, message=None, code=200, **kwargs
+    ):
+        return JsonResponse(
+            {"status": status, "data": data, "message": message}, status=code, **kwargs
+        )
 
     @database_sync_to_async
-    def ajson_response(self, data, **kwargs):
-        return self.json_response(data, **kwargs)
+    def ajson_response(self, status, data, message, code, **kwargs):
+        return self.json_response(status, data, message, code, **kwargs)
 
-    def jsend_ok(self, data, **kwargs):
-        return JsonResponse({"status": "success", **data}, status=200, **kwargs)
-
-    @database_sync_to_async
-    def ajsend_ok(self, data, **kwargs):
-        return self.jsend_ok(data, **kwargs)
-
-    def jsend_created(self, data, **kwargs):
-        return JsonResponse({"status": "success", **data}, status=201, **kwargs)
+    def jsend_ok(self, data, message, **kwargs):
+        return self.json_response("success", data, message, 200, **kwargs)
 
     @database_sync_to_async
-    def ajsend_created(self, data, **kwargs):
-        return self.jsend_created(data, **kwargs)
+    def ajsend_ok(self, data, message, **kwargs):
+        return self.jsend_ok(data, message, **kwargs)
 
-    def jsend_bad_request(self, data, **kwargs):
-        return JsonResponse({"status": "fail", **data}, status=400, **kwargs)
+    def jsend_created(self, data, message, **kwargs):
+        return self.json_response("success", data, message, 201, **kwargs)
 
     @database_sync_to_async
-    def ajsend_bad_request(self, data, **kwargs):
-        return self.jsend_bad_request(data, **kwargs)
+    def ajsend_created(self, data, message, **kwargs):
+        return self.jsend_created(data, message, **kwargs)
+
+    def jsend_bad_request(self, data, message, **kwargs):
+        return self.json_response("fail", data, message, 400, **kwargs)
+
+    @database_sync_to_async
+    def ajsend_bad_request(self, data, message, **kwargs):
+        return self.jsend_bad_request(data, message, **kwargs)
 
     def jsend_unauthorized(self):
-        return JsonResponse(
-            {
-                "status": "fail",
-                "data": {"auth": "Authentication required"},
-            },
-            status=401,
+        return self.json_response(
+            "fail", {"auth": "authorization required"}, "authorization required", 401
         )
 
     @database_sync_to_async
@@ -158,25 +165,21 @@ class AJsonMixin:
         return self.jsend_unauthorized()
 
     def jsend_forbidden(self):
-        return JsonResponse(
-            {"status": "fail", "data": {"auth": "Forbidden"}}, status=403
-        )
+        return self.json_response("fail", {"auth": "forbidden"}, "forbidden", 403)
 
     @database_sync_to_async
     def ajsend_forbidden(self):
         return self.jsend_forbidden()
 
-    def jsend_not_found(self, data, **kwargs):
-        return JsonResponse({"status": "fail", **data}, status=404, **kwargs)
+    def jsend_not_found(self, data, message, **kwargs):
+        return self.json_response("fail", data, message, 404, **kwargs)
 
     @database_sync_to_async
-    def ajsend_not_found(self, data, **kwargs):
-        return self.jsend_not_found(data, **kwargs)
+    def ajsend_not_found(self, data, message, **kwargs):
+        return self.jsend_not_found(data, message, **kwargs)
 
     def jsend_internal_error(self):
-        return JsonResponse(
-            {"status": "error", "message": "Internal server error"}, status=500
-        )
+        return self.json_response("error", None, "internal server error", 500)
 
     @database_sync_to_async
     def ajsend_internal_error(self):
