@@ -1,14 +1,11 @@
-import json
 from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.contrib.auth import aauthenticate, alogin, alogout, get_user_model
 from django.views import View
-from django.views.decorators.http import require_http_methods
 from channels.db import database_sync_to_async
 
-from api.utils import need_json, AJsonMixin, JsonResponse
-from user.utils import need_auth
+from api.utils import AJsonMixin, AJsonAuthRequiredMixin
 
 from .forms import UserCreateModelForm, UserLoginForm
 
@@ -20,25 +17,19 @@ class SignUpView(AJsonMixin, View):
         form = UserCreateModelForm(request.json)
         if await sync_to_async(form.is_valid)():
             new_user = await database_sync_to_async(form.save)()
-            return await self.ajsend_created(
-                {
-                    "message": "User created",
-                    "data": {"user": new_user},
-                }
-            )
+            return await self.ajsend_created({"user": new_user}, "user created")
         else:
             return self.jsend_bad_request(
-                {
-                    "message": "Invalid data",
-                    "data": form.errors.as_json(),
-                }
+                form.errors.as_json(escape_html=True), "invalid data"
             )
 
 
 class LoginView(AJsonMixin, View):
     async def post(self, request):
         if (await request.auser()).is_authenticated:
-            return self.jsend_bad_request({"message": "Already logged in"})
+            return self.jsend_bad_request(
+                {"auth": "already logged in"}, "already logged in"
+            )
         form = UserLoginForm(request.json)
         if await sync_to_async(form.is_valid)():
             user = await aauthenticate(
@@ -48,19 +39,23 @@ class LoginView(AJsonMixin, View):
             )
             if user is not None:
                 await alogin(request, user)
-                return await self.ajsend_ok(
-                    {"message": "Logged in", "data": {"user": user}}
-                )
-        return self.jsend_bad_request({"message": "Invalid credentials"})
+                return await self.ajsend_ok({"user": user}, "logged in")
+        return self.jsend_bad_request(
+            {"auth": "invalid credentials"}, "invalid credentials"
+        )
 
 
-@require_http_methods(["POST"])
-@need_auth
-@need_json
-async def logout_view(request):
-    await alogout(request)
+class LogoutView(AJsonMixin, AJsonAuthRequiredMixin, View):
+    async def post(self, request):
+        await alogout(request)
 
-    return JsonResponse({"message": "Logged out"}, status=200)
+        return self.jsend_ok(None, "logged out")
+
+
+class MyInfoView(AJsonMixin, AJsonAuthRequiredMixin, View):
+    async def get(self, request):
+        user = await request.auser()
+        return self.ajsend_ok({"user": user}, "user info")
 
 
 # Path: srcs/requirements/django/user/models.py
