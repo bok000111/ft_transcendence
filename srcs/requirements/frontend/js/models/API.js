@@ -12,13 +12,32 @@ import { info } from "./Info.js";
  */
 
 class API {
+    uri;
+    method;
     sendData = {};
     recvData = {};
-    // API 전송 / 수신하는 함수
-    request;
 
-    constructor(request) {
-        this.request = request.bind(this);
+    constructor(uri, method) {
+        this.uri = uri;
+        this.method = method;
+    }
+
+    async request() {
+        const response = await fetch(this.uri, {
+            method: this.method,
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
     }
 };
 
@@ -81,6 +100,26 @@ export const logoutAPI = new API(
     async function() {
         const response = await fetch("http://localhost::8000/api/logout/", {
             method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "applicatoin/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);
+
+export const meAPI = new API(
+    async function() {
+        const response = await fetch("http://localhost::8000/api/user/me/", {
+            method: "GET",
             headers: {
                 "Host": "localhost:8000",
                 "Origin": "http://localhost:5500",
