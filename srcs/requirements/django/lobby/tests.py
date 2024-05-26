@@ -47,7 +47,7 @@ class LobbyTest(TransactionTestCase):
             content_type="application/json",
         )
 
-        self.assertContains(response, "Lobby created", status_code=201)
+        self.assertContains(response, "lobby created", status_code=201)
 
     def test_create_lobby_invalid_format(self):
         tcs = [
@@ -81,7 +81,7 @@ class LobbyTest(TransactionTestCase):
 
         response = self.client.get(lobby_url)
 
-        self.assertContains(response, "Lobbies", status_code=200)
+        self.assertContains(response, "lobbies", status_code=200)
         self.assertEqual(len(response.json()["data"]["lobbies"]), 5)
         for tc in tcs:
             self.assertContains(response, tc["name"], status_code=200)
@@ -97,7 +97,7 @@ class LobbyTest(TransactionTestCase):
             )
             lobby_id = response.json()["data"]["lobby"]["id"]
             response = self.client.get(reverse("lobby_detail", args=[lobby_id]))
-            self.assertContains(response, "Lobby", status_code=200)
+            self.assertContains(response, "lobby", status_code=200)
 
     def test_join_leave_lobby(self):
         response = self.host["client"].post(
@@ -114,7 +114,7 @@ class LobbyTest(TransactionTestCase):
             data={"nickname": "testnick"},
         )
 
-        self.assertContains(response, "Joined lobby", status_code=200)
+        self.assertContains(response, "joined lobby", status_code=200)
 
         response = self.client.get(
             reverse("lobby_detail", args=[lobby_id]),
@@ -127,7 +127,7 @@ class LobbyTest(TransactionTestCase):
             reverse("lobby_detail", args=[lobby_id]),
         )
 
-        self.assertContains(response, "Left lobby", status_code=200)
+        self.assertContains(response, "left lobby", status_code=200)
 
         response = self.client.get(
             reverse("lobby_detail", args=[lobby_id]),
@@ -140,14 +140,14 @@ class LobbyTest(TransactionTestCase):
             reverse("lobby_detail", args=[lobby_id]),
         )
 
-        self.assertContains(response, "Lobby deleted", status_code=200)
+        self.assertContains(response, "lobby deleted", status_code=200)
 
         response = self.host["client"].get(
             reverse("lobby_detail", args=[lobby_id]),
             content_type="application/json",
         )
 
-        self.assertContains(response, "Not found", status_code=404)
+        self.assertContains(response, "not found", status_code=404)
 
     def test_dup_nickname(self):
         response = self.host["client"].post(
@@ -162,14 +162,14 @@ class LobbyTest(TransactionTestCase):
             content_type="application/json",
             data={"nickname": "duptest"},
         )
-        self.assertContains(response, "Joined lobby", status_code=200)
+        self.assertContains(response, "joined lobby", status_code=200)
 
         response = self.client2.post(
             reverse("lobby_detail", args=[lobby_id]),
             content_type="application/json",
             data={"nickname": "duptest"},
         )
-        self.assertContains(response, "Nickname is already in use", status_code=400)
+        self.assertContains(response, "nickname is already in use", status_code=400)
 
     def test_same_lobby(self):
         response = self.host["client"].post(
@@ -184,7 +184,7 @@ class LobbyTest(TransactionTestCase):
             content_type="application/json",
             data={"nickname": "testnick2"},
         )
-        self.assertContains(response, "Joined lobby", status_code=200)
+        self.assertContains(response, "joined lobby", status_code=200)
 
         response = self.client.post(
             reverse("lobby_detail", args=[lobby_id]),
@@ -192,7 +192,7 @@ class LobbyTest(TransactionTestCase):
             data={"nickname": "testnick3"},
         )
 
-        self.assertContains(response, "Already in the lobby", status_code=400)
+        self.assertContains(response, "already in lobby", status_code=400)
 
     def test_user_already_in_another_lobby(self):
         response = self.host["client"].post(
@@ -214,7 +214,7 @@ class LobbyTest(TransactionTestCase):
             content_type="application/json",
             data={"nickname": "testnick2"},
         )
-        self.assertContains(response, "Joined lobby", status_code=200)
+        self.assertContains(response, "joined lobby", status_code=200)
 
         response = self.client.post(
             reverse("lobby_detail", args=[lobby_id2]),
@@ -222,10 +222,7 @@ class LobbyTest(TransactionTestCase):
             data={"nickname": "testnick3"},
         )
 
-        print(response.json())
-        self.assertContains(
-            response, "The user is already in some lobby", status_code=400
-        )
+        self.assertContains(response, "already in lobby", status_code=400)
 
 
 # class RoomWebSocketTest(TransactionTestCase):

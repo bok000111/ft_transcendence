@@ -22,7 +22,7 @@ logout_url = reverse("logout")
 class RequireJsonTest(TestCase):
     async def test_require_json(self):
         response = await self.async_client.post(reverse("signup"))
-        self.assertContains(response, "Invalid content type", status_code=400)
+        self.assertContains(response, "invalid content type", status_code=400)
 
 
 class SignupTest(TransactionTestCase):
@@ -33,7 +33,7 @@ class SignupTest(TransactionTestCase):
         data = SignUpFactory()
         response = self.client.post(signup_url, data, content_type="application/json")
         result = response.json()
-        self.assertContains(response, "User created", status_code=201)
+        self.assertContains(response, "user created", status_code=201)
         self.assertQuerySetEqual(
             User.objects.filter(email=result["data"]["user"]["email"]),
             [data["email"]],
@@ -89,7 +89,7 @@ class LoginTest(TransactionTestCase):
             content_type="application/json",
         )
 
-        self.assertContains(response, "Logged in", status_code=200)
+        self.assertContains(response, "logged in", status_code=200)
         self.assertTrue(self.client.session["_auth_user_id"])
 
     def test_login_failure(self):
@@ -109,8 +109,8 @@ class LoginTest(TransactionTestCase):
             for tc in tcs
         ]
 
-        self.assertContains(responses[0], "Invalid credentials", status_code=400)
-        self.assertContains(responses[1], "Invalid credentials", status_code=400)
+        self.assertContains(responses[0], "invalid credentials", status_code=400)
+        self.assertContains(responses[1], "invalid credentials", status_code=400)
 
     def test_login_already_logged_in(self):
         self.client.post(
@@ -132,7 +132,7 @@ class LoginTest(TransactionTestCase):
             content_type="application/json",
         )
 
-        self.assertContains(response, "Already logged in", status_code=400)
+        self.assertContains(response, "already logged in", status_code=400)
 
 
 class LogoutTest(TransactionTestCase):
@@ -152,14 +152,14 @@ class LogoutTest(TransactionTestCase):
 
     def test_logout(self):
         response = self.client.post(logout_url, content_type="application/json")
-        self.assertContains(response, "Logged out", status_code=200)
+        self.assertContains(response, "logged out", status_code=200)
         self.assertFalse(self.client.session.get("_auth_user_id"))
 
     def test_logout_failure(self):
         self.client.post(logout_url, content_type="application/json")
 
         response = self.client.post(logout_url, content_type="application/json")
-        self.assertContains(response, "Not logged in", status_code=403)
+        self.assertContains(response, "authentication required", status_code=401)
 
 
 # This test is for stress testing - need --parallel option
