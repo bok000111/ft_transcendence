@@ -22,13 +22,30 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 
-# TODO: 나중에 환경변수로 변경
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-bhb3@-^i==hy=0@6-i+(i%*#^m9u&r^cus@1s6ih-g88t+eq%c"
+def load_dotenv(file_path):
+    with open(file_path) as f:
+        for line in f:
+            # Remove leading/trailing whitespace
+            line = line.strip()
+            # Ignore comments and empty lines
+            if line.startswith("#") or not line:
+                continue
+            # Split at the first `=` character
+            key, value = line.split("=", 1)
+            # Remove leading/trailing whitespace from key and value
+            key = key.strip()
+            value = value.strip()
+            # Set the environment variable
+            os.environ[key] = value
+
 
 # TODO: 배포시 False로 변경
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+if DEBUG:
+    load_dotenv(os.path.join(BASE_DIR, "../../.env"))
+
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # TODO: 나중에 환경변수로 변경
 ALLOWED_HOSTS = [
@@ -73,6 +90,7 @@ INSTALLED_APPS = [
     "ft_transcendence",  # 프로젝트 설정
     "api",  # api 라우팅
     "ws",  # websocket 라우팅
+    "oauth",  # 42 OAuth
     "user",  # 유저 관리
     # "pong",  # 게임 관리
     "lobby",  # 로비 관리
@@ -197,3 +215,11 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+# 42 OAuth
+OAUTH_42_URL = "https://api.intra.42.fr/oauth/authorize"
+OAUTH_42_CLIENT_ID = os.getenv("OAUTH_42_CLIENT_ID")
+OAUTH_42_CLIENT_SECRET = os.getenv("OAUTH_42_CLIENT_SECRET")
+OAUTH_42_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
+OAUTH_42_TOKEN_URL = "https://api.intra.42.fr/oauth/token"
