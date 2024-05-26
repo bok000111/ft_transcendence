@@ -71,11 +71,6 @@ export const logoutAPI = new API(
     "POST"
 );
 
-export const meAPI = new API(
-    "http://localhost::8000/api/user/me/",
-    "GET"
-);
-
 // <*** TournamentLobby Object ***>
 // TournamentLobby: {
 // 	"id": number,
@@ -135,16 +130,52 @@ export const tourMakeAPI = new API(
  */
 // export const tourGameLoungeInfo = new Info();
 
-/** 미정 Info
+/** 미정 API
  * GET
  * PATH 미정  (5.18 기준)
  * sendData = {} // 일단은 없을듯?
  * recvData = { date, time, tourID }
 */
-// export const tourResultListInfo = new Info();
+export const tourResultListAPI = new API(
+    async function() {
+        const response = await fetch(`http://localhost:8000/api/result/`, {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);
 
-/** 미정 Info
+/** 미정 API
  * sendData = { tourID }
  * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
  */
-// export const tourResultDetailInfo = new Info();
+export const tourResultDetailAPI = new API(
+    async function() {
+        const response = await fetch(`http://localhost:8000/api/tournament/`, {
+            method: "POST",
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
+    }
+);

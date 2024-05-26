@@ -44,7 +44,7 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:8080",
 ]
 CSRF_COOKIE_SECURE = False  # 개발시에는 False로 설정
-CSRF_COOKIE_SAMESITE = "None"  # 개발시에는 "None"으로 설정
+CSRF_COOKIE_SAMESITE = "Lax"  # 개발시에는 "None"으로 설정
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost",
@@ -158,7 +158,7 @@ AUTH_USER_MODEL = "user.User"
 
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
-SESSION_COOKIE_SAMESITE = "None"  # 개발시에는 "None"으로 설정
+SESSION_COOKIE_SAMESITE = "Lax"  # 개발시에는 "None"으로 설정
 SESSION_COOKIE_SECURE = False  # 개발시에는 False로 설정
 
 

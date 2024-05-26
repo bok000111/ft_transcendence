@@ -29,6 +29,7 @@ class SignupSubpage extends SubPage {
             };
             try {
                 await signupAPI.request();
+                alert("Signup Success!");
                 this.requestShift("login_subpage");
             }
             catch (e) {
