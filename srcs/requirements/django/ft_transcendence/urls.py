@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
-from django.contrib import admin
+# from django.contrib import admin
 from django.urls import path, include
 
 from . import views
@@ -22,6 +22,5 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),  # 메인 페이지 - spa로 구현
     path("api/", include("api.urls")),  # api 요청들
-    # path ("ws", include("ws.urls")), # websocket 요청들
-    path("admin/", admin.site.urls),  # 관리자 페이지 - 배포 시 제거
+    # path("admin/", admin.site.urls),  # 관리자 페이지 - 배포 시 제거
 ]
