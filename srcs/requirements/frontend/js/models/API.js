@@ -46,7 +46,7 @@ class API {
  * recvData = {}
  */
 export const loginAPI = new API(
-    "http://localhost:8000/api/login/",
+    "http://localhost:8000/api/user/login/",
     "POST"
 );
 
@@ -55,7 +55,7 @@ export const loginAPI = new API(
  * recvData = {}
  */
 export const signupAPI = new API(
-    "http://localhost:8000/api/signup/",
+    "http://localhost:8000/api/user/signup/",
     "POST"
 );
 
@@ -67,8 +67,13 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    "http://localhost::8000/api/logout/",
+    "http://localhost::8000/api/user/logout/",
     "POST"
+);
+
+export const meAPI = new API(
+    "http://localhost::8000/api/user/me/",
+    "GET"
 );
 
 // <*** TournamentLobby Object ***>
@@ -137,23 +142,8 @@ export const tourMakeAPI = new API(
  * recvData = { date, time, tourID }
 */
 export const tourResultListAPI = new API(
-    async function() {
-        const response = await fetch(`http://localhost:8000/api/result/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/result/",
+    "GET"
 );
 
 /** 미정 API
@@ -161,21 +151,6 @@ export const tourResultListAPI = new API(
  * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
  */
 export const tourResultDetailAPI = new API(
-    async function() {
-        const response = await fetch(`http://localhost:8000/api/tournament/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/result/",
+    "GET"
 );
