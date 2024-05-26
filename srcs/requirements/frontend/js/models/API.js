@@ -46,23 +46,8 @@ class API {
  * recvData = {}
  */
 export const loginAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/login/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/login/",
+    "POST"
 );
 
 /**
@@ -70,23 +55,8 @@ export const loginAPI = new API(
  * recvData = {}
  */
 export const signupAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/signup/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/signup/",
+    "POST"
 );
 
 /**
@@ -97,43 +67,13 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost::8000/api/logout/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "applicatoin/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/logout/",
+    "POST"
 );
 
 export const meAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost::8000/api/user/me/", {
-            method: "GET",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "applicatoin/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/user/me/",
+    "GET"
 );
 
 // <*** TournamentLobby Object ***>
@@ -153,23 +93,8 @@ export const meAPI = new API(
  * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
 export const tourListAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost::8000/api/tournament/", {
-            method: "GET",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                // "Content-Type": "applicatoin/json",
-            },
-            // body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/tournament/",
+    "GET"
 );
 
 /**
@@ -179,23 +104,8 @@ export const tourListAPI = new API(
  * recvData = { status, message, data: { "lobby": TournamentLobby }}
 */
 export const tourEntryAPI = new API(
-    async function() {
-        const response = await fetch(`http://localhost::8000/api/tournament/${info.lobby.id}/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "applicatoin/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    `http://localhost::8000/api/tournament/${info.lobby.id}/`,
+    "POST"
 );
 
 /**
@@ -205,23 +115,8 @@ export const tourEntryAPI = new API(
  * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
 export const tourMakeAPI = new API(
-    async function() {
-        const response = await fetch(`http://localhost::8000/api/tournament/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "applicatoin/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/tournament/",
+    "POST"
 );
 
 /**
