@@ -4,4 +4,3 @@ import { signupSubpage } from "./pages/auth/SignupSubpage.js";
 import { mainSubpage } from "./pages/main/MainSubpage.js";
 
 rootPage.init();
-rootPage.checkLoggedIn();
