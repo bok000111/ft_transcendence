@@ -1,7 +1,7 @@
-const Info = {
+const info = {
     username,       // string
     lobby: {
-        lobbyID,    // number
+        id,    // number
         nickname,   // string
         isHost,     // boolean
         isReady     // boolean

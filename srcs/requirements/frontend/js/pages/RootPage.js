@@ -1,4 +1,5 @@
 import Component from "../models/Component.js";
+import { meAPI } from "../models/Info.js";
 
 export default class RootPage extends Component {
     parent; // object
@@ -35,12 +36,16 @@ export default class RootPage extends Component {
          * -> 토너먼트 진행중 : 토너먼트 화면
          * -> 나머지 : 메인 화면
          */
-        // if (session) {
-        //     this.child["main_page"].init();
-        // }
-        // else {
-            this.child[this.initChildName].init();
-        // }
+        (async () => {
+            try {
+                await meAPI.request();
+                info.username = meAPI.recvData.data.user.username;
+                this.child["main_page"].init();
+            }
+            catch {
+                this.child[this.initChildName].init();
+            }
+        })();
     }
 
     fini() {}

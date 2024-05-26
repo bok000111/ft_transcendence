@@ -1,5 +1,6 @@
 import { authPage } from "./AuthPage.js";
 import { loginAPI } from "../../models/API.js";
+import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
 class LoginSubpage extends SubPage {
@@ -27,6 +28,7 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
+                info.username = loginAPI.recvData.data.user.username;
                 this.requestShift("main_page");
             }
             catch (e) {

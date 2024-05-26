@@ -1,3 +1,5 @@
+import { info } from "./Info.js";
+
 /**
  * 기본 http 통신의 경우,
  * {
@@ -10,13 +12,32 @@
  */
 
 class API {
+    uri;
+    method;
     sendData = {};
     recvData = {};
-    // API 전송 / 수신하는 함수
-    request;
 
-    constructor(request) {
-        this.request = request.bind(this);
+    constructor(uri, method) {
+        this.uri = uri;
+        this.method = method;
+    }
+
+    async request() {
+        const response = await fetch(this.uri, {
+            method: this.method,
+            headers: {
+                "Host": "localhost:8000",
+                "Origin": "http://localhost:5500",
+                "Access-Control-Allow-Origin": "http://localhost:5500",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(this.sendData),
+            credentials: "include",
+        });
+        this.recvData = await response.json();
+        if (!response.ok) {
+            throw new Error(this.recvData.message);
+        }
     }
 };
 
@@ -25,23 +46,8 @@ class API {
  * recvData = {}
  */
 export const loginAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/user/login/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/login/",
+    "POST"
 );
 
 /**
@@ -49,23 +55,8 @@ export const loginAPI = new API(
  * recvData = {}
  */
 export const signupAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/user/signup/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost:8000/api/signup/",
+    "POST"
 );
 
 /**
@@ -76,23 +67,8 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/user/logout/", {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/logout/",
+    "POST"
 );
 
 // <*** TournamentLobby Object ***>
@@ -112,23 +88,8 @@ export const logoutAPI = new API(
  * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
 export const tourListAPI = new API(
-    async function() {
-        const response = await fetch("http://localhost:8000/api/tournament/", {
-            method: "GET",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                // "Content-Type": "application/json",
-            },
-            // body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/tournament/",
+    "GET"
 );
 
 /**
@@ -138,25 +99,8 @@ export const tourListAPI = new API(
  * recvData = { status, message, data: { "lobby": TournamentLobby }}
 */
 export const tourEntryAPI = new API(
-    async function() {
-        const tournamentID = this.sendData.id;
-        delete this.sendData.id;
-        const response = await fetch(`http://localhost:8000/api/tournament/${tournamentID}/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    `http://localhost::8000/api/tournament/${info.lobby.id}/`,
+    "POST"
 );
 
 /**
@@ -166,23 +110,8 @@ export const tourEntryAPI = new API(
  * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
 export const tourMakeAPI = new API(
-    async function() {
-        const response = await fetch(`http://localhost:8000/api/tournament/`, {
-            method: "POST",
-            headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:5500",
-                "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(this.sendData),
-            credentials: "include",
-        });
-        this.recvData = await response.json();
-        if (!response.ok) {
-            throw new Error(this.recvData.message);
-        }
-    }
+    "http://localhost::8000/api/tournament/",
+    "POST"
 );
 
 /**
