@@ -6,27 +6,27 @@ class MainSubpage extends SubPage {
     $logoutBtn;
     $participateBtn;
     $tournamentResultBtn;
-    $matchmakingBtn;
+    $normalBtn;
 
     init() {
         this.$elem.innerHTML = `
         <div>
-        <button id="logout">Logout</button>
+        <button id="participate">PARTICIPATE TOURNAMENT</button>
         </div>
         <div>
-        <button id="participate">Participate Tournament</button>
+        <button id="tournamentResult">TOURNAMENT RESULT</button>
         </div>
         <div>
-        <button id="tournamentResult">Tournament Result</button>
+        <button id="normalgame">NORMAL GAME</button>
         </div>
         <div>
-        <button id="matchmaking">Matchmaking</button>
+        <button id="logout">LOGOUT</button>
         </div>`;
 
         this.$logoutBtn = document.querySelector("#logout");
         this.$participateBtn = document.querySelector("#participate");
         this.$tournamentResultBtn = document.querySelector("#tournamentResult");
-        this.$matchmakingBtn = document.querySelector("#matchmaking");
+        this.$normalBtn = document.querySelector("#normalgame");
 
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
@@ -40,7 +40,7 @@ class MainSubpage extends SubPage {
         });
         //this.$participateBtn.addEventListener("click", this.requestShift("tour_room_page")); // 나중에 인자 이름 체킹 필요
         //this.$tournamentResultBtn.addEventListener("click", this.requestShift("tour_result_page")); // 나중에 인자 이름 체킹 필요
-        //this.$matchmakingBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요
+        //this.$normalBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요
     }
 
     fini() {
