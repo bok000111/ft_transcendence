@@ -1,5 +1,6 @@
 import Component from "../models/Component.js";
-import { meAPI } from "../models/Info.js";
+import { meAPI } from "../models/API.js";
+import { info } from "../models/Info.js";
 
 export default class RootPage extends Component {
     parent; // object
@@ -30,22 +31,24 @@ export default class RootPage extends Component {
         this.curChild.init();
     }
     
+    async checkLoggedIn() {
+        try {
+            await meAPI.request();
+            info.username = meAPI.recvData.data.user.username;
+            rootPage.childShift("main_page");
+        }
+        catch {
+            
+        }
+    }
+
     init() {
         /**
          * 로그인 세션이 유지되는 상태
          * -> 토너먼트 진행중 : 토너먼트 화면
          * -> 나머지 : 메인 화면
          */
-        (async () => {
-            try {
-                await meAPI.request();
-                info.username = meAPI.recvData.data.user.username;
-                this.child["main_page"].init();
-            }
-            catch {
-                this.child[this.initChildName].init();
-            }
-        })();
+        this.child[this.initChildName].init();
     }
 
     fini() {}
