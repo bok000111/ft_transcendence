@@ -22,5 +22,5 @@ from . import views
 urlpatterns = [
     path("", views.index, name="index"),  # 메인 페이지 - spa로 구현
     path("api/", include("api.urls")),  # api 요청들
-    # path("admin/", admin.site.urls),  # 관리자 페이지 - 배포 시 제거
+    path("oauth/", include("oauth.urls")),  # 42 OAuth 요청들
 ]
