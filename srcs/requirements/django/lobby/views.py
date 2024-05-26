@@ -23,27 +23,20 @@ from .forms import LobbyCreateModelForm, NicknameForm
 class GameLobbyView(AJsonMixin, AJsonAuthRequiredMixin, View):
     # get lobby list
     async def get(self, request):
-        lobbies = GameLobby.objects.all()
-        if not await database_sync_to_async(lobbies.exists)():
-            return self.jsend_not_found({"message": "No lobbies"})
-        return await self.ajsend_ok(
-            {"message": "Lobbies", "data": {"lobbies": lobbies}}
-        )
+        lobbies = await database_sync_to_async(list)(GameLobby.objects.all())
+        if not lobbies:
+            return self.jsend_ok({"lobbies": []}, "lobbies")
+        return await self.ajsend_ok({"lobbies": lobbies}, "lobbies")
 
     # create lobby
     async def post(self, request):
         form = LobbyCreateModelForm(request.json, user=(user := await request.auser()))
         if form.is_valid():
             new_lobby = await form.asave()
-            return await self.ajsend_created(
-                {"message": "Lobby created", "data": {"lobby": new_lobby}}
-            )
+            return await self.ajsend_created({"lobby": new_lobby}, "lobby created")
         else:
             return self.jsend_bad_request(
-                {
-                    "message": "Invalid data",
-                    "data": form.errors.as_json(),
-                }
+                form.errors.as_json(escape_html=True), "invalid data"
             )
 
 
@@ -51,81 +44,70 @@ class GameLobbyDetailView(AJsonMixin, AJsonAuthRequiredMixin, View):
     # get lobby detail
     async def get(self, request, id):
         if id is None:
-            return self.jsend_bad_request({"message": "Invalid data"})
+            return self.jsend_bad_request(None, "invalid data")
 
         try:
             lobby = await GameLobby.objects.aget(id=id)
         except GameLobby.DoesNotExist:
-            return self.jsend_not_found({"message": "Not found"})
+            return self.jsend_not_found(None, "lobby not found")
         else:
-            return await self.ajsend_ok({"message": "Lobby", "data": {"lobby": lobby}})
+            return await self.ajsend_ok({"lobby": lobby}, "lobby found")
 
     # join lobby
     async def post(self, request, id):
         if id is None:
-            return self.jsend_bad_request({"message": "Invalid data"})
+            return self.jsend_bad_request(None, "invalid data")
 
         nickname_form = NicknameForm(request.json)
         if nickname_form.is_valid():
             nickname = nickname_form.cleaned_data["nickname"]
         else:
             return self.jsend_bad_request(
-                {
-                    "message": "Invalid nickname data",
-                    "data": nickname_form.errors.as_json(),
-                }
+                nickname_form.errors.as_json(), "invalid nickname"
             )
 
         try:
             lobby = await GameLobby.objects.aget(id=id)
         except GameLobby.DoesNotExist:
-            return self.jsend_not_found({"message": "Not found"})
+            return self.jsend_not_found(None, "lobby not found")
 
         if await lobby.is_full:
-            return self.jsend_bad_request({"message": "Lobby is full"})
+            return self.jsend_bad_request(None, "lobby is full, cannot join lobby")
         elif await database_sync_to_async(
-            lobby.players.filter(id=(user := await request.auser()).id).exists
+            PlayerInLobby.objects.filter(user=(user := await request.auser())).exists
         )():
-            return self.jsend_bad_request({"message": "Already in the lobby"})
-
-        check_user = await database_sync_to_async(
-            PlayerInLobby.objects.filter(user=user).exists
-        )()
-        if check_user:
-            return self.jsend_bad_request(
-                {"message": "The user is already in some lobby"}
-            )
-
-        check_nickname = await database_sync_to_async(
+            return self.jsend_bad_request(None, "already in lobby")
+        elif await database_sync_to_async(
             PlayerInLobby.objects.filter(lobby=lobby, nickname=nickname).exists
-        )()
-        if check_nickname:
-            return self.jsend_bad_request({"message": "Nickname is already in use"})
+        )():
+            return self.jsend_bad_request(None, "nickname is already in use")
 
         await lobby.join(user, nickname=nickname)
-        return self.jsend_ok({"message": "Joined lobby"})
+        return self.jsend_ok(None, "joined lobby")
 
     # if the user is the host, delete the lobby
     # if the user is not the host, leave the lobby
     async def delete(self, request, id):
         if id is None:
-            return self.jsend_bad_request({"message": "Invalid data"})
-
-        try:
-            lobby = await GameLobby.objects.aget(id=id)
-        except GameLobby.DoesNotExist:
-            return self.jsend_not_found({"message": "Not found"})
-
-        try:
-            player = await PlayerInLobby.objects.aget(
-                lobby=lobby, user=(user := await request.auser())
-            )
-        except lobby.players.model.DoesNotExist:
-            return self.jsend_bad_request({"message": "Not in the lobby"})
+            return self.jsend_bad_request(None, "invalid data")
+        elif (
+            lobby := await database_sync_to_async(
+                GameLobby.objects.filter(id=id).first
+            )()
+        ) is None:
+            return self.jsend_not_found(None, "lobby not found")
+        elif (
+            player := await database_sync_to_async(
+                PlayerInLobby.objects.filter(
+                    lobby=lobby, user=(user := await request.auser())
+                ).first
+            )()
+        ) is None:
+            return self.jsend_bad_request(None, "not in lobby")
 
         if player.is_host:
             await database_sync_to_async(lobby.delete)()
-            return self.jsend_ok({"message": "Lobby deleted"})
+            return self.jsend_ok(None, "lobby deleted")
         else:
             await lobby.leave(user)
-            return self.jsend_ok({"message": "Left lobby"})
+            return self.jsend_ok(None, "left lobby")
