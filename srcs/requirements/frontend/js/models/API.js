@@ -26,7 +26,7 @@ class API {
  */
 export const loginAPI = new API(
     async function() {
-        const response = await fetch("http://localhost:8000/api/login/", {
+        const response = await fetch("http://localhost:8000/api/user/login/", {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -50,7 +50,7 @@ export const loginAPI = new API(
  */
 export const signupAPI = new API(
     async function() {
-        const response = await fetch("http://localhost:8000/api/signup/", {
+        const response = await fetch("http://localhost:8000/api/user/signup/", {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
@@ -77,7 +77,7 @@ export const signupAPI = new API(
 */
 export const logoutAPI = new API(
     async function() {
-        const response = await fetch("http://localhost:8000/api/logout/", {
+        const response = await fetch("http://localhost:8000/api/user/logout/", {
             method: "POST",
             headers: {
                 "Host": "localhost:8000",
