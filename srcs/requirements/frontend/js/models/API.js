@@ -23,17 +23,20 @@ class API {
     }
 
     async request() {
-        const response = await fetch(this.uri, {
+        const httpRequest = {
             method: this.method,
             headers: {
                 "Host": "localhost:8000",
                 "Origin": "http://localhost:5500",
                 "Access-Control-Allow-Origin": "http://localhost:5500",
-                "Content-Type": "application/json",
             },
-            body: JSON.stringify(this.sendData),
             credentials: "include",
-        });
+        }
+        if (this.method === "POST") {
+            httpRequest.body = JSON.stringify(this.sendData);
+            httpRequest.headers["Content-Type"] = "application/json";
+        }
+        const response = await fetch(this.uri, httpRequest);
         this.recvData = await response.json();
         if (!response.ok) {
             throw new Error(this.recvData.message);
@@ -67,12 +70,12 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    "http://localhost::8000/api/user/logout/",
+    "http://localhost:8000/api/user/logout/",
     "POST"
 );
 
 export const meAPI = new API(
-    "http://localhost::8000/api/user/me/",
+    "http://localhost:8000/api/user/me/",
     "GET"
 );
 
