@@ -8,6 +8,7 @@ class SignupSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
+            <h2>Signup</h2>
             <form>
                 <input id="email" type="text" placeholder="email">
                 <input id="password" type="password" placeholder="password">

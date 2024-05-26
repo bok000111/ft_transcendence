@@ -9,6 +9,7 @@ class LoginSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
+            <h2>Login</h2>
             <form>
                 <input id="email" type="text" placeholder="email">
                 <input id="password" type="password" placeholder="password">
