@@ -24,12 +24,8 @@ class TourEntrySubpage extends SubPage {
             tourEntryAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
             try {
                 await tourEntryAPI.request();
-                info.lobby = {
-                    id: info.lobby.id,
-                    nickname: tourEntryAPI.sendData.nickname,
-                    is_host: false,
-                    is_ready: false,
-                }
+                info.lobby.nickname = tourEntryAPI.sendData.nickname;
+                info.lobby.players = structuredClone(tourEntryAPI.recvData.data.lobby.players);
                 this.requestShift("tour_lobby_subpage");
             }
             catch (e) {

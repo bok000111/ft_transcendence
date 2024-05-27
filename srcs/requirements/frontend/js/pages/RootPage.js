@@ -30,11 +30,12 @@ export default class RootPage extends Component {
         this.curChild = this.child[nextChildName];
         this.curChild.init();
     }
-    
+
     async checkLoggedIn() {
         try {
             await meAPI.request();
-            info.username = meAPI.recvData.data.user.username;
+            info.myID = meAPI.recvData.data.user.id;
+            info.myUsername = meAPI.recvData.data.user.username;
             this.curChild = this.child["main_page"];
         }
         catch {

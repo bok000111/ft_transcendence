@@ -1,9 +1,9 @@
 export const info = {
-    username: "",           // string
+    myID: null,
+    myUsername: null,
     lobby: {
-        id: null,           // number
-        nickname: null,     // string
-        is_host: null,       // boolean
-        is_ready: null       // boolean
-    }
+        id: null,       // lobby id
+        nickname: null,
+        players: null,
+    },
 };

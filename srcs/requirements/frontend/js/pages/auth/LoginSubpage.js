@@ -29,7 +29,8 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
-                info.username = loginAPI.recvData.data.user.username;
+                info.myID = loginAPI.recvData.data.user.id;
+                info.myUsername = loginAPI.recvData.data.user.username;
                 this.requestShift("main_page");
             }
             catch (e) {

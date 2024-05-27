@@ -79,6 +79,32 @@ export const meAPI = new API(
     "GET"
 );
 
+// <*** NormalLobby API ***>
+export const normalListAPI = new API(
+    "http://localhost:8000/api/lobby/",
+    "GET"
+);
+
+export const normalMakeAPI = new API(
+    "http://localhost:8000/api/lobby/",
+    "POST"
+);
+
+export const normalEntryAPI = new API(
+    `http://localhost:8000/api/lobby/${info.lobby.id}/`,
+    "POST"
+);
+
+export const normalDetailAPI = new API(
+    `http://localhost:8000/api/lobby/${info.lobby.id}/`,
+    "GET"
+);
+
+export const normalExitAPI = new API(
+    `http://localhost:8000/api/lobby/${info.lobby.id}/`,
+    "DELETE"
+);
+
 // <*** TournamentLobby Object ***>
 // TournamentLobby: {
 // 	"id": number,
@@ -96,19 +122,8 @@ export const meAPI = new API(
  * recvData = { status, message, data: { "lobbies": TournamentLobby[] } } // TournamentLobby 구조체 추가 예정
 */
 export const tourListAPI = new API(
-    "http://localhost::8000/api/tournament/",
+    "http://localhost:8000/api/tournament/",
     "GET"
-);
-
-/**
- * POST
- * /api/tournament/id/
- * sendData = { nickname }
- * recvData = { status, message, data: { "lobby": TournamentLobby }}
-*/
-export const tourEntryAPI = new API(
-    `http://localhost::8000/api/tournament/${info.lobby.id}/`,
-    "POST"
 );
 
 /**
@@ -118,8 +133,29 @@ export const tourEntryAPI = new API(
  * recvData = { status, message, data: { "lobby": TournamentLobby } }
  */
 export const tourMakeAPI = new API(
-    "http://localhost::8000/api/tournament/",
+    "http://localhost:8000/api/tournament/",
     "POST"
+);
+
+/**
+ * POST
+ * /api/tournament/id/
+ * sendData = { nickname }
+ * recvData = { status, message, data: { "lobby": TournamentLobby }}
+*/
+export const tourEntryAPI = new API(
+    `http://localhost:8000/api/tournament/${info.lobby.id}/`,
+    "POST"
+);
+
+export const tourDetailAPI = new API(
+    `http://localhost:8000/api/tournament/${info.lobby.id}/`,
+    "GET"
+);
+
+export const tourExitAPI = new API(
+    `http://localhost:8000/api/tournament/${info.lobby.id}/`,
+    "DELETE"
 );
 
 /**
