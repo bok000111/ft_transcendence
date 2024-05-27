@@ -29,8 +29,8 @@ class TourLobbySubpage extends SubPage {
         this.$elem.innerHTML = `
             <h2></h2>
             <ol></ol>
-            ${info.lobby.isHost ? `<button id="tour-start">시작</button>` : `<button id="tour-ready">준비</button>`}
-            <button id="tour-exit">토너먼트 나가기</button>
+            ${info.lobby.is_host ? `<button id="tour-start">시작</button>` : `<button id="tour-ready">준비</button>`}
+            <button id="tour-exit">나가기</button>
         `;
 
         /**

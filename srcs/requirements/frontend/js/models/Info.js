@@ -3,7 +3,7 @@ export const info = {
     lobby: {
         id: null,           // number
         nickname: null,     // string
-        isHost: null,       // boolean
-        isReady: null       // boolean
+        is_host: null,       // boolean
+        is_ready: null       // boolean
     }
 };

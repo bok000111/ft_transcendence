@@ -7,7 +7,7 @@ class TourListSubpage extends SubPage {
     $refreshBtn;
     $makeBtn;
 
-    renderList({ data }) {
+    render({ data }) {
         this.$lobbyList.innerHTML = ``;
 
         for (lobby of data.lobbies) {
@@ -32,7 +32,7 @@ class TourListSubpage extends SubPage {
     async refresh() {
         try {
             await tourListAPI.request();
-            this.renderList(tourListAPI.recvData);
+            this.render(tourListAPI.recvData);
         }
         catch (e) {
             alert(`Tournament List: ${e.message}`);

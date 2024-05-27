@@ -27,8 +27,8 @@ class TourEntrySubpage extends SubPage {
                 info.lobby = {
                     id: info.lobby.id,
                     nickname: tourEntryAPI.sendData.nickname,
-                    isHost: false,
-                    isReady: false,
+                    is_host: false,
+                    is_ready: false,
                 }
                 this.requestShift("tour_lobby_subpage");
             }
