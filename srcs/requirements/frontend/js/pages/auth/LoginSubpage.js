@@ -2,12 +2,14 @@ import { authPage } from "./AuthPage.js";
 import { loginAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
+import RootPage from "../RootPage.js"
 
 class LoginSubpage extends SubPage {
     $form;
     $oauthbtn;
-    // $loginbtn;
+    $loginbtn;
     $signupbtn;
+    response;
 
     init() {
         this.$elem.innerHTML = `
@@ -35,11 +37,11 @@ class LoginSubpage extends SubPage {
         </div>`;
 
         this.$form = this.$elem.querySelector("form");
-        // this.$loginbtn = this.$elem.querySelector("#loginbtn");
+        this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
 
-        this.$form.addEventListener("submit", async (event) => {
+        this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
@@ -47,7 +49,7 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
-                //info.username = loginAPI.recvData.data.user.username;
+                info.username = loginAPI.recvData.data.user.username;
                 this.requestShift("main_page");
             }
             catch (e) {
@@ -59,10 +61,13 @@ class LoginSubpage extends SubPage {
             this.requestShift("signup_subpage");
         });
 
-        // 42 oauth 추가 예정
-        // this.$oauthbtn.addEventListener("click", () => {
-
-        // });
+        // oauth -> should be modified
+        // now always 
+        this.$oauthbtn.addEventListener("click", () => {
+            window.location.href = "http://localhost:8000/oauth/login";
+            this.parent.parent.init(); // may be removed later
+            this.parent.parent.checkLoggedIn(); // may be removed later
+        });
     }
     
     fini() {
