@@ -10,17 +10,31 @@ class MainSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
-        <div>
-        <button id="participate">PARTICIPATE TOURNAMENT</button>
-        </div>
-        <div>
-        <button id="tournamentResult">TOURNAMENT RESULT</button>
-        </div>
-        <div>
-        <button id="normalgame">NORMAL GAME</button>
-        </div>
-        <div>
-        <button id="logout">LOGOUT</button>
+        <div class="container z_highest">
+            <div class="row justify-content-center mt-5">
+                <div class="col-md-6 col-lg-4">
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="participate" class="btn btn-warning btn-lg btn-block">PARTICIPATE TOURNAMENT</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="tournamentResult" class="btn btn-warning btn-lg btn-block">TOURNAMENT RESULT</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="normalgame" class="btn btn-warning btn-lg btn-block">NORMAL GAME</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="logout" class="btn btn-danger btn-lg btn-block">LOGOUT</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>`;
 
         this.$logoutBtn = document.querySelector("#logout");
