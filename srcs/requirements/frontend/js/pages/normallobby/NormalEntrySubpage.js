@@ -1,8 +1,8 @@
 import SubPage from "../SubPage.js";
-import { tourEntryAPI } from "../../models/API.js";
+import { normalEntryAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
-class TourEntrySubpage extends SubPage {
+class NormalEntrySubpage extends SubPage {
     $form;
     $backBtn;
 
@@ -21,21 +21,21 @@ class TourEntrySubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            tourEntryAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
+            normalEntryAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
             try {
-                await tourEntryAPI.request();
-                info.lobby.nickname = tourEntryAPI.sendData.nickname;
-                info.lobby.players = structuredClone(tourEntryAPI.recvData.data.lobby.players);
-                this.requestShift("tour_lobby_subpage");
+                await normalEntryAPI.request();
+                info.lobby.nickname = normalEntryAPI.sendData.nickname;
+                info.lobby.players = structuredClone(normalEntryAPI.recvData.data.lobby.players);
+                this.requestShift("normal_lobby_subpage");
             }
             catch (e) {
-                alert(`Tournament Entry: ${e.message}`);
+                alert(`normalnament Entry: ${e.message}`);
                 this.$form.querySelector("#nickname").value = "";
             }
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.requestShift("tour_list_subpage");
+            this.requestShift("normal_list_subpage");
         });
     }
 

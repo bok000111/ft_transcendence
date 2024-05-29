@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { tourLobbyAPI } from "../../models/API.js";
+import { tourDetailAPI, tourLobbyAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
 /**
@@ -21,62 +21,152 @@ class TourLobbySubpage extends SubPage {
     $readyBtn;
     $startBtn;
 
-    render() {
-        
+    requestShift(nextChildName) {
+        if (nextChildName !== "tour_gamelounge_subpage"
+            && this.sock !== null) {
+            this.sock.close();
+        }
+        this.parent.childShift(nextChildName);
     }
 
-    init() {
+    async detailRender() {
+        this.$players.innerHTML = ``;
+        for (player of tourDetailAPI.recvData.data.lobby.players) {
+            const newNode = document.createElement("li");
+
+            newNode.innerHTML = `
+                <div id="${player.nickname}">
+                    <h3>${player.nickname}</h3>
+                    ${() => {
+                        if (player.is_host) {
+                            return `<h4>방장</h4>`;
+                        }
+                        else if (player.is_ready) {
+                            return `<h4>ready</h4>`;
+                        }
+                        else {
+                            return ``;
+                        }
+                    }}
+                </div>
+            `;
+            this.$players.appendChild(newNode);
+        }
+    }
+
+    skeletonRender() {
         this.$elem.innerHTML = `
             <h2></h2>
             <ol></ol>
-            ${info.lobby.players.find((elem) => elem.id === info.myID).is_host
+            ${info.lobby.players.find(elem => elem.id === info.myID).is_host
                 ? `<button id="tour-start">start</button>`
                 : `<button id="tour-ready">ready</button>`}
-            <button id="tour-exit">나가기</button>
+            <button id="tour-leave">leave</button>
         `;
-
-        /**
-         * readyBtn: 백에게 현재 준비상태가 완료되었다고 API 전송.
-         * startBtn: 모든 플레이어가 준비상태가 된 경우 백에서 이 버튼을 활성화시킴.
-         * 활성화된 startBtn: 백에게 시작하라고 API 전송.
-         * -> 백은 모든 플레이어들에게 시작한다는 API 전송.
-         */
 
         this.$title = this.$elem.querySelector("h2");
         this.$players = this.$elem.querySelector("ol");
         this.$readyBtn = this.$elem.querySelector("#tour-ready");
         this.$startBtn = this.$elem.querySelector("#tour-start");
-        this.$exitBtn = this.$elem.querySelector("#tour-exit");
+        this.$leaveBtn = this.$elem.querySelector("#tour-leave");
 
-        /**
-         * 만약 새 탭이나 새로고침을 한 경우 이 subpage로 넘어오게 되어 자동으로 소켓이 생성된다. (중복 시 소켓 연결 거절)
-         * 여기서 소켓을 생성한다.
-         * 소켓의 비동기 처리에 대한 eventListener들을 모두 등록한다.
-         * try {
-         *     this.sock = new Websocket("uri");
-         * }
-         * catch {
-         *     this.requestShift("main_page");
-         * }
-         * 실패했을 경우 main_page로 쫓아내야 함.
-         * this.sock.addEventListener("message", (event) => {
-         *     
-         * })
-         * if (this.sock)
-         *     window.addEventListener("beforeunload", this.sock.close);
-         */
+        this.$leaveBtn.addEventListener("click", () => {
+            this.requestShift("tour_list_subpage");
+        });
 
-        this.$exitBtn.addEventListener("click", () => {
+        if (this.$readyBtn) {
+            this.$readyBtn.addEventListener("click", () => {
+                this.sock.send(JSON.stringify({
+                    type: "client_message",
+                    data: {
+                        event: "ready",
+                    }
+                }));
+                this.detailRender();
+            });
+        }
+        else {
+            this.$startBtn.addEventListener("click", () => {
+                this.sock.send(JSON.stringify({
+                    type: "client_message",
+                    data: {
+                        event: "start",
+                    }
+                }));
+            });
+        }
+        this.$leaveBtn.addEventListener("click", () => {
+            this.sock.send(JSON.stringify({
+                type: "client_message",
+                data: {
+                    event: "leave",
+                }
+            }));
             this.requestShift("tour_list_subpage");
         });
     }
 
-    fini() {
-        if (this.sock) {
-            // 소켓에 남은 데이터가 있는지 확인..?
-            this.sock.close();
-            this.sock = null;
+    messageHandler(event) {
+        const data = JSON.parse(event.data).data;
+
+        // 이게 맞는지 모르겠다.
+        if (data === null || data === undefined) {
+            return;
         }
+
+        switch (data.event) {
+        case "leave":
+            info.lobby.players = info.lobby.players.filter(elem => data.id !== elem.id);
+            break;
+        case "ready":
+            info.lobby.players.find(elem => data.id === elem.id).is_ready = true;
+            break;
+        case "join":
+            info.lobby.players.push({
+                id: data.id,
+                nickname: data.nickname,
+                score: null, // ?
+                is_host: false,
+                is_ready: false,
+            });
+        case "start":
+            this.requestShift("tour_gamelounge_subpage");
+            return;
+        case "error":
+            this.requestShift("tour_list_subpage");
+            return;
+        }
+        this.detailRender();
+    }
+
+    init() {
+        this.skeletonRender();
+        try {
+            this.sock = new WebSocket(`ws://localhost:8000/ws/lobby/${info.lobby.id}/`);
+            this.sock.addEventListener("open", async () => {
+                try {
+                    await tourLobbyAPI.request();
+                    this.detailRender();
+                }
+                catch (e) {
+                    alert(`Tournament Lobby: ${e.message}`);
+                    this.requestShift("tour_list_subpage");
+                }
+            });
+            this.sock.addEventListener("message", (event) => {
+                this.messageHandler(event);
+            });
+            this.sock.addEventListener("error", () => {
+                this.requestShift("tour_list_subpage");
+            });
+        }
+        catch (e) {
+            alert(`Tournament Lobby: ${e.message}`);
+            this.requestShift("tour_list_subpage");
+        }
+    }
+
+    fini() {
         this.$elem.innerHTML = ``;
     }
 };

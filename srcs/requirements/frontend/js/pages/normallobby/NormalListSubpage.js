@@ -1,8 +1,8 @@
 import SubPage from "../SubPage.js";
-import { tourListAPI } from "../../models/API.js";
+import { normalListAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
-class TourListSubpage extends SubPage {
+class NormalListSubpage extends SubPage {
     $lobbyList;
     $refreshBtn;
     $makeBtn;
@@ -23,7 +23,7 @@ class TourListSubpage extends SubPage {
             newNode.addEventListener("click", () => {
                 // 클로저의 성질을 잘 몰라서 얘는 될 지 모르겠다..
                 info.lobby.id = lobby.id;
-                this.requestShift("tour_entry_subpage");
+                this.requestShift("normal_entry_subpage");
             });
             this.$lobbyList.appendChild(newNode);
         }
@@ -31,20 +31,20 @@ class TourListSubpage extends SubPage {
 
     async refresh() {
         try {
-            await tourListAPI.request();
-            this.render(tourListAPI.recvData);
+            await normalListAPI.request();
+            this.render(normalListAPI.recvData);
         }
         catch (e) {
-            alert(`Tournament List: ${e.message}`);
+            alert(`Normal List: ${e.message}`);
         }
     }
 
     init() {
         this.$elem.innerHTML = `
-            <h2>토너먼트 목록</h2>
+            <h2>게임 목록</h2>
             <button id="refresh">새로고침</button>
             <ul></ul>
-            <button id="make">토너먼트 만들기</button>
+            <button id="make">게임 만들기</button>
         `;
 
         this.$lobbyList = this.$elem.querySelector("ul");
@@ -53,7 +53,7 @@ class TourListSubpage extends SubPage {
 
         this.$refreshBtn.addEventListener("click", this.refresh);
         this.$makeBtn.addEventListener("click", () => {
-            this.requestShift("tour_make_subpage");
+            this.requestShift("normal_make_subpage");
         });
 
         this.refresh();

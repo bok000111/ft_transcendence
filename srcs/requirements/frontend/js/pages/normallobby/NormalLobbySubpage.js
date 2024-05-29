@@ -54,14 +54,14 @@ class NormalLobbySubpage extends SubPage {
             ${info.lobby.players.find(elem => elem.id === info.myID).is_host
                 ? `<button id="normal-start">start</button>`
                 : `<button id="normal-ready">ready</button>`}
-            <button id="normal-exit">leave</button>
+            <button id="normal-leave">leave</button>
         `;
 
         this.$title = this.$elem.querySelector("h2");
         this.$players = this.$elem.querySelector("ol");
         this.$readyBtn = this.$elem.querySelector("#normal-ready");
         this.$startBtn = this.$elem.querySelector("#normal-start");
-        this.$leaveBtn = this.$elem.querySelector("#normal-exit");
+        this.$leaveBtn = this.$elem.querySelector("#normal-leave");
 
         this.$leaveBtn.addEventListener("click", () => {
             this.requestShift("normal_list_subpage");
