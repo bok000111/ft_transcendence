@@ -5,10 +5,23 @@ import { info } from "../../models/Info.js";
 class NormalLobbySubpage extends SubPage {
     $title;
     $players;
-    $exitBtn;
+    $leaveBtn;
     $readyBtn;
     $startBtn;
 
+    requestShift(nextChildName) {
+        if (nextChildName !== "normal_gamelounge_subpage"
+            && this.sock !== null) {
+            this.sock.close();
+        }
+        this.parent.childShift(nextChildName);
+    }
+
+    /**
+     * 이 함수는 프로토타입으로써 상태변화가 일어났을 때 호출되는 함수이다.
+     * 하지만 약간의 수정만으로 전체 돔 구조가 달라져버리기 때문에
+     * 최적화의 가능성이 있는 함수로 일단 남겨놓았다.
+     */
     async detailRender() {
         this.$players.innerHTML = ``;
         for (player of normalDetailAPI.recvData.data.lobby.players) {
@@ -41,16 +54,47 @@ class NormalLobbySubpage extends SubPage {
             ${info.lobby.players.find(elem => elem.id === info.myID).is_host
                 ? `<button id="normal-start">start</button>`
                 : `<button id="normal-ready">ready</button>`}
-            <button id="normal-exit">나가기</button>
+            <button id="normal-exit">leave</button>
         `;
 
         this.$title = this.$elem.querySelector("h2");
         this.$players = this.$elem.querySelector("ol");
         this.$readyBtn = this.$elem.querySelector("#normal-ready");
         this.$startBtn = this.$elem.querySelector("#normal-start");
-        this.$exitBtn = this.$elem.querySelector("#normal-exit");
+        this.$leaveBtn = this.$elem.querySelector("#normal-exit");
 
-        this.$exitBtn.addEventListener("click", () => {
+        this.$leaveBtn.addEventListener("click", () => {
+            this.requestShift("normal_list_subpage");
+        });
+
+        if (this.$readyBtn) {
+            this.$readyBtn.addEventListener("click", () => {
+                this.sock.send(JSON.stringify({
+                    type: "client_message",
+                    data: {
+                        event: "ready",
+                    }
+                }));
+                this.detailRender();
+            });
+        }
+        else {
+            this.$startBtn.addEventListener("click", () => {
+                this.sock.send(JSON.stringify({
+                    type: "client_message",
+                    data: {
+                        event: "start",
+                    }
+                }));
+            });
+        }
+        this.$leaveBtn.addEventListener("click", () => {
+            this.sock.send(JSON.stringify({
+                type: "client_message",
+                data: {
+                    event: "leave",
+                }
+            }));
             this.requestShift("normal_list_subpage");
         });
     }
@@ -93,6 +137,11 @@ class NormalLobbySubpage extends SubPage {
      */
     messageHandler(event) {
         const data = JSON.parse(event.data).data;
+
+        // 이게 맞는지 모르겠다.
+        if (data === null || data === undefined) {
+            return;
+        }
 
         switch (data.event) {
         case "leave":
@@ -147,10 +196,6 @@ class NormalLobbySubpage extends SubPage {
     }
 
     fini() {
-        if (this.sock) {
-            this.sock.close();
-            this.sock = null;
-        }
         this.$elem.innerHTML = ``;
     }
 };
