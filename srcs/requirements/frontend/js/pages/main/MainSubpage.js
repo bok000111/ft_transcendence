@@ -4,9 +4,9 @@ import { logoutAPI } from "../../models/API.js"
 
 class MainSubpage extends SubPage {
     $logoutBtn;
-    $participateBtn;
-    $tournamentResultBtn;
-    $normalBtn;
+    $tourLobbyBtn;
+    $tourResultBtn;
+    $normalLobbyBtn;
 
     init() {
         this.$elem.innerHTML = `
@@ -15,17 +15,17 @@ class MainSubpage extends SubPage {
                 <div class="col-md-6 col-lg-4">
                     <div class="row mb-4 pt-4 pb-3">
                         <div class="col">
-                            <button id="participate" class="btn btn-warning btn-lg btn-block">PARTICIPATE TOURNAMENT</button>
+                            <button id="tourLobby" class="btn btn-warning btn-lg btn-block">PARTICIPATE TOURNAMENT</button>
                         </div>
                     </div>
                     <div class="row mb-4 pt-4 pb-3">
                         <div class="col">
-                            <button id="tournamentResult" class="btn btn-warning btn-lg btn-block">TOURNAMENT RESULT</button>
+                            <button id="tourResult" class="btn btn-warning btn-lg btn-block">TOURNAMENT RESULT</button>
                         </div>
                     </div>
                     <div class="row mb-4 pt-4 pb-3">
                         <div class="col">
-                            <button id="normalgame" class="btn btn-warning btn-lg btn-block">NORMAL GAME</button>
+                            <button id="normalLobby" class="btn btn-warning btn-lg btn-block">NORMAL GAME</button>
                         </div>
                     </div>
                     <div class="row mb-4 pt-4 pb-3">
@@ -38,9 +38,9 @@ class MainSubpage extends SubPage {
         </div>`;
 
         this.$logoutBtn = document.querySelector("#logout");
-        this.$participateBtn = document.querySelector("#participate");
-        this.$tournamentResultBtn = document.querySelector("#tournamentResult");
-        this.$normalBtn = document.querySelector("#normalgame");
+        this.$tourLobbyBtn = document.querySelector("#tourLobby");
+        this.$tourResultBtn = document.querySelector("#tourResult");
+        this.$normalLobbyBtn = document.querySelector("#normalLobby");
 
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
@@ -52,9 +52,13 @@ class MainSubpage extends SubPage {
                 alert(`Logout: ${e.message}`);
             }
         });
-        //this.$participateBtn.addEventListener("click", this.requestShift("tour_room_page")); // 나중에 인자 이름 체킹 필요
-        //this.$tournamentResultBtn.addEventListener("click", this.requestShift("tour_result_page")); // 나중에 인자 이름 체킹 필요
-        //this.$normalBtn.addEventListener("click", this.requestShift("match_making_page")); // 나중에 인자 이름 체킹 필요
+        //this.$tourLobbyBtn.addEventListener("click", this.requestShift("tour_lobby_page"));
+        this.$tourResultBtn.addEventListener("click", () => {
+            this.requestShift("tour_result_page");
+        });
+        this.$normalLobbyBtn.addEventListener("click", () => {
+            this.requestShift("normal_lobby_page");
+        });
     }
 
     fini() {
