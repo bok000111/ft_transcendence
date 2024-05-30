@@ -13,6 +13,14 @@ class NormalMakeSubpage extends SubPage {
             <form>
                 <input id="lobby-name" type="text" placeholder="lobby-name">
                 <input id="nickname" type="text" placeholder="nickname">
+                <h3>
+                    <input id="two-players" type="radio" name="max-num" placeholder="2p">
+                    2p
+                    <input id="three-players" type="radio" name="max-num" placeholder="3p">
+                    3p
+                    <input id="four-players" type="radio" name="max-num" placeholder="4p">
+                    4p
+                </h3>
                 <input type="submit" value="생성"
             </form>
             <button>뒤로 가기</button>

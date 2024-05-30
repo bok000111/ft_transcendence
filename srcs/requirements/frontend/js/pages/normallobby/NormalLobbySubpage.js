@@ -1,5 +1,5 @@
 import SubPage from "../SubPage.js";
-import { normalDetailAPI, normalLobbyAPI } from "../../models/API.js";
+import { normalDetailAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import { normalLobbyPage } from "./NormalLobbyPage.js";
 
@@ -176,7 +176,7 @@ class NormalLobbySubpage extends SubPage {
             this.sock = new WebSocket(`ws://localhost:8000/ws/lobby/${info.lobby.id}/`);
             this.sock.addEventListener("open", async () => {
                 try {
-                    await normalLobbyAPI.request();
+                    await normalDetailAPI.request();
                     this.detailRender();
                 }
                 catch (e) {

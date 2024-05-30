@@ -14,7 +14,10 @@ export default class RootPage extends Component {
         this.parent = parent;
         if (parent)
             parent.mount(this, selfName);
+        this.setEvent();
     }
+
+    setEvent() {}
 
     mount(child, childName) {
         this.child[childName] = child;
