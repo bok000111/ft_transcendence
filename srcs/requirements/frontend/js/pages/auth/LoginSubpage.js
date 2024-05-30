@@ -28,8 +28,8 @@ class LoginSubpage extends SubPage {
                             </div>
                             <div class="mb-3 mt-4 d-grid gap-2">
                                 <button type="submit" class="btn btn-primary" id="loginbtn">Login</button>
-                                <button class="btn btn-primary" id="oauthbtn">Login with 42</button>
-                                <button class="btn btn-secondary" id="signupbtn">Sign Up</button>
+                                <button type="button" class="btn btn-primary" id="oauthbtn">Login with 42</button>
+                                <button type="button" class="btn btn-secondary" id="signupbtn">Sign Up</button>
                             </div>
                         </form>
                     </div>
