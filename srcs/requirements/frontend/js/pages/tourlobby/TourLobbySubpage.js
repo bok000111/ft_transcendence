@@ -1,6 +1,7 @@
 import SubPage from "../SubPage.js";
 import { tourDetailAPI, tourLobbyAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
+import { tourLobbyPage } from "./TourLobbyPage.js";
 
 /**
  * TourLobbySubpage -> TourGameLoungeSubpage
@@ -15,7 +16,6 @@ import { info } from "../../models/Info.js";
  */
 
 class TourLobbySubpage extends SubPage {
-    sock;
     $title;
     $players;
     $exitBtn;
@@ -23,7 +23,7 @@ class TourLobbySubpage extends SubPage {
     $startBtn;
 
     requestShift(nextChildName) {
-        if (nextChildName !== "tour_gamelounge_subpage"
+        if (nextChildName !== "tour_game_lounge_subpage"
             && this.sock !== null) {
             this.sock.close();
         }
@@ -131,7 +131,7 @@ class TourLobbySubpage extends SubPage {
                 is_ready: false,
             });
         case "start":
-            this.requestShift("tour_gamelounge_subpage");
+            this.requestShift("tour_game_lounge_subpage");
             return;
         case "error":
             this.requestShift("tour_list_subpage");
@@ -171,3 +171,10 @@ class TourLobbySubpage extends SubPage {
         this.$elem.innerHTML = ``;
     }
 };
+
+export const tourLobbySubpage = new TourLobbySubpage(
+    tourLobbyPage.$elem.querySelector("div"),
+    tourLobbyPage,
+    null,
+    "tour_lobby_subpage"
+);

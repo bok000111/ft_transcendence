@@ -2,9 +2,11 @@ import Page from "../Page.js";
 import { rootPage } from "../RootPage.js";
 
 class NormalLobbyPage extends Page {
+    sock;
     $mainBtn;
 
     setup() {
+        this.sock = null;
         this.$mainBtn = this.$elem.querySelector("button");
     }
 
@@ -15,7 +17,7 @@ class NormalLobbyPage extends Page {
     }
 };
 
-const normalLobbyPage = new NormalLobbyPage(
+export const normalLobbyPage = new NormalLobbyPage(
     rootPage.$elem.querySelector(".normal-lobby-page"),
     rootPage,
     "normal_list_subpage",
