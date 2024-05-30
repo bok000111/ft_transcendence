@@ -12,6 +12,8 @@ rootPage.init();
 const title_pong = document.querySelector("#titlePong");
 
 title_pong.addEventListener("click", () => {
+    rootPage.fini();
     rootPage.curChild.curChild.fini(); // SubPage innerHTML clear
+    rootPage.curChild.fini();
     rootPage.init();
 });
