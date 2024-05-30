@@ -30,25 +30,27 @@ export default class RootPage extends Component {
         this.curChild = this.child[nextChildName];
         this.curChild.init();
     }
-    
+
     async checkLoggedIn() {
         try {
             await meAPI.request();
-            info.username = meAPI.recvData.data.user.username;
-            rootPage.childShift("main_page");
+            info.myID = meAPI.recvData.data.user.id;
+            info.myUsername = meAPI.recvData.data.user.username;
+            this.curChild = this.child["main_page"];
         }
         catch {
             
         }
     }
 
-    init() {
+    async init() {
         /**
          * 로그인 세션이 유지되는 상태
          * -> 토너먼트 진행중 : 토너먼트 화면
          * -> 나머지 : 메인 화면
          */
-        this.child[this.initChildName].init();
+        await this.checkLoggedIn();
+        this.curChild.init();
     }
 
     fini() {}

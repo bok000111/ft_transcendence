@@ -13,28 +13,29 @@ class LoginSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
-        <div class="container z_highest">
-            <div class="row justify-content-center mt-5">
-                <div class="col-md-6 col-lg-4">
-                    <h3 class="text-center">Login</h3>
-                    <form>
-                        <div class="mb-3 mt-4">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" placeholder="Enter your email">
-                        </div>
-                        <div class="mb-3 mt-4">
-                            <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" placeholder="Enter your password">
-                        </div>
-                        <div class="mb-3 mt-4 d-grid gap-2">
-                            <button type="submit" class="btn btn-primary" id="loginbtn">Login</button>
-                            <button class="btn btn-primary" id="oauthbtn">Login with 42</button>
-                            <button class="btn btn-secondary" id="signupbtn">Sign Up</button>
-                        </div>
-                    </form>
+            <div class="container z_highest">
+                <div class="row justify-content-center mt-5">
+                    <div class="col-md-6 col-lg-4">
+                        <h3 class="text-center">Login</h3>
+                        <form>
+                            <div class="mb-3 mt-4">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                            </div>
+                            <div class="mb-3 mt-4">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" placeholder="Enter your password">
+                            </div>
+                            <div class="mb-3 mt-4 d-grid gap-2">
+                                <button type="submit" class="btn btn-primary" id="loginbtn">Login</button>
+                                <button class="btn btn-primary" id="oauthbtn">Login with 42</button>
+                                <button class="btn btn-secondary" id="signupbtn">Sign Up</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>`;
+        `;
 
         this.$form = this.$elem.querySelector("form");
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
@@ -49,7 +50,8 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
-                info.username = loginAPI.recvData.data.user.username;
+                info.myID = loginAPI.recvData.data.user.id;
+                info.myUsername = loginAPI.recvData.data.user.username;
                 this.requestShift("main_page");
             }
             catch (e) {

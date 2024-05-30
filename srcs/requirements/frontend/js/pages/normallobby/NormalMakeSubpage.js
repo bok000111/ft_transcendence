@@ -1,8 +1,8 @@
 import SubPage from "../SubPage.js";
-import { tourMakeAPI } from "../../models/API.js";
+import { normalMakeAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
-class TourMakeSubpage extends SubPage {
+class NormalMakeSubpage extends SubPage {
     $form;
     $backBtn;
 
@@ -22,24 +22,24 @@ class TourMakeSubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
-            tourMakeAPI.sendData.name = this.$form.querySelector("#lobby-name").value;
-            tourMakeAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
+            normalMakeAPI.sendData.name = this.$form.querySelector("#lobby-name").value;
+            normalMakeAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
             try {
-                await tourMakeAPI.request();
-                info.lobby.id = tourMakeAPI.recvData.data.lobby.id;
-                info.lobby.nickname = tourMakeAPI.sendData.nickname;
-                info.lobby.players = structuredClone(tourMakeAPI.recvData.data.lobby.players);
-                this.requestShift("tour_lobby_subpage");
+                await normalMakeAPI.request();
+                info.lobby.id = normalMakeAPI.recvData.data.lobby.id;
+                info.lobby.nickname = normalMakeAPI.sendData.nickname;
+                info.lobby.players = structuredClone(normalMakeAPI.recvData.data.lobby.players);
+                this.requestShift("normal_lobby_subpage");
             }
             catch (e) {
-                alert(`Tournament Make Room: ${e.message}`);
+                alert(`Normal Make Room: ${e.message}`);
                 this.$form.querySelector("#lobby-name").value = "";
                 this.$form.querySelector("#nickname").value = "";
             }
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.requestShift("tour_list_subpage");
+            this.requestShift("normal_list_subpage");
         });
     }
 
