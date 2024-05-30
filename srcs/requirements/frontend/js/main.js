@@ -8,3 +8,10 @@ import { normalLobbySubpage } from "./pages/normallobby/NormalLobbySubpage.js";
 import { normalMakeSubpage } from "./pages/normallobby/NormalMakeSubpage.js";
 
 rootPage.init();
+
+const title_pong = document.querySelector("#titlePong");
+
+title_pong.addEventListener("click", () => {
+    rootPage.curChild.curChild.fini(); // SubPage innerHTML clear
+    rootPage.init();
+});

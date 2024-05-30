@@ -21,7 +21,7 @@ class NormalMakeSubpage extends SubPage {
                     <input id="four-players" type="radio" name="max-num">
                     4p
                 </h3>
-                <input type="submit" value="생성"
+                <input type="submit" value="생성">
             </form>
             <button>뒤로 가기</button>
         `;
