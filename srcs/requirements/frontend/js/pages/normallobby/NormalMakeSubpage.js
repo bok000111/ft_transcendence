@@ -14,11 +14,11 @@ class NormalMakeSubpage extends SubPage {
                 <input id="lobby-name" type="text" placeholder="lobby-name">
                 <input id="nickname" type="text" placeholder="nickname">
                 <h3>
-                    <input id="two-players" type="radio" name="max-num" placeholder="2p">
+                    <input id="two-players" type="radio" name="max-num">
                     2p
-                    <input id="three-players" type="radio" name="max-num" placeholder="3p">
+                    <input id="three-players" type="radio" name="max-num">
                     3p
-                    <input id="four-players" type="radio" name="max-num" placeholder="4p">
+                    <input id="four-players" type="radio" name="max-num">
                     4p
                 </h3>
                 <input type="submit" value="생성"
@@ -33,6 +33,19 @@ class NormalMakeSubpage extends SubPage {
             event.preventDefault();
             normalMakeAPI.sendData.name = this.$form.querySelector("#lobby-name").value;
             normalMakeAPI.sendData.nickname = this.$form.querySelector("#nickname").value;
+            if (this.$form.querySelector("#two-players").checked) {
+                normalMakeAPI.sendData.max_players = 2;
+            }
+            else if (this.$form.querySelector("#three-players").checked) {
+                normalMakeAPI.sendData.max_players = 3;
+            }
+            else if (this.$form.querySelector("#four-players").checked) {
+                normalMakeAPI.sendData.max_players = 4;
+            }
+            else {
+                alert("Please check the number of players.");
+                return;
+            }
             try {
                 await normalMakeAPI.request();
                 info.lobby.id = normalMakeAPI.recvData.data.lobby.id;
