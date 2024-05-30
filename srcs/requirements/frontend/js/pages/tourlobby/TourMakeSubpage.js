@@ -1,6 +1,7 @@
 import SubPage from "../SubPage.js";
 import { tourMakeAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
+import { tourLobbyPage } from "./TourLobbyPage.js";
 
 class TourMakeSubpage extends SubPage {
     $form;
@@ -47,3 +48,10 @@ class TourMakeSubpage extends SubPage {
         this.$elem.innerHTML = ``;
     }
 };
+
+export const tourMakeSubpage = new TourMakeSubpage(
+    tourLobbyPage.$elem.querySelector("div"),
+    tourLobbyPage,
+    null,
+    "tour_make_subpage"
+);

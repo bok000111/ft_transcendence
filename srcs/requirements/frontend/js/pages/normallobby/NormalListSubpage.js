@@ -1,6 +1,7 @@
 import SubPage from "../SubPage.js";
 import { normalListAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
+import { normalLobbyPage } from "./NormalLobbyPage.js";
 
 class NormalListSubpage extends SubPage {
     $lobbyList;
@@ -63,3 +64,10 @@ class NormalListSubpage extends SubPage {
         this.$elem.innerHTML = ``;
     }
 };
+
+export const normalListSubpage = new NormalListSubpage(
+    normalLobbyPage.$elem.querySelector("div"),
+    normalLobbyPage,
+    null,
+    "normal_list_subpage"
+);

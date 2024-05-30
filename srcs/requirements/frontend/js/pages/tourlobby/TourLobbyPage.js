@@ -17,7 +17,7 @@ class TourLobbyPage extends Page {
     }
 };
 
-const tourLobbyPage = new TourLobbyPage(
+export const tourLobbyPage = new TourLobbyPage(
     rootPage.$elem.querySelector(".tour-lobby-page"),
     rootPage,
     "tour_list_subpage",

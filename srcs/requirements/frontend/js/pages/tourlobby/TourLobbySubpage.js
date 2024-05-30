@@ -1,6 +1,7 @@
 import SubPage from "../SubPage.js";
 import { tourDetailAPI, tourLobbyAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
+import { tourLobbyPage } from "./TourLobbyPage.js";
 
 /**
  * TourLobbySubpage -> TourGameLoungeSubpage
@@ -170,3 +171,10 @@ class TourLobbySubpage extends SubPage {
         this.$elem.innerHTML = ``;
     }
 };
+
+export const tourLobbySubpage = new TourLobbySubpage(
+    tourLobbyPage.$elem.querySelector("div"),
+    tourLobbyPage,
+    null,
+    "tour_lobby_subpage"
+);

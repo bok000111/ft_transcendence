@@ -1,4 +1,5 @@
 import SubPage from "../SubPage.js";
+import { tourLobbyPage } from "./TourLobbyPage.js";
 
 const canvasWidth = 1200;
 const canvasHeight = 900;
@@ -95,3 +96,10 @@ class TourGameLoungeSubpage extends SubPage {
         this.$elem.innerHTML = ``;
     }
 };
+
+export const tourGameLoungeSubpage = new TourGameLoungeSubpage(
+    tourLobbyPage.$elem.querySelector("div"),
+    tourLobbyPage,
+    null,
+    "tour_game_lounge_subpage"
+);
