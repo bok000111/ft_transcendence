@@ -15,6 +15,7 @@ import { info } from "../../models/Info.js";
  */
 
 class TourLobbySubpage extends SubPage {
+    sock;
     $title;
     $players;
     $exitBtn;

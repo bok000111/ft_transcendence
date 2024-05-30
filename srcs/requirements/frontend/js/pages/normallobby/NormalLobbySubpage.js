@@ -3,6 +3,7 @@ import { normalDetailAPI, normalLobbyAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
 class NormalLobbySubpage extends SubPage {
+    sock;
     $title;
     $players;
     $leaveBtn;
@@ -22,30 +23,6 @@ class NormalLobbySubpage extends SubPage {
      * 하지만 약간의 수정만으로 전체 돔 구조가 달라져버리기 때문에
      * 최적화의 가능성이 있는 함수로 일단 남겨놓았다.
      */
-    async detailRender() {
-        this.$players.innerHTML = ``;
-        for (player of normalDetailAPI.recvData.data.lobby.players) {
-            const newNode = document.createElement("li");
-
-            newNode.innerHTML = `
-                <div id="${player.nickname}">
-                    <h3>${player.nickname}</h3>
-                    ${() => {
-                        if (player.is_host) {
-                            return `<h4>방장</h4>`;
-                        }
-                        else if (player.is_ready) {
-                            return `<h4>ready</h4>`;
-                        }
-                        else {
-                            return ``;
-                        }
-                    }}
-                </div>
-            `;
-            this.$players.appendChild(newNode);
-        }
-    }
     
     skeletonRender() {
         this.$elem.innerHTML = `
@@ -99,6 +76,31 @@ class NormalLobbySubpage extends SubPage {
         });
     }
     
+    async detailRender() {
+        this.$players.innerHTML = ``;
+        for (player of normalDetailAPI.recvData.data.lobby.players) {
+            const newNode = document.createElement("li");
+
+            newNode.innerHTML = `
+                <div id="${player.nickname}">
+                    <h3>${player.nickname}</h3>
+                    ${() => {
+                        if (player.is_host) {
+                            return `<h4>방장</h4>`;
+                        }
+                        else if (player.is_ready) {
+                            return `<h4>ready</h4>`;
+                        }
+                        else {
+                            return ``;
+                        }
+                    }}
+                </div>
+            `;
+            this.$players.appendChild(newNode);
+        }
+    }
+
     /**
      * socket 수신 메시지 구조
      * {

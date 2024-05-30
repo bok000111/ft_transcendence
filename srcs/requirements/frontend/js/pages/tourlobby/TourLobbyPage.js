@@ -2,11 +2,9 @@ import Page from "../Page.js";
 import { rootPage } from "../RootPage.js";
 
 class TourLobbyPage extends Page {
-    sock;
     $mainBtn;
 
     setup() {
-        this.sock = null;
         this.$mainBtn = this.$elem.querySelector("button");
     }
 
