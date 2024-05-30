@@ -3,7 +3,6 @@ import { normalDetailAPI, normalLobbyAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 
 class NormalLobbySubpage extends SubPage {
-    sock;
     $title;
     $players;
     $leaveBtn;
@@ -11,7 +10,7 @@ class NormalLobbySubpage extends SubPage {
     $startBtn;
 
     requestShift(nextChildName) {
-        if (nextChildName !== "normal_gamelounge_subpage"
+        if (nextChildName !== "pong_subpage"
             && this.sock !== null) {
             this.sock.close();
         }
@@ -128,7 +127,7 @@ class NormalLobbySubpage extends SubPage {
      * < 수신 메시지 처리 >
      * - "join" / "leave" -> 사용자를 추가 / 삭제 렌더링을 해 준다.
      * - "ready" -> 사용자 옆에 ready 표시를 띄워준다.
-     * - "start" -> requestShift("normal_gamelounge_subpage") 호출
+     * - "start" -> requestShift("pong_subpage") 호출
      * - "error" -> requestShift("normal_list_subpage") 호출
      * 
      * < 송신 메시지 처리 >
@@ -161,7 +160,7 @@ class NormalLobbySubpage extends SubPage {
                 is_ready: false,
             });
         case "start":
-            this.requestShift("normal_gamelounge_subpage");
+            this.requestShift("pong_subpage");
             return;
         case "error":
             this.requestShift("normal_list_subpage");

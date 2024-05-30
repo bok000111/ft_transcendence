@@ -15,7 +15,6 @@ import { info } from "../../models/Info.js";
  */
 
 class TourLobbySubpage extends SubPage {
-    sock;
     $title;
     $players;
     $exitBtn;
@@ -23,7 +22,7 @@ class TourLobbySubpage extends SubPage {
     $startBtn;
 
     requestShift(nextChildName) {
-        if (nextChildName !== "tour_gamelounge_subpage"
+        if (nextChildName !== "tour_game_lounge_subpage"
             && this.sock !== null) {
             this.sock.close();
         }
@@ -131,7 +130,7 @@ class TourLobbySubpage extends SubPage {
                 is_ready: false,
             });
         case "start":
-            this.requestShift("tour_gamelounge_subpage");
+            this.requestShift("tour_game_lounge_subpage");
             return;
         case "error":
             this.requestShift("tour_list_subpage");
