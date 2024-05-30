@@ -11,7 +11,7 @@ class TourListSubpage extends SubPage {
     render({ data }) {
         this.$lobbyList.innerHTML = ``;
 
-        for (lobby of data.lobbies) {
+        for (let lobby of data.lobbies) {
             if (lobby.player_count === lobby.max_players)
                 continue;
 
@@ -52,7 +52,9 @@ class TourListSubpage extends SubPage {
         this.$refreshBtn = this.$elem.querySelector("#refresh");
         this.$makeBtn = this.$elem.querySelector("#make");
 
-        this.$refreshBtn.addEventListener("click", this.refresh);
+        this.$refreshBtn.addEventListener("click", () => {
+            this.refresh();
+        });
         this.$makeBtn.addEventListener("click", () => {
             this.requestShift("tour_make_subpage");
         });
