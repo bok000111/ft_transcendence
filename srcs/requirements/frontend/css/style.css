@@ -2,6 +2,10 @@
     display: none;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .co_main .co_frame .co_line2,
 .co_main .co_frame .co_line3,
 .co_main .co_frame .co_line5,

@@ -7,6 +7,7 @@ class MainSubpage extends SubPage {
     $tourLobbyBtn;
     $tourResultBtn;
     $normalLobbyBtn;
+    $localGameBtn;
 
     init() {
         this.$elem.innerHTML = `
@@ -15,17 +16,22 @@ class MainSubpage extends SubPage {
                 <div class="col-md-6 col-lg-4">
                     <div class="row mb-4 pt-4 pb-3">
                         <div class="col">
-                            <button id="tourLobby" class="btn btn-warning btn-lg btn-block">PARTICIPATE TOURNAMENT</button>
+                            <button id="tourLobby" class="btn btn-warning btn-lg btn-block">TOURNAMENT MODE</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="normalLobby" class="btn btn-warning btn-lg btn-block">NORMAL MODE</button>
+                        </div>
+                    </div>
+                    <div class="row mb-4 pt-4 pb-3">
+                        <div class="col">
+                            <button id="localGame" class="btn btn-warning btn-lg btn-block">LOCAL MODE</button>
                         </div>
                     </div>
                     <div class="row mb-4 pt-4 pb-3">
                         <div class="col">
                             <button id="tourResult" class="btn btn-warning btn-lg btn-block">TOURNAMENT RESULT</button>
-                        </div>
-                    </div>
-                    <div class="row mb-4 pt-4 pb-3">
-                        <div class="col">
-                            <button id="normalLobby" class="btn btn-warning btn-lg btn-block">NORMAL GAME</button>
                         </div>
                     </div>
                     <div class="row mb-4 pt-4 pb-3">
@@ -37,11 +43,24 @@ class MainSubpage extends SubPage {
             </div>
         </div>`;
 
-        this.$logoutBtn = document.querySelector("#logout");
         this.$tourLobbyBtn = document.querySelector("#tourLobby");
-        this.$tourResultBtn = document.querySelector("#tourResult");
         this.$normalLobbyBtn = document.querySelector("#normalLobby");
-
+        this.$localGameBtn = this.$elem.querySelector("localGame");
+        this.$tourResultBtn = document.querySelector("#tourResult");
+        this.$logoutBtn = document.querySelector("#logout");
+        
+        // this.$tourLobbyBtn.addEventListener("click", () => {
+        //     this.requestShift("tour_lobby_page")
+        // });
+        this.$normalLobbyBtn.addEventListener("click", () => {
+            this.requestShift("normal_lobby_page");
+        });
+        // this.$localGameBtn.addEventListener("click", () => {
+        //     this.requestShift("local_game_page");
+        // });
+        // this.$tourResultBtn.addEventListener("click", () => {
+        //     this.requestShift("tour_result_page");
+        // });
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {
@@ -51,13 +70,6 @@ class MainSubpage extends SubPage {
             catch (e) {
                 alert(`Logout: ${e.message}`);
             }
-        });
-        //this.$tourLobbyBtn.addEventListener("click", this.requestShift("tour_lobby_page"));
-        this.$tourResultBtn.addEventListener("click", () => {
-            this.requestShift("tour_result_page");
-        });
-        this.$normalLobbyBtn.addEventListener("click", () => {
-            this.requestShift("normal_lobby_page");
         });
     }
 
