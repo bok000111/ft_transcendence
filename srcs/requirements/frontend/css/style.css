@@ -112,3 +112,13 @@
 .z_highest {
     z-index: 9999;
 }
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid black;
+    justify-content: center;
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+  }
