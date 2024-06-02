@@ -19,7 +19,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ft_transcendence.settings")
 
 django_asgi_app = get_asgi_application()
 
-from . import routing
+from ws import routing
 
 application = ProtocolTypeRouter(
     {
