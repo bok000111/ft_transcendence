@@ -14,14 +14,6 @@ class TourResultDetailSubpage extends SubPage {
         async() => {
             try {
                 await tourResultDetailAPI.request();
-                // for(let i = 0; i <tourResultDetailAPI.recvData.length; i++)
-                // {
-                //     this.$dv.innerHTML += `
-                //         <div>
-                //             <button>$tourResultDetailAPI.recvData[i].rank} : $tourResultDetailAPI.recvData[i].playerName}</button>
-                //         </div>
-                //     `;
-                // }
             }
             catch(e) {
                 alert(`Result Detail: ${e.message}`);

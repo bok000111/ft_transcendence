@@ -178,18 +178,15 @@ export const tourExitAPI = new API(
  * GET
  * PATH 미정  (5.18 기준)
  * sendData = {} // 일단은 없을듯?
- * recvData = { date, time, tourID }
+ * recvData = { resultData: [id, date, tourResult{}] }
+ * tourResult -> {
+ * player1 nickname: String
+ * player2 nickname: String
+ * player1 score: Int
+ * player2 score: Int
+ * }
 */
 export const tourResultListAPI = new API(
-    "http://localhost:8000/api/result/",
-    "GET"
-);
-
-/** 미정 API
- * sendData = { tourID }
- * recvData = { [ "playerID" : "rank" ] -> 이건 일단 위에서 받아놨던걸로 알아서 처리할 예정. + resultDetailInfo 삭제예정 }
- */
-export const tourResultDetailAPI = new API(
     "http://localhost:8000/api/result/",
     "GET"
 );
