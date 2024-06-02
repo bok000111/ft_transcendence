@@ -10,6 +10,7 @@ class MainSubpage extends SubPage {
     $localGameBtn;
 
     init() {
+        this.vailidate();
         this.$elem.innerHTML = `
         <div class="container z_highest">
             <div class="row justify-content-center mt-5">
@@ -58,9 +59,9 @@ class MainSubpage extends SubPage {
         // this.$localGameBtn.addEventListener("click", () => {
         //     this.requestShift("local_game_page");
         // });
-        // this.$tourResultBtn.addEventListener("click", () => {
-        //     this.requestShift("tour_result_page");
-        // });
+        this.$tourResultBtn.addEventListener("click", () => {
+            this.requestShift("tour_result_page");
+        });
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {

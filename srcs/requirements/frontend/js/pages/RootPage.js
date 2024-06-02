@@ -32,6 +32,8 @@ export default class RootPage extends Component {
         this.curChild.fini();
         this.curChild = this.child[nextChildName];
         this.curChild.init();
+        const url = location.origin + location.pathname + '#' + this.curChild.initChildName;
+        history.pushState(null, null, url);
     }
 
     async checkLoggedIn() {
@@ -39,21 +41,64 @@ export default class RootPage extends Component {
             await meAPI.request();
             info.myID = meAPI.recvData.data.user.id;
             info.myUsername = meAPI.recvData.data.user.username;
+            const url = location.origin + location.pathname + '#' + "main_subpage";
+            history.pushState(null, null, url);
             this.curChild = this.child["main_page"];
         }
         catch {
-            
+            const url = location.origin + location.pathname + '#' + "login_subpage"; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
+            history.pushState(null, null, url);
         }
     }
 
-    async init() {
+    async pongHandler() {
         /**
          * 로그인 세션이 유지되는 상태
-         * -> 토너먼트 진행중 : 토너먼트 화면
-         * -> 나머지 : 메인 화면
+         * -> 로그인 상태 : 메인 화면
+         * -> 나머지 : 로그인 페이지
          */
         await this.checkLoggedIn();
         this.curChild.init();
+    }
+
+    async init() {
+        await this.pongHandler();
+        const title_pong = document.querySelector("#titlePong");
+
+        title_pong.addEventListener("click", (event) => {
+            event.preventDefault();
+            location.reload(location);
+        });
+        window.addEventListener("hashchange", this.route.bind(this));
+    }
+
+    async route() {
+        if (location.hash === "#login_subpage") {
+            try {
+                await meAPI.request();
+            }
+            catch {
+                const url = location.origin + location.pathname + '#' + "login_subpage"; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
+                history.pushState(null, null, url);
+            }
+        }
+        switch(location.hash) {
+            case "#login_subpage":
+                this.childShift("auth_page");
+                this.curChild.childShift("login_subpage");
+                break;
+            case "#signup_subpage":
+                this.childShift("auth_page");
+                this.curChild.childShift("signup_subpage");
+                break;
+            case "#main_subpage":
+                this.childShift("main_page");
+                this.curChild.childShift("main_subpage");
+            default:
+                alert("Cannot Access!");
+                location.reload();
+                break;
+        }
     }
 
     fini() {}

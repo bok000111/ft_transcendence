@@ -11,6 +11,8 @@ export default class Page extends RootPage {
             this.requestShift(nextChildName);
         }
         else {
+            const url = location.origin + location.pathname + '#' + nextChildName;
+            history.pushState(null, null, url);
             this.curChild = this.child[nextChildName];
             this.curChild.init();
         }

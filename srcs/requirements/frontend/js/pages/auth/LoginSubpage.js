@@ -55,6 +55,8 @@ class LoginSubpage extends SubPage {
                 this.requestShift("main_page");
             }
             catch (e) {
+                // location.href = location.origin + location.pathname;
+                location.reload();
                 alert(`Login: ${e.message}`);
             }
         });

@@ -1,13 +1,27 @@
 import Page from "./Page.js";
+import { meAPI } from "../models/API.js"
 
 export default class SubPage extends Page {
     childShift(nextChildName) {}
 
+    requestShift(nextChildName) {
+        this.parent.childShift(nextChildName);
+    }
+
     mount(childName, initFunc, finiFunc) {}
 
+    // login, signup 서브 페이지를 제외한 모든 서브페이지 init 시마다 유효한 액세스인지 확인 필수!
+    async vailidate() {
+        try {
+            await meAPI.request();
+        }
+        catch {
+            alert("Cannot Access!");
+            location.reload();
+        }
+    }
+
     init() {
-        //서버로부터 응답 받아서 DOM요소 정리 슥삭
-        //~.innerHTML = `ㅁㄴㅇㄹ`; // ㅁㄴㅇㄹ에 띄울애들 정리
     }
 
     fini() {
