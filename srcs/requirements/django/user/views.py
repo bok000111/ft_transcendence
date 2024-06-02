@@ -55,7 +55,7 @@ class LogoutView(AJsonMixin, AJsonAuthRequiredMixin, View):
 class MyInfoView(AJsonMixin, AJsonAuthRequiredMixin, View):
     async def get(self, request):
         user = await request.auser()
-        return self.ajsend_ok({"user": user}, "user info")
+        return await self.ajsend_ok({"user": user}, "user info")
 
 
 # Path: srcs/requirements/django/user/models.py
