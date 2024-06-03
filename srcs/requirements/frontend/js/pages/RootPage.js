@@ -6,12 +6,14 @@ export default class RootPage extends Component {
     parent; // object
     initChildName; // string
     curChild; // object
+    selfName;
     child = {};
 
     constructor(elem, parent, initChildName, selfName) {
         super(elem);
         this.initChildName = initChildName;
         this.parent = parent;
+        this.selfName = selfName;
         if (parent)
             parent.mount(this, selfName);
         this.setEvent();
@@ -69,37 +71,39 @@ export default class RootPage extends Component {
             event.preventDefault();
             location.reload(location);
         });
-        window.addEventListener("hashchange", this.route.bind(this));
+        window.addEventListener("hashchange", () => {
+            location.hash.substring(1);
+        });
     }
 
-    async route() {
-        if (location.hash === "#login_subpage") {
-            try {
-                await meAPI.request();
-            }
-            catch {
-                const url = location.origin + location.pathname + '#' + "login_subpage"; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
-                history.pushState(null, null, url);
-            }
-        }
-        switch(location.hash) {
-            case "#login_subpage":
-                this.childShift("auth_page");
-                this.curChild.childShift("login_subpage");
-                break;
-            case "#signup_subpage":
-                this.childShift("auth_page");
-                this.curChild.childShift("signup_subpage");
-                break;
-            case "#main_subpage":
-                this.childShift("main_page");
-                this.curChild.childShift("main_subpage");
-            default:
-                alert("Cannot Access!");
-                location.reload();
-                break;
-        }
-    }
+    // async route() {
+    //     if (location.hash === "#login_subpage") {
+    //         try {
+    //             await meAPI.request();
+    //         }
+    //         catch {
+    //             const url = location.origin + location.pathname + '#' + "login_subpage"; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
+    //             history.pushState(null, null, url);
+    //         }
+    //     }
+    //     switch(location.hash) {
+    //         case "#login_subpage":
+    //             this.childShift("auth_page");
+    //             this.curChild.childShift("login_subpage");
+    //             break;
+    //         case "#signup_subpage":
+    //             this.childShift("auth_page");
+    //             this.curChild.childShift("signup_subpage");
+    //             break;
+    //         case "#main_subpage":
+    //             this.childShift("main_page");
+    //             this.curChild.childShift("main_subpage");
+    //         default:
+    //             alert("Cannot Access!");
+    //             location.reload();
+    //             break;
+    //     }
+    // }
 
     fini() {}
 };
