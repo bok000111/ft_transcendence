@@ -72,7 +72,8 @@ export default class RootPage extends Component {
             location.reload(location);
         });
         window.addEventListener("hashchange", () => {
-            location.hash.substring(1);
+            // 컴파일 에러 안 나나? 안 나면 다행이고.
+            this.curChild.curChild.requestShift(location.hash.substring(1));
         });
     }
 

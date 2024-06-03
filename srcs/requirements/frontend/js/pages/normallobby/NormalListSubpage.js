@@ -24,7 +24,7 @@ class NormalListSubpage extends SubPage {
             newNode.addEventListener("click", () => {
                 // 클로저의 성질을 잘 몰라서 얘는 될 지 모르겠다..
                 info.lobby.id = lobby.id;
-                this.requestShift("normal_entry_subpage");
+                this.route("normal_entry_subpage");
             });
             this.$lobbyList.appendChild(newNode);
         }
@@ -56,7 +56,7 @@ class NormalListSubpage extends SubPage {
             this.refresh();
         });
         this.$makeBtn.addEventListener("click", () => {
-            this.requestShift("normal_make_subpage");
+            this.route("normal_make_subpage");
         });
 
         this.refresh();

@@ -27,7 +27,7 @@ class TourEntrySubpage extends SubPage {
                 await tourEntryAPI.request();
                 info.lobby.nickname = tourEntryAPI.sendData.nickname;
                 info.lobby.players = structuredClone(tourEntryAPI.recvData.data.lobby.players);
-                this.requestShift("tour_lobby_subpage");
+                this.route("tour_lobby_subpage");
             }
             catch (e) {
                 alert(`Tournament Entry: ${e.message}`);
@@ -36,7 +36,7 @@ class TourEntrySubpage extends SubPage {
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.requestShift("tour_list_subpage");
+            this.route("tour_list_subpage");
         });
     }
 

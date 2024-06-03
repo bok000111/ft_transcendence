@@ -51,22 +51,22 @@ class MainSubpage extends SubPage {
         this.$logoutBtn = document.querySelector("#logout");
         
         // this.$tourLobbyBtn.addEventListener("click", () => {
-        //     this.requestShift("tour_lobby_page")
+        //     this.route("tour_lobby_page")
         // });
         this.$normalLobbyBtn.addEventListener("click", () => {
-            this.requestShift("normal_lobby_page");
+            this.route("normal_lobby_page");
         });
         // this.$localGameBtn.addEventListener("click", () => {
-        //     this.requestShift("local_game_page");
+        //     this.route("local_game_page");
         // });
         this.$tourResultBtn.addEventListener("click", () => {
-            this.requestShift("tour_result_page");
+            this.route("tour_result_page");
         });
         this.$logoutBtn.addEventListener("click" , async() => {
             logoutAPI.sendData = {};
             try {
                 await logoutAPI.request();
-                this.requestShift("auth_page");
+                this.route("auth_page");
             }
             catch (e) {
                 alert(`Logout: ${e.message}`);

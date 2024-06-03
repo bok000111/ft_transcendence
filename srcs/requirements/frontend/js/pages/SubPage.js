@@ -4,8 +4,10 @@ import { meAPI } from "../models/API.js"
 export default class SubPage extends Page {
     childShift(nextChildName) {}
 
-    requestShift(nextChildName) {
-        this.parent.childShift(nextChildName);
+    route(nextChildName) {
+        // try-catch로 짜야 하나?
+        this.requestShift(nextChildName);
+        history.pushState(null, null, location.origin + location.pathname + "#" + nextChildName);
     }
 
     mount(childName, initFunc, finiFunc) {}

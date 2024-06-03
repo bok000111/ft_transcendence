@@ -51,7 +51,7 @@ class NormalMakeSubpage extends SubPage {
                 info.lobby.id = normalMakeAPI.recvData.data.lobby.id;
                 info.lobby.nickname = normalMakeAPI.sendData.nickname;
                 info.lobby.players = structuredClone(normalMakeAPI.recvData.data.lobby.players);
-                this.requestShift("normal_lobby_subpage");
+                this.route("normal_lobby_subpage");
             }
             catch (e) {
                 alert(`Normal Make Room: ${e.message}`);
@@ -61,7 +61,7 @@ class NormalMakeSubpage extends SubPage {
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.requestShift("normal_list_subpage");
+            this.route("normal_list_subpage");
         });
     }
 
