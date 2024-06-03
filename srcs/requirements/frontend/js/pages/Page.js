@@ -2,7 +2,12 @@ import RootPage from "./RootPage.js";
 
 export default class Page extends RootPage {
     requestShift(nextChildName) {
-        this.parent.childShift(nextChildName);
+        try {
+            this.parent.childShift(nextChildName);
+        }
+        catch {
+            alert("404 Not Found");
+        }
     }
 
     childShift(nextChildName) {
