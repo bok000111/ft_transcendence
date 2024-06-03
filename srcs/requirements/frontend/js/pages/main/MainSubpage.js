@@ -10,7 +10,7 @@ class MainSubpage extends SubPage {
     $localGameBtn;
 
     init() {
-        this.vailidate();
+        this.validate();
         this.$elem.innerHTML = `
         <div class="container z_highest">
             <div class="row justify-content-center mt-5">
