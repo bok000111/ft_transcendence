@@ -2,7 +2,6 @@ import { authPage } from "./AuthPage.js";
 import { loginAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
-import RootPage from "../RootPage.js"
 
 class LoginSubpage extends SubPage {
     $form;
