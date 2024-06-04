@@ -8,7 +8,9 @@ export default class SubPage extends Page {
     route(nextChildName) {
         // try-catch로 짜야 하나?
         this.requestShift(nextChildName);
-        history.pushState(null, null, location.origin + location.pathname + "#" + nextChildName);
+        if (location.pathname.substring(1) !== nextChildName) {
+            history.pushState(null, null, location.origin + "/" + nextChildName);
+        }
     }
 
     mount(childName, initFunc, finiFunc) {}
@@ -20,7 +22,7 @@ export default class SubPage extends Page {
         }
         catch {
             alert("Cannot Access!");
-            location.reload();
+            location.reload(true);
         }
     }
 

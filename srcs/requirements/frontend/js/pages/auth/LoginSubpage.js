@@ -55,7 +55,7 @@ class LoginSubpage extends SubPage {
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
-                location.reload();
+                location.reload(true);
                 alert(`Login: ${e.message}`);
             }
         });

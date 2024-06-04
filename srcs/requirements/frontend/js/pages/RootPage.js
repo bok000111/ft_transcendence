@@ -36,21 +36,17 @@ export default class RootPage extends Component {
         this.curChild.init();
     }
 
-    getHashURL() {
-        return this.curChild.selfName + "/" + this.curChild.curChild.selfName;
-    }
-
     async checkLoggedIn() {
         try {
             await meAPI.request();
             info.myID = meAPI.recvData.data.user.id;
             info.myUsername = meAPI.recvData.data.user.username;
             this.curChild = this.child["main_page"];
-            const url = location.origin + location.pathname + '#' + this.getHashURL();
+            const url = location.origin + "/" + this.curChild.selfName + "/" + this.curChild.curChild.selfName;
             history.replaceState(null, null, url);
         }
         catch {
-            const url = location.origin + location.pathname + '#' + this.getHashURL(); // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
+            const url = location.origin + "/" + this.curChild.selfName + "/" + this.curChild.curChild.selfName; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
             history.replaceState(null, null, url);
         }
     }
@@ -71,11 +67,11 @@ export default class RootPage extends Component {
 
         title_pong.addEventListener("click", (event) => {
             event.preventDefault();
-            location.reload(location);
+            this.curChild.curChild.route("main_page/main_subpage");
         });
         window.addEventListener("popstate", () => {
             // 컴파일 에러 안 나나? 안 나면 다행이고.
-            this.curChild.curChild.requestShift(location.hash.substring(1));
+            this.curChild.curChild.requestShift(location.pathname.substring(1));
         });
     }
 
