@@ -9,8 +9,6 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 from channels.db import database_sync_to_async
 
-from lobby.models import GameLobby, PlayerInLobby
-
 
 User = get_user_model()
 
@@ -24,25 +22,6 @@ class ModelJSONEncoder(DjangoJSONEncoder):
                 "id": obj.pk,
                 "username": obj.username,
                 "email": obj.email,
-            }
-        elif isinstance(obj, GameLobby):
-            return {
-                "id": obj.pk,
-                "name": obj.name,
-                "players": [
-                    {"id": player.pk, "username": player.username}
-                    for player in obj.players.all()
-                ],
-                "player_count": obj.player_count,
-                "max_players": obj.max_players,
-                "end_score": obj.end_score,
-            }
-        elif isinstance(obj, PlayerInLobby):
-            return {
-                "id": obj.player.pk,
-                "score": obj.score,
-                "is_host": obj.is_host,
-                "is_ready": obj.is_ready,
             }
         elif hasattr(obj, "as_dict"):
             return obj.as_dict()
