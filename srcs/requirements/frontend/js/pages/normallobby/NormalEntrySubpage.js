@@ -27,7 +27,7 @@ class NormalEntrySubpage extends SubPage {
                 await normalEntryAPI.request();
                 info.lobby.nickname = normalEntryAPI.sendData.nickname;
                 info.lobby.players = structuredClone(normalEntryAPI.recvData.data.lobby.players);
-                this.route("normal_lobby_subpage");
+                this.route("normal_lobby_page/normal_lobby_subpage");
             }
             catch (e) {
                 alert(`normalnament Entry: ${e.message}`);
@@ -36,7 +36,7 @@ class NormalEntrySubpage extends SubPage {
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.route("normal_list_subpage");
+            this.route("normal_lobby_page/normal_list_subpage");
         });
     }
 

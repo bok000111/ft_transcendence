@@ -34,8 +34,10 @@ export default class RootPage extends Component {
         this.curChild.fini();
         this.curChild = this.child[nextChildName];
         this.curChild.init();
-        const url = location.origin + location.pathname + '#' + this.curChild.initChildName;
-        history.pushState(null, null, url);
+    }
+
+    getHashURL() {
+        return this.curChild.selfName + "/" + this.curChild.curChild.selfName;
     }
 
     async checkLoggedIn() {
@@ -43,13 +45,13 @@ export default class RootPage extends Component {
             await meAPI.request();
             info.myID = meAPI.recvData.data.user.id;
             info.myUsername = meAPI.recvData.data.user.username;
-            const url = location.origin + location.pathname + '#' + "main_subpage";
-            history.pushState(null, null, url);
             this.curChild = this.child["main_page"];
+            const url = location.origin + location.pathname + '#' + this.getHashURL();
+            history.replaceState(null, null, url);
         }
         catch {
-            const url = location.origin + location.pathname + '#' + "login_subpage"; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
-            history.pushState(null, null, url);
+            const url = location.origin + location.pathname + '#' + this.getHashURL(); // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
+            history.replaceState(null, null, url);
         }
     }
 
@@ -71,7 +73,7 @@ export default class RootPage extends Component {
             event.preventDefault();
             location.reload(location);
         });
-        window.addEventListener("hashchange", () => {
+        window.addEventListener("popstate", () => {
             // 컴파일 에러 안 나나? 안 나면 다행이고.
             this.curChild.curChild.requestShift(location.hash.substring(1));
         });

@@ -48,7 +48,7 @@ class SignupSubpage extends SubPage {
             try {
                 await signupAPI.request();
                 alert("Signup Success!");
-                this.route("login_subpage");
+                this.route("auth_page/login_subpage");
             }
             catch (e) {
                 alert(`Signup: ${e.message}`);
@@ -56,7 +56,7 @@ class SignupSubpage extends SubPage {
         });
 
         this.$loginbtn.addEventListener("click", () => {
-            this.route("login_subpage");
+            this.route("auth_page/login_subpage");
         });
     }
 

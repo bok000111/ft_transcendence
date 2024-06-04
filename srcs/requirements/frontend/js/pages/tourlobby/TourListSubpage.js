@@ -24,7 +24,7 @@ class TourListSubpage extends SubPage {
             newNode.addEventListener("click", () => {
                 // 클로저의 성질을 잘 몰라서 얘는 될 지 모르겠다..
                 info.lobby.id = lobby.id;
-                this.route("tour_entry_subpage");
+                this.route("tour_lobby_page/tour_entry_subpage");
             });
             this.$lobbyList.appendChild(newNode);
         }
@@ -56,7 +56,7 @@ class TourListSubpage extends SubPage {
             this.refresh();
         });
         this.$makeBtn.addEventListener("click", () => {
-            this.route("tour_make_subpage");
+            this.route("tour_lobby_page/tour_make_subpage");
         });
 
         this.refresh();

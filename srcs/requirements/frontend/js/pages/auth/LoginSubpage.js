@@ -51,7 +51,7 @@ class LoginSubpage extends SubPage {
                 await loginAPI.request();
                 info.myID = loginAPI.recvData.data.user.id;
                 info.myUsername = loginAPI.recvData.data.user.username;
-                this.route("main_page");
+                this.route("main_page/main_subpage");
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
@@ -61,7 +61,7 @@ class LoginSubpage extends SubPage {
         });
 
         this.$signupbtn.addEventListener("click", () => {
-            this.route("signup_subpage");
+            this.route("auth_page/signup_subpage");
         });
 
         // oauth -> should be modified

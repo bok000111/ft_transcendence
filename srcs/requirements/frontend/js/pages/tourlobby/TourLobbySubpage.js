@@ -72,7 +72,7 @@ class TourLobbySubpage extends SubPage {
         this.$leaveBtn = this.$elem.querySelector("#tour-leave");
 
         this.$leaveBtn.addEventListener("click", () => {
-            this.route("tour_list_subpage");
+            this.route("tour_lobby_page/tour_list_subpage");
         });
 
         if (this.$readyBtn) {
@@ -103,7 +103,7 @@ class TourLobbySubpage extends SubPage {
                     event: "leave",
                 }
             }));
-            this.route("tour_list_subpage");
+            this.route("tour_lobby_page/tour_list_subpage");
         });
     }
 
@@ -131,10 +131,10 @@ class TourLobbySubpage extends SubPage {
                 is_ready: false,
             });
         case "start":
-            this.route("tour_game_lounge_subpage");
+            this.route("tour_lobby_page/tour_game_lounge_subpage");
             return;
         case "error":
-            this.route("tour_list_subpage");
+            this.route("tour_lobby_page/tour_list_subpage");
             return;
         }
         this.detailRender();
@@ -151,19 +151,19 @@ class TourLobbySubpage extends SubPage {
                 }
                 catch (e) {
                     alert(`Tournament Lobby: ${e.message}`);
-                    this.route("tour_list_subpage");
+                    this.route("tour_lobby_page/tour_list_subpage");
                 }
             });
             this.sock.addEventListener("message", (event) => {
                 this.messageHandler(event);
             });
             this.sock.addEventListener("error", () => {
-                this.route("tour_list_subpage");
+                this.route("tour_lobby_page/tour_list_subpage");
             });
         }
         catch (e) {
             alert(`Tournament Lobby: ${e.message}`);
-            this.route("tour_list_subpage");
+            this.route("tour_lobby_page/tour_list_subpage");
         }
     }
 

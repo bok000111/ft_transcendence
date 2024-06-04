@@ -2,21 +2,19 @@ import RootPage from "./RootPage.js";
 
 export default class Page extends RootPage {
     requestShift(nextChildName) {
-        try {
-            this.parent.childShift(nextChildName);
-        }
-        catch {
-            alert("404 Not Found");
-        }
+        this.parent.childShift(nextChildName);
     }
 
     childShift(nextChildName) {
+        const pageName = nextChildName.split("/")[0];
+        const subpageName = nextChildName.split("/")[1];
+    
         this.curChild.fini();
-        if (this.selfName === nextChildName) {
-            this.requestShift(nextChildName);
+        if (this.selfName !== pageName) {
+            this.requestShift(pageName);
         }
         else {
-            this.curChild = this.child[nextChildName];
+            this.curChild = this.child[subpageName];
             this.curChild.init();
         }
     }

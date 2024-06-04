@@ -30,7 +30,7 @@ class TourMakeSubpage extends SubPage {
                 info.lobby.id = tourMakeAPI.recvData.data.lobby.id;
                 info.lobby.nickname = tourMakeAPI.sendData.nickname;
                 info.lobby.players = structuredClone(tourMakeAPI.recvData.data.lobby.players);
-                this.route("tour_lobby_subpage");
+                this.route("tour_lobby_page/tour_lobby_subpage");
             }
             catch (e) {
                 alert(`Tournament Make Room: ${e.message}`);
@@ -40,7 +40,7 @@ class TourMakeSubpage extends SubPage {
         });
 
         this.$backBtn.addEventListener("click", () => {
-            this.route("tour_list_subpage");
+            this.route("tour_lobby_page/tour_list_subpage");
         });
     }
 

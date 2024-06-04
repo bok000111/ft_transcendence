@@ -41,7 +41,7 @@ class NormalLobbySubpage extends SubPage {
         this.$leaveBtn = this.$elem.querySelector("#normal-leave");
 
         this.$leaveBtn.addEventListener("click", () => {
-            this.route("normal_list_subpage");
+            this.route("normal_lobby_page/normal_list_subpage");
         });
 
         if (this.$readyBtn) {
@@ -72,7 +72,7 @@ class NormalLobbySubpage extends SubPage {
                     event: "leave",
                 }
             }));
-            this.route("normal_list_subpage");
+            this.route("normal_lobby_page/normal_list_subpage");
         });
     }
     
@@ -161,10 +161,10 @@ class NormalLobbySubpage extends SubPage {
                 is_ready: false,
             });
         case "start":
-            this.route("pong_subpage");
+            this.route("pong_page/pong_subpage");
             return;
         case "error":
-            this.route("normal_list_subpage");
+            this.route("normal_lobby_page/normal_list_subpage");
             return;
         }
         this.detailRender();
@@ -181,19 +181,19 @@ class NormalLobbySubpage extends SubPage {
                 }
                 catch (e) {
                     alert(`Normal Lobby: ${e.message}`);
-                    this.route("normal_list_subpage");
+                    this.route("normal_lobby_page/normal_list_subpage");
                 }
             });
             this.sock.addEventListener("message", (event) => {
                 this.messageHandler(event);
             });
             this.sock.addEventListener("error", () => {
-                this.route("normal_list_subpage");
+                this.route("normal_lobby_page/normal_list_subpage");
             });
         }
         catch (e) {
             alert(`Normal Lobby: ${e.message}`);
-            this.route("normal_list_subpage");
+            this.route("normal_lobby_page/normal_list_subpage");
         }
     }
 
