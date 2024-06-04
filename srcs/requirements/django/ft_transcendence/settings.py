@@ -59,6 +59,11 @@ CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5500",
     "http://localhost:8000",
     "http://localhost:8080",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080",
 ]
 CSRF_COOKIE_SECURE = False  # 개발시에는 False로 설정
 CSRF_COOKIE_SAMESITE = "Lax"
@@ -69,6 +74,11 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5500",
     "http://localhost:8000",
     "http://localhost:8080",
+    "http://127.0.0.1",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5500",
+    "http://127.0.0.1:8000",
+    "http://127.0.0.1:8080",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -92,8 +102,6 @@ INSTALLED_APPS = [
     "ws",  # websocket 라우팅
     "oauth",  # 42 OAuth
     "user",  # 유저 관리
-    # "pong",  # 게임 관리
-    "lobby",  # 로비 관리
     "channels",  # channels - websocket
     "django.contrib.admin",
     "django.contrib.auth",
