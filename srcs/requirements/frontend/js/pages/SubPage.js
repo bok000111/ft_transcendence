@@ -20,6 +20,7 @@ export default class SubPage extends Page {
                 nextChildName = "main_page/main_subpage";
             }
         }
+        // 로그인이 안 된 경우
         catch {
             if (page_path !== "auth_page") {
                 alert("login required");

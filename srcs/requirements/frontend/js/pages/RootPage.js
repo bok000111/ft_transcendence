@@ -36,7 +36,7 @@ export default class RootPage extends Component {
     }
 
     async init() {
-        await this.curChild.curChild.route("main_page/main_subpage", true);
+        await this.curChild.curChild.route("auth_page/login_subpage", true);
 
         document.querySelector("#titlePong").addEventListener("click", (event) => {
             event.preventDefault();
