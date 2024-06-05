@@ -38,15 +38,15 @@ export default class SubPage extends Page {
     mount(childName, initFunc, finiFunc) {}
 
     // login, signup 서브 페이지를 제외한 모든 서브페이지 init 시마다 유효한 액세스인지 확인 필수!
-    async validate() {
-        try {
-            await meAPI.request();
-        }
-        catch {
-            alert("Cannot Access!");
-            location.reload(true);
-        }
-    }
+    // async validate() {
+    //     try {
+    //         await meAPI.request();
+    //     }
+    //     catch {
+    //         alert("Cannot Access!");
+    //         location.reload(true);
+    //     }
+    // }
 
     init() {
     }

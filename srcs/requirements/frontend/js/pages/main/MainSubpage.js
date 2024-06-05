@@ -1,6 +1,6 @@
 import { mainPage } from "./MainPage.js"
-import SubPage from "../SubPage.js"
 import { logoutAPI } from "../../models/API.js"
+import SubPage from "../SubPage.js"
 
 class MainSubpage extends SubPage {
     $logoutBtn;
@@ -10,7 +10,7 @@ class MainSubpage extends SubPage {
     $localGameBtn;
 
     init() {
-        this.validate();
+        // this.validate();
         this.$elem.innerHTML = `
         <div class="container z_highest">
             <div class="row justify-content-center mt-5">

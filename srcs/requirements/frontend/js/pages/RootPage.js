@@ -1,6 +1,4 @@
 import Component from "../models/Component.js";
-import { meAPI } from "../models/API.js";
-import { info } from "../models/Info.js";
 
 export default class RootPage extends Component {
     parent; // object
