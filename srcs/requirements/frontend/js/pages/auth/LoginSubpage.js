@@ -10,7 +10,12 @@ class LoginSubpage extends SubPage {
     $signupbtn;
     response;
 
-    init() {
+    connectSocket() {
+        this.sock = new WebSocket("ws://localhost:8000/ws/");
+        this.sock.addEventListener("open", )
+    }
+
+    async init() {
         this.$elem.innerHTML = `
             <div class="container z_highest">
                 <div class="row justify-content-center mt-5">
@@ -49,15 +54,27 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
-                info.myID = loginAPI.recvData.data.user.id;
-                info.myUsername = loginAPI.recvData.data.user.username;
-                this.route("main_page/main_subpage");
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
-                location.reload(true);
                 alert(`Login: ${e.message}`);
+                return;
             }
+            info.myID = loginAPI.recvData.data.user.id;
+            info.myUsername = loginAPI.recvData.data.user.username;
+            
+            /**
+             * login 성공 시 웹소켓 연결.
+             * 웹소켓 연결 성공 -> mainpage로 이동.
+             * 웹소켓 연결 실패 -> 로그아웃
+             */
+            try {
+                
+            }
+            catch (e) {
+
+            }
+            this.route("main_page/main_subpage");
         });
 
         this.$signupbtn.addEventListener("click", () => {

@@ -1,6 +1,7 @@
 import Component from "../models/Component.js";
 
 export default class RootPage extends Component {
+    static sock = null;
     parent; // object
     initChildName; // string
     curChild; // object
