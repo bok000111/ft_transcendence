@@ -8,6 +8,7 @@ class LoginSubpage extends SubPage {
     $oauthbtn;
     $loginbtn;
     $signupbtn;
+    loginModal;
     response;
 
     connectSocket() {
@@ -39,15 +40,29 @@ class LoginSubpage extends SubPage {
                     </div>
                 </div>
             </div>
+            <!-- Modal -->
+            <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h1>Logging in ...</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
 
         this.$form = this.$elem.querySelector("form");
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
+        this.loginModal = new bootstrap.Modal("#loginModal", {});
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
+            // 모달 띄우기
+            this.loginModal.show();
+
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
                 password: this.$form.querySelector("#password").value,
@@ -58,6 +73,7 @@ class LoginSubpage extends SubPage {
             catch (e) {
                 // location.href = location.origin + location.pathname;
                 alert(`Login: ${e.message}`);
+                this.loginModal.hide();
                 return;
             }
             info.myID = loginAPI.recvData.data.user.id;
@@ -78,17 +94,30 @@ class LoginSubpage extends SubPage {
                  * 무한 재시도..?
                  */
                 alert(`Login: ${e.message}`);
-                while (true) {
-                    try {
-                        await logoutAPI.request();
-                        break;
-                    }
-                    catch (e) {}
-                }
+                await logoutAPI.request();
+                this.loginModal.hide();
                 return;
             }
             this.sock.addEventListener("open", () => {
-                
+                this.loginModal.hide();
+                this.route("main_page/main_subpage");
+            });
+            this.sock.addEventListener("message", () => {
+                /**
+                 * 여러 가지 메시지 처리
+                 */
+            });
+            this.sock.addEventListener("close", () => {
+                /**
+                 * 로그아웃
+                 * login_subpage로 돌아가기
+                 */
+            });
+            this.sock.addEventListener("error", () => {
+                /**
+                 * 로그아웃 ?
+                 * login_subpage로 돌아가기 ?
+                 */
             });
         });
 
