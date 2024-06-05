@@ -36,42 +36,16 @@ export default class RootPage extends Component {
         this.curChild.init();
     }
 
-    async checkLoggedIn() {
-        try {
-            await meAPI.request();
-            info.myID = meAPI.recvData.data.user.id;
-            info.myUsername = meAPI.recvData.data.user.username;
-            this.curChild = this.child["main_page"];
-            const url = location.origin + "/" + this.curChild.selfName + "/" + this.curChild.curChild.selfName;
-            history.replaceState(null, null, url);
-        }
-        catch {
-            const url = location.origin + "/" + this.curChild.selfName + "/" + this.curChild.curChild.selfName; // 일단은 항상 로그인 안한 오류에 대해서만. 나중에 메인문에서 뒤로 갈 때 고려해야함.
-            history.replaceState(null, null, url);
-        }
-    }
-
-    async pongHandler() {
-        /**
-         * 로그인 세션이 유지되는 상태
-         * -> 로그인 상태 : 메인 화면
-         * -> 나머지 : 로그인 페이지
-         */
-        await this.checkLoggedIn();
-        this.curChild.init();
-    }
-
     async init() {
-        await this.pongHandler();
-        const title_pong = document.querySelector("#titlePong");
+        await this.curChild.curChild.route("main_page/main_subpage", true);
 
-        title_pong.addEventListener("click", (event) => {
+        document.querySelector("#titlePong").addEventListener("click", (event) => {
             event.preventDefault();
             this.curChild.curChild.route("main_page/main_subpage");
         });
         window.addEventListener("popstate", () => {
             // 컴파일 에러 안 나나? 안 나면 다행이고.
-            this.curChild.curChild.requestShift(location.pathname.substring(1));
+            this.curChild.curChild.route(location.pathname.substring(1), true);
         });
     }
 

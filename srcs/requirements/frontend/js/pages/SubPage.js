@@ -1,14 +1,36 @@
 import Page from "./Page.js";
-import { rootPage } from "./RootPage.js";
 import { meAPI } from "../models/API.js"
+import { info } from "../models/Info.js";
 
 export default class SubPage extends Page {
     childShift(nextChildName) {}
 
-    route(nextChildName) {
-        // try-catch로 짜야 하나?
+    async route(nextChildName, replace = false) {
+        /**
+         * auth_fail인 경우 auth_page/login_subpage 로 route
+         * auth_success인 경우 정상적으로 route
+         */
+        const page_path = nextChildName.split("/")[0];
+        try {
+            await meAPI.request();
+            info.myID = meAPI.recvData.data.user.id;
+            info.myUsername = meAPI.recvData.data.user.username;
+            if (page_path === "auth_page") {
+                alert("already logged in");
+                nextChildName = "main_page/main_subpage";
+            }
+        }
+        catch {
+            if (page_path !== "auth_page") {
+                alert("login required");
+                nextChildName = "auth_page/login_subpage";
+            }
+        }
         this.requestShift(nextChildName);
-        if (location.pathname.substring(1) !== nextChildName) {
+        if (replace) {
+            history.replaceState(null, null, location.origin + "/" + nextChildName);
+        }
+        else if (location.pathname.substring(1) !== nextChildName) {
             history.pushState(null, null, location.origin + "/" + nextChildName);
         }
     }
