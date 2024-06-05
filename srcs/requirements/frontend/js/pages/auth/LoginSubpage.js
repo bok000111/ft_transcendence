@@ -42,10 +42,10 @@ class LoginSubpage extends SubPage {
             </div>
             <!-- Modal -->
             <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog">
+                <div class="modal-dialog modal-xl modal-dialog-centered">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <h1>Logging in ...</h1>
+                            <h1 align="center">Logging in ...</h1>
                         </div>
                     </div>
                 </div>
@@ -56,7 +56,7 @@ class LoginSubpage extends SubPage {
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
-        this.loginModal = new bootstrap.Modal("#loginModal", {});
+        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), {});
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
