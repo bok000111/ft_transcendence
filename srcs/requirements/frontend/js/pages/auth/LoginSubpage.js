@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { loginAPI } from "../../models/API.js";
+import { loginAPI, logoutAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -69,12 +69,27 @@ class LoginSubpage extends SubPage {
              * 웹소켓 연결 실패 -> 로그아웃
              */
             try {
-                
+                this.sock = new WebSocket("ws://localhost:8000/ws/");
             }
             catch (e) {
-
+                /**
+                 * logout;
+                 * 그런데 만약 logout이 실패하면 어떻게 하지..?
+                 * 무한 재시도..?
+                 */
+                alert(`Login: ${e.message}`);
+                while (true) {
+                    try {
+                        await logoutAPI.request();
+                        break;
+                    }
+                    catch (e) {}
+                }
+                return;
             }
-            this.route("main_page/main_subpage");
+            this.sock.addEventListener("open", () => {
+                
+            });
         });
 
         this.$signupbtn.addEventListener("click", () => {
