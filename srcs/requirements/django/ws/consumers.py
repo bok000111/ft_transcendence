@@ -61,7 +61,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         message = event.get("message")
         if message is None:
             await self.send_error(4000, "message required")
-                return
+            return
         game_type = message.get("type")
         if type is None:
             await self.send_error(4000, "game_type required")
