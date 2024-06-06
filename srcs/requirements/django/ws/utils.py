@@ -1,7 +1,5 @@
-from django.http import JsonResponse
 from functools import wraps
 from inspect import iscoroutinefunction
-import json
 
 
 def ws_need_auth(consumer):
