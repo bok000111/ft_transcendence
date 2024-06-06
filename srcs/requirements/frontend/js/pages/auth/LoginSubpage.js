@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { loginAPI, logoutAPI } from "../../models/API.js";
+import { loginAPI } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -40,16 +40,6 @@ class LoginSubpage extends SubPage {
                     </div>
                 </div>
             </div>
-            <!-- Modal -->
-            <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-                <div class="modal-dialog modal-xl modal-dialog-centered">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <h1 align="center">Logging in ...</h1>
-                        </div>
-                    </div>
-                </div>
-            </div>
         `;
 
         this.$form = this.$elem.querySelector("form");
@@ -69,56 +59,16 @@ class LoginSubpage extends SubPage {
             };
             try {
                 await loginAPI.request();
+                info.myID = loginAPI.recvData.data.user.id;
+                info.myUsername = loginAPI.recvData.data.user.username;
+                this.loginModal.hide();
+                this.route("main_page/main_subpage");
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
                 alert(`Login: ${e.message}`);
                 this.loginModal.hide();
-                return;
             }
-            info.myID = loginAPI.recvData.data.user.id;
-            info.myUsername = loginAPI.recvData.data.user.username;
-            
-            /**
-             * login 성공 시 웹소켓 연결.
-             * 웹소켓 연결 성공 -> mainpage로 이동.
-             * 웹소켓 연결 실패 -> 로그아웃
-             */
-            try {
-                this.sock = new WebSocket("ws://localhost:8000/ws/");
-            }
-            catch (e) {
-                /**
-                 * logout;
-                 * 그런데 만약 logout이 실패하면 어떻게 하지..?
-                 * 무한 재시도..?
-                 */
-                alert(`Login: ${e.message}`);
-                await logoutAPI.request();
-                this.loginModal.hide();
-                return;
-            }
-            this.sock.addEventListener("open", () => {
-                this.loginModal.hide();
-                this.route("main_page/main_subpage");
-            });
-            this.sock.addEventListener("message", () => {
-                /**
-                 * 여러 가지 메시지 처리
-                 */
-            });
-            this.sock.addEventListener("close", () => {
-                /**
-                 * 로그아웃
-                 * login_subpage로 돌아가기
-                 */
-            });
-            this.sock.addEventListener("error", () => {
-                /**
-                 * 로그아웃 ?
-                 * login_subpage로 돌아가기 ?
-                 */
-            });
         });
 
         this.$signupbtn.addEventListener("click", () => {
