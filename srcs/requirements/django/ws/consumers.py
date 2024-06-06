@@ -61,7 +61,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         message = event.get("message")
         if message is None:
             await self.send_error(4000, "message required")
-
+                return
         game_type = message.get("type")
         if type is None:
             await self.send_error(4000, "game_type required")
@@ -71,6 +71,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         nickname = message.get("nickname")
         if nickname is None:
             await self.send_error(4000, "nickname required")
+            return
 
         if game_type not in self.queue:
             await self.send_json(
