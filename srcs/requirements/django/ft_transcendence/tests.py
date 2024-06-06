@@ -51,10 +51,3 @@ def logout(cookies):
     request.session = engine.SessionStore(session_key)
     logout(request)
     return SimpleCookie()
-
-
-def channels_reverse(name, *args, **kwargs):
-    from django.urls import reverse
-    from django.conf import settings
-
-    return reverse(name, urlconf=settings.CHANNEL_URLCONF, args=args, kwargs=kwargs)
