@@ -26,6 +26,15 @@ services:
       - intra
     restart: always
 
+  ganache:
+    image: trufflesuite/ganache:latest
+    container_name: ganache
+    ports:
+      - "7545:7545"
+    networks:
+      - intra
+    restart: always
+
   # 개발중이면 도커 사용 안함
   # django:
   #   build: ./backend/.
