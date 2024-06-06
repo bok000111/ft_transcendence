@@ -51,6 +51,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "[::1]",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -123,7 +124,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "ft_transcendence.urls"
-CHANNEL_URLCONF = "ft_transcendence.routing"
+CHANNEL_URLCONF = "ws.routing"
 
 TEMPLATES = [
     {
@@ -186,6 +187,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False  # 개발시에는 False로 설정
+SESSION_COOKIE_HTTPONLY = False  # 개발시에는 False로 설정
 
 
 # Internationalization
@@ -216,8 +218,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 CHANNEL_LAYERS = {
     "default": {
-        # "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("localhost", 6379)],
         },
