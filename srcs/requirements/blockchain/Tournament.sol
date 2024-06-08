@@ -1,49 +1,78 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.0;
+pragma solidity >=0.6.0 <0.9.0;
 
-contract Tournament {
+contract TournamentManager {
+    
+    uint8 private constant SUB_GAME_COUNT = 3;
+    uint8 private constant TUPLE_INFO = 5; // (game_id, player1, player2, score1, score2)
+    uint8 private constant PLAYER_COUNT = 4;
 
-    uint8 private constant ROUND_COUNT = 3;
-
-    struct Player {
-        uint64 id;
-        string username;
-        string nickname;
+    struct SubGame {
+        uint64 game_id;
+        uint64 player1;
+        uint64 player2;
+        uint8 score1;
+        uint8 score2;
     }
 
-    struct Round {
-        Player[2] players;
-        string round_type;
-        uint64 winner_id;
-        uint8[2] score;
+    struct Tournament {
+        uint timestamp;
+        uint64[PLAYER_COUNT] players;
+        SubGame[] sub_games;
     }
 
-    Round[ROUND_COUNT] private rounds;
-    uint8 private finished_round = 0;
+    mapping(uint64 => Tournament) private tournaments;
+    uint64[] private valid_tournaments;
 
-    mapping(uint64 => Player) private players;
-
-    function addPlayer(uint64 _id, string calldata _username, string calldata _nickname) external {
-        players[_id] = Player(_id, _username, _nickname);
+    function add_game(uint64 id, uint timestamp, uint64[PLAYER_COUNT] calldata players) external {
+        tournaments[id] = Tournament(timestamp, players, new SubGame[](0));
     }
 
-    function saveResult() private {
-        // round의 형식에 맞추어 result를 저장
-    }
-
-    function setWinner(uint8 round, uint8[2] calldata score) external returns(uint64) {
-        rounds[round].score = score;
-        finished_round += 1;
-
-        if (finished_round == ROUND_COUNT)
-            saveResult();
+    function add_sub_game(uint64 id, uint64[TUPLE_INFO] calldata sub_game) external {
+        require(tournaments[id].sub_games.length < SUB_GAME_COUNT, "SubGame count exceeded.");
         
-        return 1;
+        tournaments[id].sub_games.push(
+            SubGame({
+                game_id: sub_game[0],
+                player1: sub_game[1],
+                player2: sub_game[2],
+                score1: uint8(sub_game[3]),
+                score2: uint8(sub_game[4])
+            })
+        );
+
+        // SUB_GAME_COUNT에 도달하면 is_valid를 true로 설정
+        if(tournaments[id].sub_games.length == SUB_GAME_COUNT) {
+            valid_tournaments.push(id);
+        }
     }
 
-    function setFinishedRound(uint8 _finished_round) external returns(uint64){
-        finished_round = _finished_round;
-        return finished_round;
+    function get_valid_tournaments() external view returns (uint64[] memory) {
+        return valid_tournaments;
     }
 
+    function get_subgame_info(Tournament storage tournament, uint index) private view returns (uint64, uint8, uint8) {
+        SubGame storage sub_game = tournament.sub_games[index];
+        return (sub_game.game_id, sub_game.score1, sub_game.score2);
+    }
+
+    function get_tournament(uint64 id) external view returns (
+        uint, 
+        uint64, uint8, uint8, 
+        uint64, uint8, uint8,
+        uint64, uint8, uint8
+    ) {
+        Tournament storage tournament = tournaments[id];
+
+        (uint64 game_id1, uint8 score1_1, uint8 score2_1) = get_subgame_info(tournament, 0);
+        (uint64 game_id2, uint8 score1_2, uint8 score2_2) = get_subgame_info(tournament, 1);
+        (uint64 game_id3, uint8 score1_3, uint8 score2_3) = get_subgame_info(tournament, 2);
+
+        return (
+            tournament.timestamp, 
+            game_id1, score1_1, score2_1, 
+            game_id2, score1_2, score2_2, 
+            game_id3, score1_3, score2_3
+        );
+    }
 }

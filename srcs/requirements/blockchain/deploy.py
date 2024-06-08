@@ -4,78 +4,117 @@ from solcx import compile_standard, install_solc
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
-install_solc("0.6.0"),
-with open("./Tournament.sol", "r") as file:
-    tournament_file = file.read()
+# 1. 초기에 Smart contract를 배포하는 함수(1번만 하면 됨)
+# 2. 받은 결과를 바탕으로 contract 객체를 배포하는 함수(tournament가 끝나는 시점마다 실행)
+# 3. 현재 있는 contract 객체를 바탕으로 저장된 결과들을 가공해서 frontend에 던지는 함수
+class TournamentContract:
+    def __init__(self, sol_path, provider):
+        self.solc_version = "0.6.0"
+        self.w3 = Web3(Web3.HTTPProvider(provider))
+        self.chain_id = 1337
+        self.chain_address = os.getenv("ADDRESS")
+        self.private_key = os.getenv("PRIVATE_KEY")
+        self.bytecode = None
+        self.abi = None
+        self.__compile_sol(sol_path)
 
-# Compile Our Solidity
-compiled_sol = compile_standard(
-    {
-        "language": "Solidity",
-        "sources": {"Tournament.sol": {"content": tournament_file}},
-        "settings": {
-            "outputSelection": {
-                "*": {
-                    "*": ["abi", "metadata", "evm.bytecode", "evm.bytecode.sourceMap"]
-                }
+    def __compile_sol(self, sol_path):
+        install_solc(self.solc_version)
+        with open(sol_path, "rt", encoding='UTF8') as file:
+            tournament_file = file.read()
+        compiled_sol = compile_standard(
+            {
+                "language": "Solidity",
+                "sources": {"TournamentManager.sol": {"content": tournament_file}},
+                "settings": {
+                    "outputSelection": {
+                        "*": {
+                            "*": ["abi", "metadata", "evm.bytecode", "evm.bytecode.sourceMap"]
+                        }
+                    }
+                },
+            },
+            solc_version=self.solc_version,
+        )
+        self.bytecode = compiled_sol["contracts"]["TournamentManager.sol"]["TournamentManager"]["evm"]["bytecode"]["object"]
+        # for get bytecode
+        with open("bytecode.json", "w") as file:
+            json.dump(self.bytecode, file)
+        self.abi = compiled_sol["contracts"]["TournamentManager.sol"]["TournamentManager"]["abi"]
+        
+        # for get abi
+        # with open("abi.json", "w") as file:
+        #     json.dump(self.abi, file)
+
+    def deploy_contract(self):
+        Tournament = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
+        nonce = self.w3.eth.get_transaction_count(self.chain_address)
+        transaction = Tournament.constructor().build_transaction(
+            {
+                "chainId": self.chain_id,
+                "gasPrice": self.w3.eth.gas_price,
+                "from": self.chain_address,
+                "nonce": nonce,
             }
-        },
-    },
-    solc_version="0.6.0",
-)
+        )
+        signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key=self.private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        self.tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        return self.tx_receipt.contractAddress
 
-with open("compiled_code.json", "w") as file:
-    json.dump(compiled_sol, file)
+    def start_game(self, id, timestamp, players):
+        nonce = self.w3.eth.get_transaction_count(self.chain_address)
+        started_game = self.w3.eth.contract(address=self.tx_receipt.contractAddress, abi=self.abi)
+        tx = started_game.functions.add_game(id, timestamp, players).build_transaction(
+            {
+                "chainId": self.chain_id,
+                "gasPrice": self.w3.eth.gas_price,
+                "from": self.chain_address,
+                "nonce": nonce,
+            }
+        )
+        signed_txn = self.w3.eth.account.sign_transaction(tx, private_key=self.private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        # print(started_game.functions.test_start(id).call())
+        return tx_receipt
+    
+    def save_sub_game(self, id, sub_game_info):
+        nonce = self.w3.eth.get_transaction_count(self.chain_address)
+        sub_game = self.w3.eth.contract(address=self.tx_receipt.contractAddress, abi=self.abi)
+        tx = sub_game.functions.add_sub_game(id, sub_game_info).build_transaction(
+            {
+                "chainId": self.chain_id,
+                "gasPrice": self.w3.eth.gas_price,
+                "from": self.chain_address,
+                "nonce": nonce,
+            }
+        )
+        signed_txn = self.w3.eth.account.sign_transaction(tx, private_key=self.private_key)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+        # print(sub_game.functions.test_sub(id).call())
+        return tx_receipt
+    
+    def get_all_tournaments(self):
+        cont = self.w3.eth.contract(address=self.tx_receipt.contractAddress, abi=self.abi)
+        valid_tournaments = cont.functions.get_valid_tournaments().call()
+        print(valid_tournaments)
+        all_tournaments = []
+        for id in valid_tournaments:
+            tournament_info = cont.functions.get_tournament(id).call()
+            all_tournaments.append(tournament_info)
+        return all_tournaments
 
-# Get Bytecode
-bytecode = compiled_sol["contracts"]["Tournament.sol"]["Tournament"]["evm"][
-    "bytecode"
-]["object"]
+# Usage
+load_dotenv()
+tournament_contract = TournamentContract("./TournamentManager.sol", os.getenv("GANACHE_URL"))
+contract_address = tournament_contract.deploy_contract()
+print(f"Contract deployed at address: {contract_address}")
+tournament_contract.start_game(12, 1625140800, [123, 456, 789, 1011])
+tournament_contract.save_sub_game(12, [2, 123, 456, 1, 10])
+tournament_contract.save_sub_game(12, [3, 789, 1011, 10, 5])
+tx_receipt = tournament_contract.save_sub_game(12, [1, 456, 789, 3, 10])
+a = tournament_contract.get_all_tournaments()
+print(a)
 
-# get abi
-abi = compiled_sol["contracts"]["Tournament.sol"]["Tournament"]["abi"]
-
-# For connecting to Ganache
-w3 = Web3(Web3.HTTPProvider("http://127.0.0.1:8545"))
-chain_id = 1337
-my_address = os.getenv("ADDRESS")
-private_key = os.getenv("PRIVATE_KEY")
-print(w3)
-
-Tournament = w3.eth.contract(abi=abi, bytecode=bytecode)
-print(Tournament)
-
-# Get the latest transaction
-nonce = w3.eth.get_transaction_count(my_address)
-
-# 1. Build a transaction
-# 2. Sign a transaction
-# 3. Send a transaction
-transaction = Tournament.constructor().build_transaction(
-    {
-        "chainId": chain_id,
-        "gasPrice": w3.eth.gas_price,
-        "from": my_address,
-        "nonce": nonce,
-    }
-)
-print(transaction)
-
-signed_txn = w3.eth.account.sign_transaction(
-    transaction, private_key=private_key)
-
-tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
-
-tournament = w3.eth.contract(address=tx_receipt.contractAddress, abi=abi)
-
-store_transaction = tournament.functions.setFinishedRound(10).build_transaction(
-    {"chainId": chain_id, "from": my_address,
-        "nonce": nonce + 1, "gasPrice": w3.eth.gas_price}
-)
-signed_store_txn = w3.eth.account.sign_transaction(
-    store_transaction, private_key=private_key
-)
-send_store_tx = w3.eth.send_raw_transaction(signed_store_txn.rawTransaction)
-tx_receipt = w3.eth.wait_for_transaction_receipt(send_store_tx)
