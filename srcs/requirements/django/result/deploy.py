@@ -1,3 +1,4 @@
+import json
 from web3 import Web3
 from solcx import compile_standard, install_solc
 import os
@@ -6,13 +7,11 @@ from dotenv import load_dotenv
 
 class TournamentResultManager:
     def __init__(self, sol_path, provider):
-        load_dotenv()
         self.solc_version = "0.6.0"
-        self.w3 = Web3(Web3.HTTPProvider(provider))
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
-        self.abi = os.getenv("ABI")
-        # self.__compile_sol(sol_path)
+        self.w3 = Web3(Web3.HTTPProvider(provider))
+        print(self.w3.eth.get_transaction_count(self.chain_address))
         self.chain_id = 1337
         receipt = self.__deploy_contract(sol_path)
         if receipt == None:
@@ -40,15 +39,15 @@ class TournamentResultManager:
         )
         bytecode = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]["evm"]["bytecode"]["object"]
         self.abi = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]["abi"]
-        # # for get abi
-        # with open("abi.json", "w") as file:
-        #     json.dump(self.abi, file)
+        # for get abi
+        with open("abi.json", "w") as file:
+            json.dump(self.abi, file)
         return bytecode
 
     def __deploy_contract(self, sol_path):
         nonce = self.w3.eth.get_transaction_count(self.chain_address)
         if nonce != 0:
-            print("Contract already deployed")
+            self.abi = os.getenv("ABI")
             return None
         bytecode = self.__compile_sol(sol_path)
         Tournament = self.w3.eth.contract(abi=self.abi, bytecode=bytecode)
@@ -116,13 +115,19 @@ class TournamentResultManager:
         return all_tournaments
 
 
-# tournament_contract.start_game(20, 1625940800, [263, 456, 989, 1011])
-# tournament_contract.save_sub_game(20, [2, 10, 1])
-# tournament_contract.save_sub_game(20, [3, 2, 10])
-# tournament_contract.save_sub_game(20, [1, 4, 10])
+from result import *
 
-# a = tournament_contract.get_all_tournaments()
-# print(a)
+load_dotenv()
+tournament_contract = TournamentResultManager(
+    "../../blockchain/TournamentContract.sol", os.getenv("GANACHE_URL"))
 
-# for res in a:
-#     print(TournamentResult(res))
+tournament_contract.start_game(20, 1625940800, [263, 456, 989, 1011])
+tournament_contract.save_sub_game(20, [2, 10, 1])
+tournament_contract.save_sub_game(20, [3, 2, 10])
+tournament_contract.save_sub_game(20, [1, 4, 10])
+
+a = tournament_contract.get_all_tournaments()
+print(a)
+
+for res in a:
+    print(TournamentResult(res))
