@@ -1,5 +1,4 @@
 import json
-from inspect import iscoroutinefunction
 from functools import wraps
 
 from django.http import JsonResponse
@@ -7,28 +6,27 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
-from channels.db import database_sync_to_async
 
 
 User = get_user_model()
 
 
 class ModelJSONEncoder(DjangoJSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, QuerySet):
-            return tuple(obj)
-        elif isinstance(obj, User):
+    def default(self, o):
+        if isinstance(o, QuerySet):
+            return tuple(o)
+        if isinstance(o, User):
             return {
-                "id": obj.pk,
-                "username": obj.username,
-                "email": obj.email,
+                "id": o.pk,
+                "username": o.username,
+                "email": o.email,
             }
-        elif hasattr(obj, "as_dict"):
-            return obj.as_dict()
-        return super().default(obj)
+        if hasattr(o, "as_dict"):
+            return o.as_dict()
+        return super().default(o)
 
 
-class JsonResponse(JsonResponse):
+class CustomJsonResponse(JsonResponse):
     def __init__(self, data, encoder=ModelJSONEncoder, **kwargs):
         super().__init__(data, encoder=encoder, **kwargs)
 
@@ -37,7 +35,7 @@ def need_json(view):
     @wraps(view)
     def _wrapped_view(request, *args, **kwargs):
         if request.content_type != "application/json":
-            return JsonResponse(
+            return CustomJsonResponse(
                 {
                     "status": "fail",
                     "data": {"content_type": "invalid content type"},
@@ -52,7 +50,7 @@ def need_json(view):
 
 class JsonAuthRequiredMixin(AccessMixin):
     def handle_no_permission(self):
-        return JsonResponse(
+        return CustomJsonResponse(
             {
                 "status": "fail",
                 "data": {"auth": "authentication required"},
@@ -86,7 +84,7 @@ class JsonMixin:
     def json_response(
         self, status="success", data=None, message=None, code=200, **kwargs
     ):
-        return JsonResponse(
+        return CustomJsonResponse(
             {"status": status, "data": data, "message": message}, status=code, **kwargs
         )
 

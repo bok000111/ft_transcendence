@@ -44,4 +44,7 @@ dbc:
 test:
 	$(MANAGE_PY) test $(TESTS) --parallel
 
+lint:
+	pylint --rcfile=./srcs/.pylint.rc $(TESTS)/*
+
 .PHONY: all clean fclean re mkdir req freeze dev dbc test

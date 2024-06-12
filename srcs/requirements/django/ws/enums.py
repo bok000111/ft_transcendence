@@ -24,11 +24,10 @@ class GameType(Enum):
     def max_player(cls, game_type: "GameType") -> int:
         if game_type == cls.NORMAL_2:
             return 2
-        elif game_type == cls.NORMAL_4:
+        if game_type == cls.NORMAL_4:
             return 4
-        elif game_type == cls.TOURNAMENT:
+        if game_type == cls.TOURNAMENT:
             return 4
-        elif game_type == cls.LOCAL:
+        if game_type == cls.LOCAL:
             return 2
-        else:
-            raise ValueError("invalid game type")
+        return None

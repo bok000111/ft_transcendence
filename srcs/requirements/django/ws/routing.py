@@ -1,6 +1,6 @@
-from django.urls import path
-
 from ws.consumers import MainConsumer
+
+from django.urls import path
 
 
 urlpatterns = [
