@@ -1,30 +1,46 @@
-from asyncio import Queue
-
-from django.contrib.auth import get_user_model
-from channels.generic.websocket import AsyncJsonWebsocketConsumer
+import asyncio
 
 from ws.enums import WebSocketActionType, GameType
+
+from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.contrib.auth import get_user_model
+
 
 User = get_user_model()
 
 
 class MainConsumer(AsyncJsonWebsocketConsumer):
-    queue = {
-        GameType.NORMAL_2: Queue(),
-        GameType.NORMAL_4: Queue(),
-        GameType.TOURNAMENT: Queue(),
-    }
 
-    async def connect(self):
+    queue = {
+        GameType.NORMAL_2: asyncio.Queue(),
+        GameType.NORMAL_4: asyncio.Queue(),
+        GameType.TOURNAMENT: asyncio.Queue(),
+    }
+    # users = set()
+    # users_lock = asyncio.Lock()
+    games = set()
+    games_lock = asyncio.Lock()
+    tournaments = set()
+    tournaments_lock = asyncio.Lock()
+    # 이게 맞는지 모르겠음
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.lock = asyncio.Lock()
         self.waiting = None
         self.playing = None  # 관리 방법은 바뀔 수 있음
 
+    async def connect(self):
+        print(self.scope)
+        self.scope["lock"] = asyncio.Lock()  # 혹시 모르니 scope에 변수 저장
+
         await self.accept()
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, code):
         await self.close()
 
-    async def receive_json(self, content):
+    async def receive_json(self, content, **kwargs):
         match WebSocketActionType(content.get("action")):
             case WebSocketActionType.JOIN:
                 await self.channel_layer.send(
@@ -55,8 +71,9 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def join_queue(self, event):
+
         if self.waiting is not None or self.playing is not None:
-            await self.send_error(4001, "already joined")
+            await self.send_error(4000, "already joined")
             return
         message = event.get("message")
         if message is None:
@@ -73,7 +90,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(4000, "nickname required")
             return
 
-        if game_type not in self.queue:
+        if game_type == GameType.LOCAL:
             await self.send_json(
                 {
                     "action": WebSocketActionType.WAIT.value,

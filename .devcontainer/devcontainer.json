@@ -49,6 +49,11 @@
 				"python.formatting.provider": "black",
 				"python.analysis.extraPaths": [
 					"/workspaces/ft_transcendence/srcs/requirements/django"
+				],
+				"python.linting.pylintArgs": [
+					"--load-plugins=pylint_django",
+					"--disable=missing-class-docstring",
+					"--disable=missing-function-docstring"
 				]
 			}
 		}

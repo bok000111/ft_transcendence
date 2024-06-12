@@ -1,9 +1,8 @@
-from django.conf import settings
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.views import View
-
 from api.utils import JsonMixin, JsonAuthRequiredMixin
 from user.forms import UserCreateModelForm, UserLoginForm
+
+from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.views import View
 
 User = get_user_model()
 
@@ -14,10 +13,9 @@ class SignUpView(JsonMixin, View):
         if form.is_valid():
             new_user = form.save()
             return self.jsend_created({"user": new_user}, "user created")
-        else:
-            return self.jsend_bad_request(
-                form.errors.as_json(escape_html=True), "invalid data"
-            )
+        return self.jsend_bad_request(
+            form.errors.as_json(escape_html=True), "invalid data"
+        )
 
 
 class LoginView(JsonMixin, View):

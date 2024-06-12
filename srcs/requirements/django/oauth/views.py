@@ -1,15 +1,17 @@
+import requests
+
 from django.views.generic import View
 from django.shortcuts import redirect
 from django.conf import settings
 from django.contrib.auth import get_user_model, login
 
-import requests
 
 User = get_user_model()
 
 
 class OauthLoginView(View):
-    ft_auth_url = f"{settings.OAUTH_42_URL}?client_id={settings.OAUTH_42_CLIENT_ID}&redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code"
+    ft_auth_url = f"{settings.OAUTH_42_URL}?client_id={settings.OAUTH_42_CLIENT_ID}\
+        &redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code"
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -33,7 +35,9 @@ class OauthCallbackView(View):
             "redirect_uri": settings.OAUTH_42_REDIRECT_URI,
         }
 
-        response = requests.post(settings.OAUTH_42_TOKEN_URL, data=token_data)
+        response = requests.post(
+            settings.OAUTH_42_TOKEN_URL, data=token_data, timeout=5
+        )
         response_data = response.json()
         if response.status_code != 200:
             return redirect("oauth_login")
@@ -45,7 +49,7 @@ class OauthCallbackView(View):
         info_url = "https://api.intra.42.fr/v2/me"
 
         response = requests.get(
-            info_url, headers={"Authorization": f"Bearer {access_token}"}
+            info_url, headers={"Authorization": f"Bearer {access_token}"}, timeout=5
         )
 
         if response.status_code != 200:
