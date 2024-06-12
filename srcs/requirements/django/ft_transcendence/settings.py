@@ -103,6 +103,7 @@ INSTALLED_APPS = [
     "oauth",  # 42 OAuth
     "user",  # 유저 관리
     "channels",  # channels - websocket
+    "result",  # 결과 페이지 - 블록체인으로 관리
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",

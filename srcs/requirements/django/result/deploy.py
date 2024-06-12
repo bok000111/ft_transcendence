@@ -1,3 +1,4 @@
+from result import *
 import json
 from web3 import Web3
 from solcx import compile_standard, install_solc
@@ -6,16 +7,18 @@ from dotenv import load_dotenv
 
 
 class TournamentResultManager:
-    def __init__(self, sol_path, provider):
+    def __init__(self, provider):
+        load_dotenv()
+        sol_path = "../../blockchain/TournamentContract.sol"
         self.solc_version = "0.6.0"
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
-        if self.chain_address == None or self.private_key == None:
+        if self.chain_address == "" or self.private_key == "":
             print("Please set the CHAIN_ADDRESS and PRIVATE_KEY in the .env file.")
             return
         self.w3 = Web3(Web3.HTTPProvider(provider))
         self.chain_id = 1337
-        
+
         if self.w3.eth.get_transaction_count(self.chain_address) == 0 or os.getenv("CONTRACT_ADDRESS") == "":
             self.__set_initial_settings(sol_path)
         else:
@@ -124,19 +127,16 @@ class TournamentResultManager:
         return all_tournaments
 
 
-from result import *
+# tournament_contract = TournamentResultManager(
+#     "../../blockchain/TournamentContract.sol", os.getenv("GANACHE_URL"))
 
-load_dotenv()
-tournament_contract = TournamentResultManager(
-    "../../blockchain/TournamentContract.sol", os.getenv("GANACHE_URL"))
+# tournament_contract.start_game(4, 1625940800, [263, 456, 989, 1011])
+# tournament_contract.save_sub_game(4, [2, 10, 1])
+# tournament_contract.save_sub_game(4, [3, 2, 10])
+# tournament_contract.save_sub_game(4, [1, 4, 10])
 
-tournament_contract.start_game(4, 1625940800, [263, 456, 989, 1011])
-tournament_contract.save_sub_game(4, [2, 10, 1])
-tournament_contract.save_sub_game(4, [3, 2, 10])
-tournament_contract.save_sub_game(4, [1, 4, 10])
+# a = tournament_contract.get_all_tournaments()
+# print(a)
 
-a = tournament_contract.get_all_tournaments()
-print(a)
-
-for res in a:
-    print(TournamentResult(res))
+# for res in a:
+#     print(TournamentResult(res))
