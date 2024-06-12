@@ -9,8 +9,6 @@ from dotenv import load_dotenv
 class TournamentResultManager:
     def __init__(self, provider):
         load_dotenv()
-        sol_path = "../../blockchain/TournamentContract.sol"
-        self.solc_version = "0.6.0"
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
         if self.chain_address == "" or self.private_key == "":
@@ -20,23 +18,30 @@ class TournamentResultManager:
         self.chain_id = 1337
 
         if self.w3.eth.get_transaction_count(self.chain_address) == 0 or os.getenv("CONTRACT_ADDRESS") == "":
-            self.__set_initial_settings(sol_path)
+            self.__set_initial_settings()
         else:
-            with open("./abi.json", 'r', encoding='utf-8') as file:
+            with open("abi.json", 'r', encoding='utf-8') as file:
                 self.abi = file.read()
             self.contract_address = os.getenv("CONTRACT_ADDRESS")
 
-    def __set_initial_settings(self, sol_path):
-        bytecode = self.__compile_sol(sol_path)
+    def __set_initial_settings(self):
+        bytecode = self.__compile_sol()
         contract_address = self.__deploy_contract(bytecode)
         self.contract_address = str(contract_address)
         print("The contract address is as follows: " + self.contract_address)
         print("Set the above contract address as the CONTRACT_ADDRESS in the .env file.")
 
-    def __compile_sol(self, sol_path):
-        install_solc(self.solc_version)
-        with open(sol_path, "rt", encoding='UTF8') as file:
-            tournament_file = file.read()
+    def __compile_sol(self):
+        solc_version = "0.6.0"
+        install_solc(solc_version)
+        sol_path = "../../blockchain/TournamentContract.sol"
+        try:
+            with open(sol_path, "rt", encoding='utf-8') as file:
+                tournament_file = file.read()
+        except Exception as e:
+            print(e)
+            return
+            
         compiled_sol = compile_standard(
             {
                 "language": "Solidity",
@@ -49,7 +54,7 @@ class TournamentResultManager:
                     }
                 },
             },
-            solc_version=self.solc_version,
+            solc_version=solc_version,
         )
         self.abi = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]["abi"]
         bytecode = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]["evm"]["bytecode"]["object"]

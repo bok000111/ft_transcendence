@@ -18,7 +18,6 @@ class SubGame:
     def to_dict(self):
         return {
             'players': self.players,
-            'game_id': self.game_id,
             'game_type': self.game_type,
             'score': self.score,
             'winner_id': self.winner_id
