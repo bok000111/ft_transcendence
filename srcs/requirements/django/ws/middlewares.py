@@ -5,6 +5,7 @@ from channels.middleware import BaseMiddleware
 from channels.security.websocket import AllowedHostsOriginValidator
 
 
+# pylint: disable=too-few-public-methods
 class AuthReqMiddleware(BaseMiddleware):
     async def __call__(self, scope, receive, send):
         user = scope.get("user")
@@ -14,5 +15,6 @@ class AuthReqMiddleware(BaseMiddleware):
         return await super().__call__(scope, receive, send)
 
 
+# pylint: disable=invalid-name
 def AuthReqMiddlewareStack(inner):
     return AllowedHostsOriginValidator(AuthMiddlewareStack(AuthReqMiddleware(inner)))

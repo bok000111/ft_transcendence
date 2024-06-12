@@ -1,6 +1,5 @@
-from django.http import JsonResponse
 from functools import wraps
-from inspect import iscoroutinefunction
+from django.http import JsonResponse
 
 
 def need_auth(view):
