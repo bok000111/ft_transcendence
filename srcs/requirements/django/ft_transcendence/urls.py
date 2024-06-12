@@ -1,6 +1,7 @@
 from django.urls import path, include
 
-from . import views
+from ft_transcendence import views
+
 
 urlpatterns = [
     path("", views.index, name="index"),  # 메인 페이지 - spa로 구현
