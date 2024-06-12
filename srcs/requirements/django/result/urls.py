@@ -1,6 +1,6 @@
 from django.urls import path
-from result import TournamentResultView
+from result.views import TournamentResultView
 
 urlpatterns = [
-    path("result/", TournamentResultView.as_view(), name='result'),
+    path("", TournamentResultView.as_view(), name="result"),
 ]
