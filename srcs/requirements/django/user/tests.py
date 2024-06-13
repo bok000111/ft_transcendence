@@ -1,10 +1,10 @@
 from faker import Faker
 
+from user.factories import UserFactory, SignUpFactory
+
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-
-from user.factories import UserFactory, SignUpFactory
 
 
 User = get_user_model()
