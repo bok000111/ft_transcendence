@@ -1,26 +1,29 @@
+# pylint: disable=invalid-name, too-few-public-methods, unused-import
+
+
 import asyncio
 from typing import AsyncGenerator
 
-from django.contrib.auth import get_user_model
-from django.test import TransactionTestCase, Client, AsyncClient
 from channels.testing import WebsocketCommunicator
 from channels.db import database_sync_to_async
+from django.contrib.auth import get_user_model
+from django.test import TransactionTestCase, Client, AsyncClient
+from django.urls import reverse
+from django.conf import settings
 
-from ft_transcendence.asgi import application
 from user.tests import UserFactory
+from ft_transcendence.asgi import application
 
 
 User = get_user_model()
 
 
 def channels_reverse(name, *args, **kwargs):
-    from django.urls import reverse
-    from django.conf import settings
 
     return reverse(name, urlconf=settings.CHANNEL_URLCONF, args=args, kwargs=kwargs)
 
 
-async def asyncCommunicatorGenerator(
+async def async_communicator_generator(
     signed: bool = False,
 ) -> AsyncGenerator[WebsocketCommunicator, None]:
     while True:
@@ -48,7 +51,7 @@ class WebSocketTest(TransactionTestCase):
 
     async def test_unauth_ws_connect(self):
         count = 0
-        async for communicator in asyncCommunicatorGenerator():
+        async for communicator in async_communicator_generator():
             connected, _ = await communicator.connect()
             self.assertFalse(connected)
             count += 1
@@ -57,7 +60,7 @@ class WebSocketTest(TransactionTestCase):
 
     async def test_ws_connect(self):
         count = 0
-        async for communicator in asyncCommunicatorGenerator(True):
+        async for communicator in async_communicator_generator(True):
             connected, _ = await communicator.connect()
             self.assertTrue(connected)
             count += 1
@@ -66,7 +69,7 @@ class WebSocketTest(TransactionTestCase):
 
     async def test_ws_join(self):
         communicators = []
-        async for communicator in asyncCommunicatorGenerator(True):
+        async for communicator in async_communicator_generator(True):
             await communicator.connect()
             await communicator.send_json_to(
                 {

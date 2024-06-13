@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def load_dotenv(file_path):
-    with open(file_path) as f:
+    with open(file_path, encoding="utf-8") as f:
         for line in f:
             # Remove leading/trailing whitespace
             line = line.strip()
@@ -208,7 +208,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "../frontend/"),
+    os.path.abspath(os.path.join(BASE_DIR, "../frontend/")),
 ]
 
 # Default primary key field type

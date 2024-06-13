@@ -1,3 +1,5 @@
+# pylint: disable=invalid-name, too-few-public-methods, import-outside-toplevel, redefined-outer-name
+
 from importlib import import_module
 from channels.db import database_sync_to_async
 from django.conf import settings
@@ -35,8 +37,8 @@ def login(**credentials):
     user = authenticate(**credentials)
     if user:
         return _login(user)
-    else:
-        return SimpleCookie()
+
+    return SimpleCookie()
 
 
 @database_sync_to_async
