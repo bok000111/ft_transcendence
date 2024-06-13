@@ -17,6 +17,7 @@ class Ball:
             self.vel["x"] *= -1
         elif direction == "y":
             self.vel["y"] *= -1
+        self.increase_speed()
 
     def increase_speed(self):
         # x와 y 방향으로 속도를 증가시킨다. 단, 최대 속도를 초과하지 않도록 한다.
