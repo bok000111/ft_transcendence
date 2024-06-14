@@ -5,7 +5,8 @@ from .constants import *
 
 class Game:
     # 2인용 게임, 4인용 게임 구분
-    def __init__(self, player_list):
+    def __init__(self, id, player_list):
+        self.id = id
         self.players = player_list
         self.player_count = len(player_list)
         self.ball = Ball()
@@ -16,6 +17,18 @@ class Game:
             player.move()
         self.ball.move()
         self.check_collision()
+        # check game end(임시)
+        if self.player_count == 2:
+            if self.players[0].score >= 5 or self.players[1].score >= 5:
+                self.status = "end"
+        elif self.player_count == 4:
+            if (
+                self.players[0].score >= 5
+                or self.players[1].score >= 5
+                or self.players[2].score >= 5
+                or self.players[3].score >= 5
+            ):
+                self.status = "end"
 
     def check_collision(self):
         if self.player_count == 2:
@@ -74,7 +87,6 @@ class Game:
             ):
                 self.ball.bounce("x")
             else:
-                # update score
                 is_loser[1] = True
                 self.ball.reset_pos()
         # check 3p collision
@@ -85,7 +97,6 @@ class Game:
             ):
                 self.ball.bounce("y")
             else:
-                # update score
                 is_loser[2] = True
                 self.ball.reset_pos()
         # check 4p collision
@@ -96,13 +107,27 @@ class Game:
             ):
                 self.ball.bounce("y")
             else:
-                # update score
                 is_loser[3] = True
                 self.ball.reset_pos()
         if True in is_loser:
             for i in range(4):
                 if not is_loser[i]:
                     self.players[i].score += 1
+
+    def info(self):
+        return {
+            "id": self.id,
+            "ball": {"x": self.ball.pos["x"], "y": self.ball.pos["y"]},
+            "players": [
+                {
+                    "nickname": player.nickname,
+                    "score": player.score,
+                    "x": player.pos["x"],
+                    "y": player.pos["y"],
+                }
+                for player in self.players
+            ],
+        }
 
     async def start(self):
         # 대충 게임 시작
