@@ -3,8 +3,7 @@ from .constants import *
 
 class Ball:
     def __init__(self):
-        self.pos = {"x": SCREEN_WIDTH / 2, "y": SCREEN_HEIGHT / 2}
-        self.vel = {"x": DEFAULT_SPEED, "y": DEFAULT_SPEED}
+        self.reset_pos()
         self.speed_increment = 1  # 속도가 증가하는 양
         self.max_speed = 10  # 볼의 최대 속도
 
