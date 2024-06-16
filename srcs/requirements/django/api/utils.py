@@ -99,7 +99,8 @@ class JsonMixin:
 
     def jsend_unauthorized(self):
         return self.json_response(
-            "fail", {"auth": "authorization required"}, "authorization required", 401
+            "fail", {
+                "auth": "authorization required"}, "authorization required", 401
         )
 
     def jsend_forbidden(self):
