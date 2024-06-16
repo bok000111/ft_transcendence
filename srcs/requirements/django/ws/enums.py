@@ -2,16 +2,26 @@ from enum import Enum
 
 
 class WebSocketActionType(Enum):
-    JOIN = "join"
-    LEAVE = "leave"
-    GAME_INPUT = "game_input"
-    ME = "me"
-    ERROR = "error"
-    WAIT = "wait"
-    START = "start"
-    GAME = "game"
-    END = "end"
-    NONE = None
+    JOIN = "join", "join.queue"
+    LEAVE = "leave", "leave.queue"
+    GAME_INPUT = "game_input", "game.input"
+    ME = "me", "me.info"
+    ERROR = "error", "error"
+    WAIT = "wait", "wait.queue"
+    START = "start", "game.start"
+    GAME = "game", "game.info"
+    END = "end", "game.end"
+
+    @property
+    def type(self) -> str:
+        return self.value[1]
+
+    @classmethod
+    def from_str(cls, value: str):
+        for action in WebSocketActionType:
+            if action.value[0] == value:
+                return action
+        return None
 
 
 class GameType(Enum):
@@ -19,15 +29,22 @@ class GameType(Enum):
     NORMAL_4 = 1
     TOURNAMENT = 2
     LOCAL = 3
+    AI = 4
 
-    @classmethod
-    def max_player(cls, game_type: "GameType") -> int:
-        if game_type == cls.NORMAL_2:
+    def max_player(self) -> int:
+        if self is self.NORMAL_2 or self is self.LOCAL:
             return 2
-        if game_type == cls.NORMAL_4:
+        if self is self.NORMAL_4 or self is self.TOURNAMENT:
             return 4
-        if game_type == cls.TOURNAMENT:
-            return 4
-        if game_type == cls.LOCAL:
+        if self is self.AI:
+            return 1
+        return None
+
+    def max_client(self) -> int:
+        if self is self.NORMAL_2:
             return 2
+        if self is self.NORMAL_4 or self is self.TOURNAMENT:
+            return 4
+        if self is self.LOCAL or self is self.AI:
+            return 1
         return None
