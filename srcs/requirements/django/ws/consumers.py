@@ -61,6 +61,14 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             case _:  # WebSocketActionType.NONE or unknown
                 pass
 
+    async def send_waiting_response(self):
+        response = {
+            "code": 0,  # temp
+            "action": "wait",
+            "data": {"waiting_users": self.queue.qsize()},  # queue size(temp)
+        }
+        await self.send_json(response)
+
     async def send_error(self, code, message):
         await self.send_json(
             {
