@@ -1,6 +1,8 @@
 # pylint: disable=invalid-name, too-few-public-methods, import-outside-toplevel, redefined-outer-name
 
+from time import perf_counter
 from importlib import import_module
+from contextlib import contextmanager
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.http import HttpRequest, SimpleCookie
@@ -53,3 +55,11 @@ def logout(cookies):
     request.session = engine.SessionStore(session_key)
     logout(request)
     return SimpleCookie()
+
+
+@contextmanager
+def timer(name: str = ""):
+    start = end = perf_counter()
+    yield lambda: end - start
+    end = perf_counter()
+    print(f"{name} took {end - start:.6f} seconds")
