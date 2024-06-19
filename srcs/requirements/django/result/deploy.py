@@ -11,9 +11,9 @@ class TournamentResultManager:
     _instance = None
     _initialized = False
 
-    def __new__(cls, *args, **kwargs):
+    def __new__(cls, *args):
         if cls._instance is None:
-            cls._instance = super().__new__(cls, *args, **kwargs)
+            cls._instance = super().__new__(cls)
         return cls._instance
 
     def __init__(self, provider):
@@ -35,6 +35,7 @@ class TournamentResultManager:
             with open(str(settings.BASE_DIR) + "/../blockchain/abi.json", 'r', encoding='utf-8') as file:
                 self.abi = file.read()
             self.contract_address = os.getenv("CONTRACT_ADDRESS")
+        self._initialized = True
 
     def __set_initial_settings(self):
         bytecode = self.__compile_sol()
