@@ -8,7 +8,18 @@ from django.conf import settings
 
 
 class TournamentResultManager:
+    _instance = None
+    _initialized = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self, provider):
+        if self._initialized:
+            return
+
         load_dotenv()
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
