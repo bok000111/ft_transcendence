@@ -4,6 +4,7 @@ from web3 import Web3
 from solcx import compile_standard, install_solc
 import os
 from dotenv import load_dotenv
+from django.conf import settings
 
 
 class TournamentResultManager:
@@ -20,7 +21,7 @@ class TournamentResultManager:
         if self.w3.eth.get_transaction_count(self.chain_address) == 0 or os.getenv("CONTRACT_ADDRESS") == "":
             self.__set_initial_settings()
         else:
-            with open("abi.json", 'r', encoding='utf-8') as file:
+            with open(str(settings.BASE_DIR) + "/../blockchain/abi.json", 'r', encoding='utf-8') as file:
                 self.abi = file.read()
             self.contract_address = os.getenv("CONTRACT_ADDRESS")
 
@@ -34,14 +35,15 @@ class TournamentResultManager:
     def __compile_sol(self):
         solc_version = "0.6.0"
         install_solc(solc_version)
-        sol_path = "../../blockchain/TournamentContract.sol"
+        sol_path = str(settings.BASE_DIR) + \
+            "/../blockchain/TournamentContract.sol"
         try:
             with open(sol_path, "rt", encoding='utf-8') as file:
                 tournament_file = file.read()
         except Exception as e:
             print(e)
             return
-            
+
         compiled_sol = compile_standard(
             {
                 "language": "Solidity",
@@ -60,8 +62,8 @@ class TournamentResultManager:
         bytecode = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]["evm"]["bytecode"]["object"]
 
         # for get abi
-        if not os.path.exists("abi.json"):
-            with open("abi.json", "w") as file:
+        if not os.path.exists(str(settings.BASE_DIR) + "/../blockchain/abi.json"):
+            with open(str(settings.BASE_DIR) + "/../blockchain/abi.json", "w") as file:
                 json.dump(self.abi, file)
         return bytecode
 
