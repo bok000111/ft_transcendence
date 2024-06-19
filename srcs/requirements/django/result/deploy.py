@@ -23,11 +23,12 @@ class TournamentResultManager:
         load_dotenv()
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
-        if self.chain_address == "" or self.private_key == "":
-            print("Please set the CHAIN_ADDRESS and PRIVATE_KEY in the .env file.")
-            return
+        self.chain_id = int(os.getenv("CHAIN_ID"))
+        if self.chain_address == "" or self.private_key == "" or self.chain_id == "":
+            raise Exception(
+                "Please set the CHAIN_ADDRESS, PRIVATE_KEY and CHAIN_ID in the .env file.")
+
         self.w3 = Web3(Web3.HTTPProvider(provider))
-        self.chain_id = 1337
 
         if self.w3.eth.get_transaction_count(self.chain_address) == 0 or os.getenv("CONTRACT_ADDRESS") == "":
             self.__set_initial_settings()
@@ -147,7 +148,7 @@ class TournamentResultManager:
 
 
 # tournament_contract = TournamentResultManager(
-#     "../../blockchain/TournamentContract.sol", os.getenv("GANACHE_URL"))
+#     "../../blockchain/TournamentContract.sol", os.getenv("ENDPOINT"))
 
 # tournament_contract.start_game(4, 1625940800, [263, 456, 989, 1011])
 # tournament_contract.save_sub_game(4, [2, 10, 1])

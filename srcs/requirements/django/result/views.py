@@ -9,7 +9,7 @@ from api.utils import AJsonMixin
 import os
 
 
-tournament_contract = TournamentResultManager(os.getenv("GANACHE_URL"))
+tournament_contract = TournamentResultManager(os.getenv("ENDPOINT"))
 
 
 class TournamentResultView(AJsonMixin, View):
