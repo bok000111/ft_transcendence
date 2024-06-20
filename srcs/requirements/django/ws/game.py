@@ -52,10 +52,17 @@ class Game:
     async def send_game_info(self):
         while self.status == "playing":
             await self.channel_layer.group_send(
-                self.group_name, {"type": "game_info", "message": self.info()}
+                self.group_name,
+                {"type": "game_info", "data": "info", "message": self.info()},
             )
             self.update()
             await asyncio.sleep(1 / 30)
+        if self.status == "end":
+            # 게임 종료 처리
+            await self.channel_layer.group_send(
+                self.group_name,
+                {"type": "game_info", "data": "result", "message": self.result()},
+            )
 
     def update(self):
         for player in self.players:
@@ -178,6 +185,14 @@ class Game:
                 }
                 for player in self.players
             ],
+        }
+
+    def result(self):
+        return {
+            "id": self.gid,
+            "type": self.game_type,
+            "users": [player.nickname for player in self.players],
+            "winner": max(self.players, key=lambda x: x.score),
         }
 
     async def start(self):
