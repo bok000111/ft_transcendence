@@ -53,6 +53,12 @@ class Game:
             ):
                 self.status = "end"
 
+    # nickname에 해당하는 player의 keyevent를 처리
+    def input(self, nickname, keyevent):
+        for player in self.players:
+            if player.nickname == nickname:
+                player.set_state(keyevent)
+
     def check_collision(self):
         if self.player_count == 2:
             self.check_collision_2p()
