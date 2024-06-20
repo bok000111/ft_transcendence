@@ -1,5 +1,6 @@
-from .game import Game
 import logging
+import uuid
+from .game import Game
 
 logger = logging.getLogger(__name__)
 
@@ -12,17 +13,18 @@ class RoomManager:
         if cls._instance is None:
             cls._instance = super(RoomManager, cls).__new__(cls, *args, **kwargs)
             cls._instance.rooms = {}
-            cls._instance.room_id = 0
         return cls._instance
 
     async def create_game(self, game_type, matched_users):
         try:
+            room_id = uuid.uuid4().int
+            if room_id in self.rooms:
+                logger.warning(f"Room ID {room_id} already exists")
+                return None
             # matched_user = (uid, channel_name, nickname)
             self.rooms[self.room_id] = await Game.create(
                 self.room_id, game_type, matched_users
             )
-            room_id = self.room_id
-            self.room_id += 1
             logger.info(f"Game created with room_id: {room_id}")
             return room_id
         except Exception as e:
