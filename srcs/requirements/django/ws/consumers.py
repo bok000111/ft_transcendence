@@ -125,13 +125,23 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def game_info(self, event):
         game_status = event["message"]
-        await self.send_json(
-            {
-                "code": 2002,
-                "action": "game",
-                "data": game_status,
-            }
-        )
+        data = game_status["data"]
+        if data == "info":
+            await self.send_json(
+                {
+                    "code": 4000,  # temp
+                    "action": "game",
+                    "data": game_status,
+                }
+            )
+        elif data == "result":
+            await self.send_json(
+                {
+                    "code": 4001,  # temp
+                    "action": "end",
+                    "data": game_status,
+                }
+            )
 
     async def test_response(self, event):
         await self.send_json(event["message"])
