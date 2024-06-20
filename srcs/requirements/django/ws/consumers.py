@@ -13,6 +13,7 @@ User = get_user_model()
 
 
 class MainConsumer(AsyncJsonWebsocketConsumer):
+    room_manager = RoomManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -115,7 +116,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     # }
     async def game_input(self, event):
         gid = event["message"]["game_id"]
-        game_instance = RoomManager().get_game_instance(gid)
+        game_instance = self.room_manager.get_game_instance(gid)
         if game_instance is None:
             await self.send_error(400, "Invalid game_id")
             return None
