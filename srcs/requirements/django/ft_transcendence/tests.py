@@ -1,4 +1,8 @@
+# pylint: disable=invalid-name, too-few-public-methods, import-outside-toplevel, redefined-outer-name
+
+from time import perf_counter
 from importlib import import_module
+from contextlib import contextmanager
 from channels.db import database_sync_to_async
 from django.conf import settings
 from django.http import HttpRequest, SimpleCookie
@@ -35,8 +39,8 @@ def login(**credentials):
     user = authenticate(**credentials)
     if user:
         return _login(user)
-    else:
-        return SimpleCookie()
+
+    return SimpleCookie()
 
 
 @database_sync_to_async
@@ -53,8 +57,9 @@ def logout(cookies):
     return SimpleCookie()
 
 
-def channels_reverse(name, *args, **kwargs):
-    from django.urls import reverse
-    from django.conf import settings
-
-    return reverse(name, urlconf=settings.CHANNEL_URLCONF, args=args, kwargs=kwargs)
+@contextmanager
+def timer(name: str = ""):
+    start = end = perf_counter()
+    yield lambda: end - start
+    end = perf_counter()
+    print(f"{name} took {end - start:.6f} seconds")

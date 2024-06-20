@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def load_dotenv(file_path):
-    with open(file_path) as f:
+    with open(file_path, encoding="utf-8") as f:
         for line in f:
             # Remove leading/trailing whitespace
             line = line.strip()
@@ -51,6 +51,7 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
+    "[::1]",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -124,7 +125,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "ft_transcendence.urls"
-CHANNEL_URLCONF = "ft_transcendence.routing"
+CHANNEL_URLCONF = "ws.routing"
 
 TEMPLATES = [
     {
@@ -167,6 +168,12 @@ DATABASES = {
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 
+if DEBUG:
+    # 개발시에는 속도를 위해 MD5 사용
+    PASSWORD_HASHERS = [
+        "django.contrib.auth.hashers.MD5PasswordHasher",
+    ]
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -187,6 +194,7 @@ SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
 
 SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_SECURE = False  # 개발시에는 False로 설정
+SESSION_COOKIE_HTTPONLY = False  # 개발시에는 False로 설정
 
 
 # Internationalization
@@ -207,7 +215,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "../frontend/"),
+    os.path.abspath(os.path.join(BASE_DIR, "../frontend/")),
 ]
 
 # Default primary key field type
@@ -217,8 +225,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 CHANNEL_LAYERS = {
     "default": {
-        # "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [("localhost", 6379)],
         },
