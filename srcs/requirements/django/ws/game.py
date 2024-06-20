@@ -26,9 +26,24 @@ class Game:
     async def create(cls, id, game_type, matched_users):
         self = cls(id, game_type, matched_users)
         await self.add_players_to_group(matched_users)
-        self.status = "playing"
-        asyncio.create_task(self.send_game_info())
         return self
+
+    async def start(self):
+        self.status = "playing"
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "game_info",
+                "data": "start",
+                "message": {
+                    "id": self.gid,
+                    "type": self.game_type,
+                    "users": [player.nickname for player in self.players],
+                    "end_score": 5,
+                },
+            },
+        )
+        asyncio.create_task(self.send_game_info())
 
     async def add_players_to_group(self, matched_users):
         tasks = [
@@ -196,10 +211,6 @@ class Game:
             "users": [player.nickname for player in self.players],
             "winner": max(self.players, key=lambda x: x.score),
         }
-
-    async def start(self):
-        # 대충 게임 시작
-        pass
 
     async def input(self):
         # 대충 입력 받아서 처리
