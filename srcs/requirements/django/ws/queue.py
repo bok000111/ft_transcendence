@@ -97,7 +97,7 @@ class GameQueue:
 
                 # 대충 게임 시작하는 코드 TODO: Game 구현
                 room_manager = RoomManager()
-                await room_manager.create_game(game_type, matched_users)
+                await room_manager.create_game(game_type, matched_uids)
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
         async with self._queue_manager[game_type] as manager:

@@ -17,7 +17,6 @@ class RoomManager:
 
     async def create_game(self, game_type, matched_users):
         try:
-            # room_id 임시로 len(self.rooms)로 설정
             # matched_user = (uid, channel_name, nickname)
             self.rooms[self.room_id] = await Game.create(
                 self.room_id, game_type, matched_users

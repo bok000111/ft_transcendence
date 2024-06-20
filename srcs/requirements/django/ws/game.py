@@ -14,11 +14,13 @@ class Game:
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
         self.players = [
-            Player(idx, nickname) for idx, (_, _, nickname) in enumerate(matched_users)
+            Player(idx, channel_name, nickname)
+            for idx, (_, channel_name, nickname) in enumerate(matched_users)
         ]
         self.player_count = len(self.players)
         self.ball = Ball()
         self.status = "waiting"
+        self.channel_layer = get_channel_layer()
 
     @classmethod
     async def create(cls, id, game_type, matched_users):
@@ -28,12 +30,32 @@ class Game:
         return self
 
     async def add_players_to_group(self, matched_users):
-        channel_layer = get_channel_layer()
         tasks = [
-            channel_layer.group_add(self.group_name, channel_name)
+            self.channel_layer.group_add(self.group_name, channel_name)
             for _, channel_name, _ in matched_users
         ]
-        await asyncio.gather(*tasks)
+        try:
+            await asyncio.gather(*tasks)
+        except Exception as e:
+            print(f"An error occurred while adding players to group: {e}")
+
+    async def remove_players_from_group(self):
+        tasks = [
+            self.channel_layer.group_discard(self.group_name, player.channel_name)
+            for player in self.players
+        ]
+        try:
+            await asyncio.gather(*tasks)
+        except Exception as e:
+            print(f"An error occurred while removing players from group: {e}")
+
+    async def send_game_info(self):
+        while self.status == "playing":
+            self.update()
+            await self.channel_layer.group_send(
+                self.group_name, {"type": "game_info", "message": self.info()}
+            )
+            await asyncio.sleep(1 / 30)
 
     def update(self):
         for player in self.players:
@@ -145,7 +167,7 @@ class Game:
 
     def info(self):
         return {
-            "id": self.id,
+            "id": self.gid,
             "ball": {"x": self.ball.pos["x"], "y": self.ball.pos["y"]},
             "players": [
                 {
