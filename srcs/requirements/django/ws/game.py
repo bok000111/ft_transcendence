@@ -27,6 +27,7 @@ class Game:
         self = cls(id, game_type, matched_users)
         await self.add_players_to_group(matched_users)
         self.status = "playing"
+        asyncio.create_task(self.send_game_info())
         return self
 
     async def add_players_to_group(self, matched_users):
@@ -63,6 +64,7 @@ class Game:
                 self.group_name,
                 {"type": "game_info", "data": "result", "message": self.result()},
             )
+            await self.remove_players_from_group()
 
     def update(self):
         for player in self.players:
