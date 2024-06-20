@@ -1,3 +1,6 @@
+import asyncio
+from channels.layers import get_channel_layer
+from ws.enums import GameType
 from .ball import Ball
 from .player import Player
 from .constants import *
@@ -5,12 +8,32 @@ from .constants import *
 
 class Game:
     # 2인용 게임, 4인용 게임 구분
-    def __init__(self, id, player_list):
-        self.id = id
-        self.players = player_list
-        self.player_count = len(player_list)
+    # matched_user = tuple(uid, channel_name, nickname)
+    def __init__(self, id, game_type, matched_users):
+        self.gid = id
+        self.group_name = f"game_{self.gid}"
+        self.game_type = game_type
+        self.players = [
+            Player(idx, nickname) for idx, (_, _, nickname) in enumerate(matched_users)
+        ]
+        self.player_count = len(self.players)
         self.ball = Ball()
         self.status = "waiting"
+
+    @classmethod
+    async def create(cls, id, game_type, matched_users):
+        self = cls(id, game_type, matched_users)
+        await self.add_players_to_group(matched_users)
+        self.status = "playing"
+        return self
+
+    async def add_players_to_group(self, matched_users):
+        channel_layer = get_channel_layer()
+        tasks = [
+            channel_layer.group_add(self.group_name, channel_name)
+            for _, channel_name, _ in matched_users
+        ]
+        await asyncio.gather(*tasks)
 
     def update(self):
         for player in self.players:

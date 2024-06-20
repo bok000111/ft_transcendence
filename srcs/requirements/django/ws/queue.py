@@ -1,7 +1,7 @@
 import asyncio
 from collections import deque
 from ws.enums import GameType
-from ws.game import Game
+from ws.roommanager import RoomManager
 from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
 
@@ -74,29 +74,39 @@ class GameQueue:
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
-                matched_uids = [manager.popleft()
-                                for _ in range(game_type.max_player())]
+                matched_uids = [
+                    manager.popleft() for _ in range(game_type.max_player())
+                ]
 
                 # 매칭된 유저들을 대기열에서 제거
                 await asyncio.gather(
-                    *[self.channel_layer.group_discard(f"queue_{game_type.name}", channel_name)
-                      for _, channel_name, _ in matched_uids],
+                    *[
+                        self.channel_layer.group_discard(
+                            f"queue_{game_type.name}", channel_name
+                        )
+                        for _, channel_name, _ in matched_uids
+                    ],
                 )
 
                 # 임시로 그냥 테스트 출력
-                matched_users = [(uid, (await self.User.objects.aget(pk=uid)).username, nickname)
-                                 for uid, _, nickname in matched_uids]
+                matched_users = [
+                    (uid, (await self.User.objects.aget(pk=uid)).username, nickname)
+                    for uid, _, nickname in matched_uids
+                ]
                 print(f"{game_type.name}: {matched_users}")
 
                 # 대충 게임 시작하는 코드 TODO: Game 구현
-                # await Game().start(game_type, matched_uids)
+                room_manager = RoomManager()
+                await room_manager.create_game(game_type, matched_users)
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
         async with self._queue_manager[game_type] as manager:
             if uid not in manager:
                 return None  # TODO: 대기 중이 아닌 경우 에러 보내야함
             manager.remove(uid, channel_name)
-            await self.channel_layer.group_discard(f"queue_{game_type.name}", channel_name)
+            await self.channel_layer.group_discard(
+                f"queue_{game_type.name}", channel_name
+            )
             # 나가는 유저에게 확인 메시지 전송
             await self.channel_layer.send(
                 channel_name,
@@ -120,8 +130,8 @@ class GameQueue:
             {
                 "type": "wait.queue",
                 "message": {
-                        "type": game_type.value,
-                        "waiting_users": len(self._queue_manager[game_type]),
+                    "type": game_type.value,
+                    "waiting_users": len(self._queue_manager[game_type]),
                 },
             },
         )

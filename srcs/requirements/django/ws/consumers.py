@@ -104,6 +104,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
+    # async def game_input(self, event):
+
     async def test_response(self, event):
         await self.send_json(event["message"])
 
