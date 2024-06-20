@@ -122,6 +122,16 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
         game_instance.input(event["message"]["nickname"], event["message"]["keyevent"])
 
+    async def game_info(self, event):
+        game_status = event["message"]
+        await self.send_json(
+            {
+                "code": 2002,
+                "action": "game",
+                "data": game_status,
+            }
+        )
+
     async def test_response(self, event):
         await self.send_json(event["message"])
 
