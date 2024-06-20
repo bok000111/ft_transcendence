@@ -51,10 +51,10 @@ class Game:
 
     async def send_game_info(self):
         while self.status == "playing":
-            self.update()
             await self.channel_layer.group_send(
                 self.group_name, {"type": "game_info", "message": self.info()}
             )
+            self.update()
             await asyncio.sleep(1 / 30)
 
     def update(self):
