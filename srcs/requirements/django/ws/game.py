@@ -115,8 +115,8 @@ class Game:
         INTERVAL = PADDLE_WIDTH * 2 + BALL_RADIUS
         # check wall collision
         if (
-            self.ball.pos["y"] <= INTERVAL
-            or self.ball.pos["y"] >= SCREEN_HEIGHT - INTERVAL
+            self.ball.pos["y"] <= BALL_RADIUS
+            or self.ball.pos["y"] >= SCREEN_HEIGHT - BALL_RADIUS
         ):
             self.ball.bounce("y")
         # check paddle collision
