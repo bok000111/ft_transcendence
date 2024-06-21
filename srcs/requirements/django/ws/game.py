@@ -125,7 +125,7 @@ class Game:
                 self.players[0].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
                 and self.players[0].pos["y"] + PADDLE_HEIGHT >= self.ball.pos["y"]
             ):
-                self.ball.bounce("x")
+                self.ball.bounce("x", self.players[0].pos["y"])
             else:
                 # update score(함수로 구현할 수도)
                 self.players[1].score += 1
@@ -135,7 +135,7 @@ class Game:
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
                 and self.players[1].pos["y"] + PADDLE_HEIGHT >= self.ball.pos["y"]
             ):
-                self.ball.bounce("x")
+                self.ball.bounce("x", self.players[1].pos["y"])
             else:
                 self.players[0].score += 1
                 self.ball.reset_pos()
@@ -149,42 +149,39 @@ class Game:
                 self.players[0].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
                 and self.players[0].pos["y"] + PADDLE_HEIGHT >= self.ball.pos["y"]
             ):
-                self.ball.bounce("x")
+                self.ball.bounce("x", self.players[0].pos["y"])
             else:
                 # update score
                 is_loser[0] = True
-                self.ball.reset_pos()
         # check 2p collision
         elif self.ball.pos["x"] >= SCREEN_WIDTH - INTERVAL:
             if (
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
                 and self.players[1].pos["y"] + PADDLE_HEIGHT >= self.ball.pos["y"]
             ):
-                self.ball.bounce("x")
+                self.ball.bounce("x", self.players[1].pos["y"])
             else:
                 is_loser[1] = True
-                self.ball.reset_pos()
         # check 3p collision
         if self.ball.pos["y"] <= INTERVAL:
             if (
                 self.players[2].pos["x"] - PADDLE_HEIGHT <= self.ball.pos["x"]
                 and self.players[2].pos["x"] + PADDLE_HEIGHT >= self.ball.pos["x"]
             ):
-                self.ball.bounce("y")
+                self.ball.bounce("y", self.players[2].pos["x"])
             else:
                 is_loser[2] = True
-                self.ball.reset_pos()
         # check 4p collision
         elif self.ball.pos["y"] >= SCREEN_HEIGHT - INTERVAL:
             if (
                 self.players[3].pos["x"] - PADDLE_HEIGHT <= self.ball.pos["x"]
                 and self.players[3].pos["x"] + PADDLE_HEIGHT >= self.ball.pos["x"]
             ):
-                self.ball.bounce("y")
+                self.ball.bounce("y", self.players[3].pos["x"])
             else:
                 is_loser[3] = True
-                self.ball.reset_pos()
         if True in is_loser:
+            self.ball.reset_pos()
             for i in range(4):
                 if not is_loser[i]:
                     self.players[i].score += 1
