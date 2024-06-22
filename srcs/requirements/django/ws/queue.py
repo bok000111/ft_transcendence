@@ -93,7 +93,7 @@ class GameQueue:
                     (uid, (await self.User.objects.aget(pk=uid)).username, nickname)
                     for uid, _, nickname in matched_uids
                 ]
-                print(f"{game_type.name}: {matched_users}")
+                # print(f"{game_type.name}: {matched_users}")
 
                 # 대충 게임 시작하는 코드 TODO: Game 구현
                 room_manager = RoomManager()

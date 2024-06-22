@@ -21,6 +21,9 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
+        if self.channel_layer is None:
+            print("channel_layer is None")
+        print(self.channel_layer)
 
     @classmethod
     async def create(cls, id, game_type, matched_users):
@@ -30,6 +33,7 @@ class Game:
 
     async def start(self):
         self.status = "playing"
+        print(self.channel_layer)
         await self.channel_layer.group_send(
             self.group_name,
             {
@@ -37,7 +41,7 @@ class Game:
                 "data": "start",
                 "message": {
                     "id": self.gid,
-                    "type": self.game_type,
+                    "type": self.game_type.value,
                     "users": [player.nickname for player in self.players],
                     "end_score": 5,
                 },

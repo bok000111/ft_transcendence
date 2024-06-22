@@ -132,7 +132,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def game_info(self, event):
         game_status = event["message"]
-        data = game_status["data"]
+        data = event["data"]
         if data == "info":
             await self.send_json(
                 {
