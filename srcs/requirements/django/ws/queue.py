@@ -70,7 +70,7 @@ class GameQueue:
             await self.channel_layer.group_add(f"queue_{game_type.name}", channel_name)
 
             # 대기 중인 유저들에게 대기 중인 유저 수 전송
-            self._notify(game_type)
+            await self._notify(game_type)
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
