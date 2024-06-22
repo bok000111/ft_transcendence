@@ -21,8 +21,6 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
-        if self.channel_layer is None:
-            print("channel_layer is None")
         print(self.channel_layer)
 
     @classmethod
@@ -33,7 +31,6 @@ class Game:
 
     async def start(self):
         self.status = "playing"
-        print(self.channel_layer)
         await self.channel_layer.group_send(
             self.group_name,
             {

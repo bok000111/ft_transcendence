@@ -111,7 +111,7 @@ class GameQueue:
         async with self._queue_manager[game_type] as manager:
             if uid not in manager:
                 return None  # TODO: 대기 중이 아닌 경우 에러 보내야함
-            manager.remove(uid, channel_name)
+            manager.remove(uid)
             await self.channel_layer.group_discard(
                 f"queue_{game_type.name}", channel_name
             )
