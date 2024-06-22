@@ -206,7 +206,11 @@ class Game:
             "id": self.gid,
             "type": self.game_type,
             "users": [player.nickname for player in self.players],
-            "winner": max(self.players, key=lambda x: x.score),
+            "winner": [
+                player.nickname
+                for player in self.players
+                if player.score == max([player.score for player in self.players])
+            ],
         }
 
     async def input(self):
