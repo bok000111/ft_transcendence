@@ -1,7 +1,7 @@
 import asyncio
 from collections import deque
 from ws.enums import GameType
-from ws.game import Game
+from ws.roommanager import RoomManager
 from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
 
@@ -70,7 +70,7 @@ class GameQueue:
             await self.channel_layer.group_add(f"queue_{game_type.name}", channel_name)
 
             # 대기 중인 유저들에게 대기 중인 유저 수 전송
-            self._notify(game_type)
+            await self._notify(game_type)
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
@@ -93,9 +93,19 @@ class GameQueue:
                     (uid, (await self.User.objects.aget(pk=uid)).username, nickname)
                     for uid, _, nickname in matched_uids
                 ]
-                print(f"{game_type.name}: {matched_users}")
+                # print(f"{game_type.name}: {matched_users}")
 
                 # 대충 게임 시작하는 코드 TODO: Game 구현
+                room_manager = RoomManager()
+                gid = await room_manager.create_game(game_type, matched_uids)
+                if gid is None:
+                    print("Failed to create game")
+                    return None
+                game = room_manager.get_game_instance(gid)
+                if game is None:
+                    print("Failed to get game instance")
+                    return None
+                await game.start()
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
         async with self._queue_manager[game_type] as manager:

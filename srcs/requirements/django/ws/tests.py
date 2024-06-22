@@ -32,7 +32,7 @@ async def build_communicator(user):
         await async_client.aforce_login(user)
         headers = [
             (b"origin", b"http://localhost"),
-            (b"cookie", async_client.cookies.output(header="", sep=";").encode())
+            (b"cookie", async_client.cookies.output(header="", sep=";").encode()),
         ]
     return WebsocketCommunicator(
         application,
@@ -54,35 +54,33 @@ class WebSocketTest(TransactionTestCase):
         faker.unique.clear()
 
     async def test_unauth_ws_connect(self):
-        communicators = await \
-            asyncio.gather(*[build_communicator(None)
-                             for _ in range(self.TEST_AMOUNT)])
+        communicators = await asyncio.gather(
+            *[build_communicator(None) for _ in range(self.TEST_AMOUNT)]
+        )
 
         with timer(f"reject {self.TEST_AMOUNT} unauthorized users"):
             for future in asyncio.as_completed(
-                [communicator.connect(timeout=100)
-                 for communicator in communicators]
+                [communicator.connect(timeout=100) for communicator in communicators]
             ):
                 connected, _ = await future
                 self.assertFalse(connected)
 
     async def test_ws_connect(self):
-        communicators = await \
-            asyncio.gather(*[build_communicator(user)
-                             for user in self.users])
+        communicators = await asyncio.gather(
+            *[build_communicator(user) for user in self.users]
+        )
 
         with timer(f"connect {self.TEST_AMOUNT} users"):
             for future in asyncio.as_completed(
-                [communicator.connect(timeout=100)
-                 for communicator in communicators]
+                [communicator.connect(timeout=100) for communicator in communicators]
             ):
                 connected, _ = await future
                 self.assertTrue(connected)
 
     async def test_ws_join(self):
-        communicators = await \
-            asyncio.gather(*[build_communicator(user)
-                             for user in self.users])
+        communicators = await asyncio.gather(
+            *[build_communicator(user) for user in self.users]
+        )
         await asyncio.gather(
             *[communicator.connect(timeout=100) for communicator in communicators]
         )

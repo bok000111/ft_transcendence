@@ -3,6 +3,7 @@ from ws.enums import WebSocketActionType, GameType
 from ws.queue import GameQueue
 from ws.lobby import Lobby
 from ws.game import Game
+from ws.roommanager import RoomManager
 from ws.tournament import Tournament
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth import get_user_model
@@ -12,6 +13,7 @@ User = get_user_model()
 
 
 class MainConsumer(AsyncJsonWebsocketConsumer):
+    room_manager = RoomManager()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -110,6 +112,43 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 "data": event["message"],
             }
         )
+
+    # message:{
+    #     "action": "game_input",
+    #     "data": {
+    #         "game_id": Int,
+    #         "nickname": String,
+    #         "keyevent": Int
+    #     },
+    # }
+    async def game_input(self, event):
+        gid = event["message"]["game_id"]
+        game_instance = self.room_manager.get_game_instance(gid)
+        if game_instance is None:
+            await self.send_error(400, "Invalid game_id")
+            return None
+        # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
+        game_instance.input(event["message"]["nickname"], event["message"]["keyevent"])
+
+    async def game_info(self, event):
+        game_status = event["message"]
+        data = event["data"]
+        if data == "info":
+            await self.send_json(
+                {
+                    "code": 4000,  # temp
+                    "action": "game",
+                    "data": game_status,
+                }
+            )
+        elif data == "result":
+            await self.send_json(
+                {
+                    "code": 4001,  # temp
+                    "action": "end",
+                    "data": game_status,
+                }
+            )
 
     async def test_response(self, event):
         await self.send_json(event["message"])
