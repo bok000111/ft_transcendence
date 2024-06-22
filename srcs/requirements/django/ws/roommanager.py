@@ -22,9 +22,7 @@ class RoomManager:
                 logger.warning(f"Room ID {room_id} already exists")
                 return None
             # matched_user = (uid, channel_name, nickname)
-            self.rooms[self.room_id] = await Game.create(
-                self.room_id, game_type, matched_users
-            )
+            self.rooms[room_id] = await Game.create(room_id, game_type, matched_users)
             logger.info(f"Game created with room_id: {room_id}")
             return room_id
         except Exception as e:
