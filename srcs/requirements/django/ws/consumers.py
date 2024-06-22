@@ -27,17 +27,22 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         websocket 연결 시 호출
         lock 사용하여 async-safe
         """
-        async with self.lock:
-            # await self.channel_layer.group_add(f"user_{self.scope["user"].pk}", self.channel_name)
-            await self.accept()
+        await self.accept()
 
     async def disconnect(self, code):
         """
         websocket 연결 해제 시 호출
         """
-        async with self.lock:
-            # await self.channel_layer.group_discard(f"user_{self.scope["user"].pk}", self.channel_name)
-            pass
+        if self.waiting is not None:
+            async with self.lock:
+                await GameQueue().leave_queue(
+                    self.waiting, self.scope["user"].pk, self.channel_name
+                )
+
+        # TODO: playing 처리
+        # if self.playing is not None:
+        # await self.playing.leave_game(self.scope["user"].pk)
+        pass
 
     async def send_error(self, code: int, message: str):
         await self.send_json(
@@ -84,6 +89,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         async with self.lock:
+            self.waiting = game_type
             await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
     async def leave_queue(self, event):
@@ -96,6 +102,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
         async with self.lock:
             await GameQueue().leave_queue(game_type, uid, self.channel_name)
+            self.waiting = None
 
     async def wait_queue(self, event):
         await self.send_json(
