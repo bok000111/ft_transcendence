@@ -205,7 +205,7 @@ class Game:
     def result(self):
         return {
             "id": self.gid,
-            "type": self.game_type,
+            "type": self.game_type.value,
             "users": [player.nickname for player in self.players],
             "winner": [
                 player.nickname
