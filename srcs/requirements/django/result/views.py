@@ -18,8 +18,13 @@ class TournamentResultView(View):
         results = [TournamentResult(raw_data) for raw_data in raw_datas]
         results.sort(key=lambda x: x.timestamp)
 
+        response_data = {
+            "status": "success",
+            "data": [result.to_dict() for result in results],
+        }
+
         return JsonResponse(
-            [result.to_dict() for result in results],
+            response_data,
             encoder=DjangoJSONEncoder,
             safe=False,
         )
