@@ -117,10 +117,12 @@ class TournamentResultManager:
         tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
         return tx_receipt.contractAddress
 
-    def start_game(self, id, timestamp, players):
+    def start_game(self, game_id, timestamp, players):
         nonce = self.w3.eth.get_transaction_count(self.chain_address)
         started_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
-        tx = started_game.functions.add_game(id, timestamp, players).build_transaction(
+        tx = started_game.functions.add_game(
+            game_id, timestamp, players
+        ).build_transaction(
             {
                 "chainId": self.chain_id,
                 "gasPrice": self.w3.eth.gas_price,
@@ -136,10 +138,10 @@ class TournamentResultManager:
         # print(started_game.functions.test_start(id).call())
         return tx_receipt
 
-    def save_sub_game(self, id, sub_game_info):
+    def save_sub_game(self, game_id, sub_game_info):
         nonce = self.w3.eth.get_transaction_count(self.chain_address)
         sub_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
-        tx = sub_game.functions.add_sub_game(id, sub_game_info).build_transaction(
+        tx = sub_game.functions.add_sub_game(game_id, sub_game_info).build_transaction(
             {
                 "chainId": self.chain_id,
                 "gasPrice": self.w3.eth.gas_price,
@@ -159,8 +161,8 @@ class TournamentResultManager:
         cont = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
         valid_tournaments = cont.functions.get_valid_tournaments().call()
         all_tournaments = []
-        for id in valid_tournaments:
-            tournament_info = cont.functions.get_tournament(id).call()
+        for game_id in valid_tournaments:
+            tournament_info = cont.functions.get_tournament(game_id).call()
             all_tournaments.append(tournament_info)
         return all_tournaments
 

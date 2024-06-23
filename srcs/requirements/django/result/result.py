@@ -48,11 +48,12 @@ class TournamentResult:
     def __user_id_to_username(self, user_id):
         # return await sync_to_async(User.objects.get)(id=user_id).username
         # return sync_to_async(User.objects.get(id=user_id).username)()
-        return User.objects.get(id=user_id).username
+        return User.objects.get(pk=user_id).username
 
     def __parse(self, split_data):
         self.timestamp = datetime.fromtimestamp(int(split_data[0]))
-        players = [self.__user_id_to_username(int(id)) for id in split_data[1:5]]
+        players = [self.__user_id_to_username(pk) for pk in split_data[1:5]]
+        # players = [int(id) for id in split_data[1:5]]
 
         sub_games_data = split_data[5:]
         self.sub_games = []
