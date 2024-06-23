@@ -43,15 +43,15 @@ class Player:
 
     def move(self):
         if self.idx <= 1:
-            if self.up and self.pos["y"] > 0:
-                self.pos["y"] = max(self.pos["y"] - DEFAULT_SPEED, 0)
+            if self.up and self.pos["y"] > PADDLE_HEIGHT:
+                self.pos["y"] = max(self.pos["y"] - DEFAULT_SPEED, PADDLE_HEIGHT)
             elif self.down and self.pos["y"] < SCREEN_HEIGHT - PADDLE_HEIGHT:
                 self.pos["y"] = min(
                     self.pos["y"] + DEFAULT_SPEED, SCREEN_HEIGHT - PADDLE_HEIGHT
                 )
         else:
-            if self.down and self.pos["x"] > 0:
-                self.pos["x"] = max(self.pos["x"] - DEFAULT_SPEED, 0)
+            if self.down and self.pos["x"] > PADDLE_HEIGHT:
+                self.pos["x"] = max(self.pos["x"] - DEFAULT_SPEED, PADDLE_HEIGHT)
             elif self.up and self.pos["x"] < SCREEN_WIDTH - PADDLE_WIDTH:
                 self.pos["x"] = min(
                     self.pos["x"] + DEFAULT_SPEED, SCREEN_WIDTH - PADDLE_WIDTH

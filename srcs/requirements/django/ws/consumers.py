@@ -123,7 +123,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     # }
     async def game_input(self, event):
         gid = event["message"]["game_id"]
-        game_instance = self.room_manager.get_game_instance(gid)
+        game_instance = await self.room_manager.get_game_instance(gid)
         if game_instance is None:
             await self.send_error(400, "Invalid game_id")
             return None
