@@ -101,7 +101,7 @@ class GameQueue:
                 if gid is None:
                     print("Failed to create game")
                     return None
-                game = await room_manager.get_game_instance(gid)
+                game = room_manager.get_game_instance(gid)
                 if game is None:
                     print("Failed to get game instance")
                     return None

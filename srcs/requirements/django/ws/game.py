@@ -101,7 +101,7 @@ class Game:
                 self.status = "end"
 
     # nickname에 해당하는 player의 keyevent를 처리
-    def input(self, nickname, keyevent):
+    def handle_keyevent(self, nickname, keyevent):
         for player in self.players:
             if player.nickname == nickname:
                 player.set_state(keyevent)
@@ -213,7 +213,3 @@ class Game:
                 if player.score == max([player.score for player in self.players])
             ],
         }
-
-    async def input(self):
-        # 대충 입력 받아서 처리
-        pass
