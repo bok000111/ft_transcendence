@@ -38,23 +38,13 @@
             <div></div>
         </div>
 
-        <!-- Tournament Lobby Page -->
-        <div class="tour-lobby-page none">
+        <!-- Game Page -->
+        <div class="game-page none">
             <div></div>
         </div>
 
         <!-- Tournament Result Page -->
         <div class="tour-result-page none">
-            <div></div>
-        </div>
-
-        <!-- Pong Game Page -->
-        <div class="game-page none">
-            <div></div>
-        </div>
-
-        <!-- Normal Game Page -->
-        <div class="normal-lobby-page none">
             <div></div>
         </div>
     </div>
@@ -82,11 +72,27 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Apply</button>
+                        <button id="closeBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
+
+    <div class="modal" id="waitingModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Waiting for Game . . .</h5>
+                </div>
+                <div class="modal-body">
+                    <h5 id="waiting-status"></h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
 
     <script src="./static/js/main.js" type="module"></script>
 
