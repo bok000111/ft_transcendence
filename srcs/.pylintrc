@@ -1,3 +1,6 @@
+[MASTER]
+django-settings-module=ft_transcendence.settings
+
 [MAIN]
 
 # Analyse import fallback blocks. This can be used to support both Python 2 and
@@ -93,7 +96,7 @@ prefer-stubs=no
 
 # Minimum Python version to use for version dependent checks. Will default to
 # the version used to run pylint.
-py-version=3.12
+py-version=3.12.3
 
 # Discover python modules and packages in the file system subtree.
 recursive=no
@@ -102,7 +105,7 @@ recursive=no
 # source root is an absolute path or a path relative to the current working
 # directory used to determine a package namespace for modules located under the
 # source root.
-source-roots=/workspaces/ft_transcendence/srcs/requirements/django/*
+source-roots=/workspaces/ft_transcendence/srcs/requirements/django
 
 # When enabled, pylint would attempt to guess common misconfiguration and emit
 # user-friendly hints instead of false-positive error messages.
@@ -144,7 +147,7 @@ bad-names=foo,
 
 # Bad variable names regexes, separated by a comma. If names match any regex,
 # they will always be refused
-bad-names-rgxs=
+; bad-names-rgxs=
 
 # Naming style matching correct class attribute names.
 class-attribute-naming-style=any
@@ -199,7 +202,7 @@ good-names=i,
 
 # Good variable names regexes, separated by a comma. If names match any regex,
 # they will always be accepted
-good-names-rgxs=
+; good-names-rgxs=
 
 # Include a hint for the correct naming format with invalid-name.
 include-naming-hint=no
@@ -228,7 +231,7 @@ module-naming-style=snake_case
 
 # Colon-delimited sets of names that determine each other's naming style when
 # the name regexes allow several styles.
-name-group=
+; name-group=
 
 # Regular expression which should only match function or class names that do
 # not require a docstring.
