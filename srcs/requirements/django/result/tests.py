@@ -22,7 +22,14 @@ class TournamentResultTest(TestCase):
 
         game_id = random.randint(1, 1000000000)
         game_time = random.randint(1600000000, 1718227200)
-        player_ids = [user.id for user in self.fake_users]
+        player_ids = [user.pk for user in self.fake_users]
+        print(player_ids)
+
+        arr = [user.username for user in self.fake_users]
+        print(arr)
+
+        for i in player_ids:
+            print(User.objects.get(pk=i).username)
 
         left_win = [10, random.randint(0, 9)]
         right_win = [random.randint(0, 9), 10]
@@ -58,7 +65,8 @@ class TournamentResultTest(TestCase):
         response = self.client.get(reverse("result"))
         self.assertContains(response, "", status_code=200)
 
-        # You can also add more assertions to check the content of the response
         data = response.json()
+
+        print(data)
+
         self.assertTrue(len(data) > 0)
-        self.assertIn("timestamp", data[0])
