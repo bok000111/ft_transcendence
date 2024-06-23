@@ -13,8 +13,7 @@ tournament_contract = TournamentResultManager(os.getenv("ENDPOINT"))
 
 
 class TournamentResultView(View):
-    async def get(self, request):
-        user = await request.auser()
+    def get(self, request):
         raw_datas = tournament_contract.get_all_tournaments()
         results = [TournamentResult(raw_data) for raw_data in raw_datas]
         results.sort(key=lambda x: x.timestamp)
