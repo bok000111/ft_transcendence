@@ -69,6 +69,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         try:
+            # print(f"action: {action}")
             await self.channel_layer.send(
                 self.channel_name,
                 {
@@ -123,12 +124,16 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     # }
     async def game_input(self, event):
         gid = event["message"]["game_id"]
-        game_instance = await self.room_manager.get_game_instance(gid)
+        game_instance = self.room_manager.get_game_instance(gid)
+        # print(f"nickname: {event['message']['nickname']}")
+        # print(f"keyevent: {event['message']['keyevent']}")
         if game_instance is None:
             await self.send_error(400, "Invalid game_id")
             return None
         # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
-        game_instance.input(event["message"]["nickname"], event["message"]["keyevent"])
+        game_instance.handle_keyevent(
+            event["message"]["nickname"], event["message"]["keyevent"]
+        )
 
     async def game_info(self, event):
         game_status = event["message"]
