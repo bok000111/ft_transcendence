@@ -3,62 +3,69 @@ import { tourResultPage } from "./TourResultPage.js"
 import { tourResultListAPI } from "../../models/API.js"
 
 class TourResultListSubpage extends SubPage {
-    $resList;
-    $detailArea;
+    $tourList;
 
-    init() {
+    async init() {
         this.$elem.innerHTML = `
-            <h2>Tournament Result</h2>
-            <div class="accordion accordion-flush" id="accordionFlushExample">
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingOne">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                    Accordion Item #1
-                  </button>
-                </h2>
-                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
-                  <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the first item's accordion body.</div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingTwo">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
-                    Accordion Item #2
-                  </button>
-                </h2>
-                <div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
-                  <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the second item's accordion body. Let's imagine this being filled with some actual content.</div>
-                </div>
-              </div>
-              <div class="accordion-item">
-                <h2 class="accordion-header" id="flush-headingThree">
-                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseThree" aria-expanded="false" aria-controls="flush-collapseThree">
-                    Accordion Item #3
-                  </button>
-                </h2>
-                <div id="flush-collapseThree" class="accordion-collapse collapse" aria-labelledby="flush-headingThree" data-bs-parent="#accordionFlushExample">
-                  <div class="accordion-body">Placeholder content for this accordion, which is intended to demonstrate the <code>.accordion-flush</code> class. This is the third item's accordion body. Nothing more exciting happening here in terms of content, but just filling up the space to make it look, at least at first glance, a bit more representative of how this would look in a real-world application.</div>
-                </div>
-              </div>
-            </div>`;
+          <h2 class="text-center">Tournament Result</h2>
+          <div class="accordion accordion-flush" id="tour_list">
+          </div>
+        `;
 
-        this.$resList = this.$elem.querySelector("#res_list");
-        this.$detailArea = this.$elem.querySelector("#detail_area");
-
-        // async () => {
-        //     try {
-        //         await tourResultListAPI.request();
-        //         for(i = 0; i < tourResultListAPI.recvData.data.results.length; i++)
-        //         {
-        //             const added_text = `<a class="dropdown-item" id="${tourResultListAPI.recvData.data.results[i].id}">${tourResultListAPI.recvData.data.results[i].date}</a>`;
-        //             this.$resList.innerHTML += added_text;
-        //         }
-        //     }
-        //     catch (e) {
-        //         alert(`Result List: ${e.message}`);
-        //         this.requestShift("main_page");
-        //     }
-        // }
+        this.$tourList = this.$elem.querySelector("#tour_list");
+        try {
+            await tourResultListAPI.request();
+            for (let i = 0; i < tourResultListAPI.recvData.data.results.length; i++) {
+                let accordionItem = document.createElement("div");
+                accordionItem.className = "accordion-item";
+                accordionItem.innerHTML = `
+                    <h2 class="accordion-header" id="flush-heading${i}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${i}" aria-expanded="false" aria-controls="flush-collapse${i}">
+                            ${tourResultListAPI.recvData.data.results[i].timestamp}
+                        </button>
+                    </h2>
+                    <div id="flush-collapse${i}" class="accordion-collapse collapse" aria-labelledby="flush-heading${i}" data-bs-parent="#list_example">
+                        <div class="accordion-body" id="detailTable-${i}"></div>
+                    </div>`;
+                let tableItem = this.$elem.querySelector(`#detailTable-${i}`);
+                tableItem.innerHTML = `
+                <table class="table">
+                <thead>
+                    <tr>
+                    <th scope="col">VS</th>
+                    <th scope="col">type</th>
+                    <th scope="col">winner</th>
+                    <th scope="col">score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                    <th scope="row">${tourResultListAPI.recvData.data.results[i].sub_games[0].players[0]} vs ${tourResultListAPI.recvData.data.results[i].sub_games[0].players[1]}</th>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[0].game_type}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[0].winner}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[0].score[0]} : ${tourResultListAPI.recvData.data.results[i].sub_games[0].score[1]}</td>
+                    </tr>
+                    <tr>
+                    <th scope="row">${tourResultListAPI.recvData.data.results[i].sub_games[1].players[0]} vs ${tourResultListAPI.recvData.data.results[i].sub_games[1].players[1]}</th>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[1].game_type}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[1].winner}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[1].score[0]} : ${tourResultListAPI.recvData.data.results[i].sub_games[1].score[1]}</td>
+                    </tr>
+                    <tr>
+                    <th scope="row">${tourResultListAPI.recvData.data.results[i].sub_games[2].players[0]} vs ${tourResultListAPI.recvData.data.results[i].sub_games[2].players[1]}</th>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[2].game_type}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[2].winner}</td>
+                    <td>${tourResultListAPI.recvData.data.results[i].sub_games[2].score[0]} : ${tourResultListAPI.recvData.data.results[i].sub_games[2].score[1]}</td>
+                    </tr>
+                </tbody>
+                </table>`;
+                this.$tourList.appendChild(accordionItem);
+            }
+        }
+        catch {
+            alert("Failed to load Tournament Result...");
+            this.route("main_page/main_subpage");
+        }
     }
 
     fini() {
