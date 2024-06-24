@@ -58,7 +58,8 @@ class Game:
 
     async def remove_players_from_group(self):
         tasks = [
-            self.channel_layer.group_discard(self.group_name, player.channel_name)
+            self.channel_layer.group_discard(
+                self.group_name, player.channel_name)
             for player in self.players
         ]
         try:
@@ -131,6 +132,8 @@ class Game:
                 # update score(함수로 구현할 수도)
                 self.players[1].score += 1
                 self.ball.reset_pos()
+                self.players[0].reset_pos()
+                self.players[1].reset_pos()
         elif self.ball.pos["x"] >= SCREEN_WIDTH - INTERVAL:
             if (
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
@@ -140,6 +143,8 @@ class Game:
             else:
                 self.players[0].score += 1
                 self.ball.reset_pos()
+                self.players[0].reset_pos()
+                self.players[1].reset_pos()
 
     def check_collision_4p(self):
         INTERVAL = PADDLE_WIDTH * 2 + BALL_RADIUS
@@ -184,6 +189,7 @@ class Game:
         if True in is_loser:
             self.ball.reset_pos()
             for i in range(4):
+                self.players[i].reset_pos()
                 if not is_loser[i]:
                     self.players[i].score += 1
 
