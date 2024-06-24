@@ -6,10 +6,6 @@ from ws.game import Game
 from ws.roommanager import RoomManager
 from ws.tournament import Tournament
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.contrib.auth import get_user_model
-
-
-User = get_user_model()
 
 
 class MainConsumer(AsyncJsonWebsocketConsumer):
@@ -42,7 +38,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         # TODO: playing 처리
         # if self.playing is not None:
         # await self.playing.leave_game(self.scope["user"].pk)
-        pass
 
     async def send_error(self, code: int, message: str):
         await self.send_json(
@@ -128,7 +123,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(400, "Invalid game_id")
             return None
         # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
-        game_instance.input(event["message"]["nickname"], event["message"]["keyevent"])
+        game_instance.input(event["message"]["nickname"],
+                            event["message"]["keyevent"])
 
     async def game_info(self, event):
         game_status = event["message"]

@@ -1,5 +1,6 @@
 import math
-from .constants import *
+from ws.constants import (BALL_RADIUS, SCREEN_WIDTH, SCREEN_HEIGHT, DEFAULT_SPEED_X,
+                          DEFAULT_SPEED_Y, DEFAULT_SPEED, PADDLE_WIDTH, PADDLE_HEIGHT)
 
 
 class Ball:

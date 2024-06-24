@@ -1,16 +1,17 @@
 import asyncio
 from channels.layers import get_channel_layer
 from ws.enums import GameType
-from .ball import Ball
-from .player import Player
-from .constants import *
+from ws.ball import Ball
+from ws.player import Player
+from ws.constants import (BALL_RADIUS, SCREEN_WIDTH, SCREEN_HEIGHT, DEFAULT_SPEED_X,
+                          DEFAULT_SPEED_Y, DEFAULT_SPEED, PADDLE_WIDTH, PADDLE_HEIGHT)
 
 
 class Game:
     # 2인용 게임, 4인용 게임 구분
     # matched_user = tuple(uid, channel_name, nickname)
-    def __init__(self, id, game_type, matched_users):
-        self.gid = id
+    def __init__(self, gid: int, game_type: GameType, matched_users: list):
+        self.gid = gid
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
         self.players = [
@@ -24,8 +25,8 @@ class Game:
         print(self.channel_layer)
 
     @classmethod
-    async def create(cls, id, game_type, matched_users):
-        self = cls(id, game_type, matched_users)
+    async def create(cls, gid, game_type, matched_users):
+        self = cls(gid, game_type, matched_users)
         await self.add_players_to_group(matched_users)
         return self
 
@@ -53,17 +54,18 @@ class Game:
         ]
         try:
             await asyncio.gather(*tasks)
-        except Exception as e:
+        except (asyncio.TimeoutError, asyncio.CancelledError) as e:
             print(f"An error occurred while adding players to group: {e}")
 
     async def remove_players_from_group(self):
         tasks = [
-            self.channel_layer.group_discard(self.group_name, player.channel_name)
+            self.channel_layer.group_discard(
+                self.group_name, player.channel_name)
             for player in self.players
         ]
         try:
             await asyncio.gather(*tasks)
-        except Exception as e:
+        except (asyncio.TimeoutError, asyncio.CancelledError) as e:
             print(f"An error occurred while removing players from group: {e}")
 
     async def send_game_info(self):
@@ -203,17 +205,10 @@ class Game:
         }
 
     def result(self):
+        max_score = max(self.players, key=lambda player: player.score).score
         return {
             "id": self.gid,
             "type": self.game_type.value,
             "users": [player.nickname for player in self.players],
-            "winner": [
-                player.nickname
-                for player in self.players
-                if player.score == max([player.score for player in self.players])
-            ],
+            "winner": [player.nickname for player in self.players if player.score == max_score]
         }
-
-    async def input(self):
-        # 대충 입력 받아서 처리
-        pass
