@@ -40,10 +40,17 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                     self.waiting, self.scope["user"].pk, self.channel_name
                 )
 
-        # TODO: playing 처리
-        # if self.playing is not None:
-        # await self.playing.leave_game(self.scope["user"].pk)
-        pass
+        # # self.scope["user"].pk가 RoomManager에 있는지 확인
+        # uid = self.scope["user"].pk
+        # if uid in self.room_manager.user_rooms:
+        #     gid = self.room_manager.user_rooms[uid]
+        #     game_instance = self.room_manager.get_game_instance(gid)
+        #     if game_instance is not None:
+        #         await game_instance.leave_game(uid)
+        #     del RoomManager.user_rooms[uid]
+
+        # await self.playing.leave_game(uid)
+        # pass
 
     async def send_error(self, code: int, message: str):
         await self.send_json(
@@ -96,7 +103,12 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         async with self.lock:
             self.waiting = game_type
             print(f"uid: {uid}")
-            await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
+            if game_type == GameType.LOCAL:
+                matched_users = [(uid, self.channel_name, "player1"),
+                                 (uid, self.channel_name, "player2")]
+                await self.room_manager.start_game(game_type, matched_users)
+            else:
+                await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
     async def leave_queue(self, event):
         try:  # 대충 입력 검증
@@ -107,7 +119,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         async with self.lock:
-            await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
+            if self.waiting != GameType.LOCAL:
+                await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
             self.waiting = None
 
     async def wait_queue(self, event):

@@ -8,8 +8,10 @@ class RoomManager:
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(RoomManager, cls).__new__(cls, *args, **kwargs)
+            cls._instance = super(RoomManager, cls).__new__(
+                cls, *args, **kwargs)
             cls._instance.rooms = {}
+            cls._instance.user_rooms = {}
         return cls._instance
 
     async def create_game(self, game_type, matched_users):
@@ -22,6 +24,8 @@ class RoomManager:
                 return None
             # matched_user = (uid, channel_name, nickname)
             self.rooms[room_id] = await Game.create(room_id, game_type, matched_users)
+            for uid, _, _ in matched_users:
+                self.user_rooms[uid] = room_id
             print(f"Info: Game created with room_id: {room_id}")
             return room_id
 
@@ -42,3 +46,14 @@ class RoomManager:
             print(f"Info: Room ID {room_id} removed")
         else:
             print(f"Warning: Room ID {room_id} not found")
+
+    async def start_game(self, game_type, matched_users):
+        gid = await self.create_game(game_type, matched_users)
+        if gid is None:
+            print("Failed to create game")
+            return None
+        game = self.get_game_instance(gid)
+        if game is None:
+            print("Failed to get game instance")
+            return None
+        await game.start()
