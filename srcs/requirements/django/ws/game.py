@@ -44,7 +44,10 @@ class Game:
                 },
             },
         )
-        asyncio.create_task(self.send_game_info())
+        g = asyncio.create_task(self.send_game_info())
+        
+        await g
+        return g.result()
 
     async def add_players_to_group(self, matched_users):
         tasks = [
@@ -80,7 +83,13 @@ class Game:
                 self.group_name,
                 {"type": "game_info", "data": "result", "message": self.result()},
             )
+            await self.channel_layer.group_send(
+                self.group_name,
+                {"type": "new_func", "message": self.result()},
+            )
+            
             await self.remove_players_from_group()
+            return 
 
     def update(self):
         for player in self.players:
