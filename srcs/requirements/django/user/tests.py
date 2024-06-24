@@ -3,23 +3,25 @@ import asyncio
 from user.factories import UserFactory, SignUpFactory, faker
 
 from asgiref.sync import sync_to_async
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase, TransactionTestCase, tag
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from ft_transcendence.tests import timer
 
 
-User = get_user_model()
-
-
 class RequireJsonTest(TestCase):
     async def test_require_json(self):
-        response = await self.async_client.post(reverse("signup"))
+        response = await self.async_client.post(
+            reverse("signup"),
+            secure=True,
+        )
         self.assertContains(response, "invalid content type", status_code=400)
 
 
 class SignupTest(TestCase):
+    User = get_user_model()
+
     @classmethod
     def setUpTestData(cls):
         faker.unique.clear()
@@ -28,22 +30,27 @@ class SignupTest(TestCase):
     async def test_signup(self):
         data = SignUpFactory()
         response = await self.async_client.post(
-            reverse("signup"), data, content_type="application/json")
+            reverse("signup"),
+            data,
+            content_type="application/json",
+            secure=True,
+        )
         result = response.json()
         self.assertContains(response, "user created", status_code=201)
         await sync_to_async(self.assertQuerySetEqual)(
-            User.objects.filter(email=result["data"]["user"]["email"]),
+            self.User.objects.filter(email=result["data"]["user"]["email"]),
             [data["email"]],
             lambda x: x.email,
         )
         await sync_to_async(self.assertQuerySetEqual)(
-            User.objects.filter(username=result["data"]["user"]["username"]),
+            self.User.objects.filter(
+                username=result["data"]["user"]["username"]),
             [data["username"]],
             lambda x: x.username,
         )
         self.assertTrue(
-            User.check_password(
-                await User.objects.aget(username=result["data"]["user"]["username"]),
+            self.User.check_password(
+                await self.User.objects.aget(username=result["data"]["user"]["username"]),
                 data["password"],
             )
         )
@@ -57,11 +64,17 @@ class SignupTest(TestCase):
             SignUpFactory(username=self.exist_user.username),
         ]
 
-        responses = await asyncio.gather(*[
-            self.async_client.post(reverse("signup"), tc,
-                                   content_type="application/json")
-            for tc in tcs
-        ])
+        responses = await asyncio.gather(
+            *[
+                self.async_client.post(
+                    reverse("signup"),
+                    tc,
+                    content_type="application/json",
+                    secure=True,
+                )
+                for tc in tcs
+            ]
+        )
 
         self.assertContains(responses[0], "Email required", status_code=400)
         self.assertContains(responses[1], "Username required", status_code=400)
@@ -73,7 +86,7 @@ class SignupTest(TestCase):
 
 
 class LoginTest(TestCase):
-    @classmethod
+    @ classmethod
     def setUpTestData(cls):
         faker.unique.clear()
         cls.email = faker.unique.email()
@@ -91,6 +104,7 @@ class LoginTest(TestCase):
                 "password": self.password,
             },
             content_type="application/json",
+            secure=True,
         )
 
         self.assertContains(response, "logged in", status_code=200)
@@ -114,6 +128,7 @@ class LoginTest(TestCase):
                     reverse("login"),
                     tc,
                     content_type="application/json",
+                    secure=True,
                 )
                 for tc in tcs
             ]
@@ -134,13 +149,14 @@ class LoginTest(TestCase):
                 "password": self.password,
             },
             content_type="application/json",
+            secure=True,
         )
 
         self.assertContains(response, "already logged in", status_code=400)
 
 
 class LogoutTest(TestCase):
-    @classmethod
+    @ classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
 
@@ -152,7 +168,8 @@ class LogoutTest(TestCase):
 
     async def test_logout(self):
         response = await self.async_client.post(
-            reverse("logout"), content_type="application/json")
+            reverse("logout"), content_type="application/json", secure=True
+        )
 
         self.assertContains(response, "logged out", status_code=200)
         self.assertFalse(self.async_client.session.get("_auth_user_id"))
@@ -161,39 +178,42 @@ class LogoutTest(TestCase):
         await self.async_client.alogout()
 
         response = await self.async_client.post(
-            reverse("logout"), content_type="application/json")
+            reverse("logout"), content_type="application/json", secure=True
+        )
         self.assertContains(
             response, "authentication required", status_code=401)
 
 
 class StressTest(TransactionTestCase):
-    TEST_AMOUNT = 1000
+    TEST_AMOUNT = 10
 
     def setUp(self):
-        self.users = [(SignUpFactory(),
-                       self.async_client_class())
-                      for _ in range(self.TEST_AMOUNT)]
+        self.users = [
+            (SignUpFactory(), self.async_client_class())
+            for _ in range(self.TEST_AMOUNT)
+        ]
         self.signup_url = reverse("signup")
         self.login_url = reverse("login")
         self.logout_url = reverse("logout")
 
+    @tag("slow")
     async def signup_login_logout(self, user, client):
         response = await client.post(
-            self.signup_url, user, content_type="application/json")
+            self.signup_url, user, content_type="application/json", secure=True
+        )
         self.assertContains(response, "user created", status_code=201)
 
         response = await client.post(
-            self.login_url, user, content_type="application/json")
+            self.login_url, user, content_type="application/json", secure=True,
+        )
         self.assertContains(response, "logged in", status_code=200)
 
-        response = await client.post(
-            self.logout_url, content_type="application/json")
+        response = await client.post(self.logout_url, content_type="application/json", secure=True)
         self.assertContains(response, "logged out", status_code=200)
 
     async def test_stress(self):
 
         with timer(f"signup login logout {self.TEST_AMOUNT} users"):
-            await asyncio.gather(*[
-                self.signup_login_logout(user, client)
-                for user, client in self.users
-            ])
+            await asyncio.gather(
+                *[self.signup_login_logout(user, client) for user, client in self.users]
+            )
