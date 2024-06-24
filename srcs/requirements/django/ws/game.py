@@ -74,7 +74,7 @@ class Game:
                 {"type": "game_info", "data": "info", "message": self.info()},
             )
             self.update()
-            await asyncio.sleep(1 / 30)
+            await asyncio.sleep(1 / 60)
         if self.status == "end":
             # 게임 종료 처리
             await self.channel_layer.group_send(
