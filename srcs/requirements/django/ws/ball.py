@@ -7,7 +7,7 @@ class Ball:
         self.reset_pos()
         self.speed = DEFAULT_SPEED
         self.speed_increment = 1.1  # 속도가 증가하는 양
-        self.max_speed = 26  # 최대 속도
+        self.max_speed = MAX_SPEED  # 최대 속도
         self.collision_count = 0
 
     def move(self):
@@ -22,12 +22,10 @@ class Ball:
                     PADDLE_HEIGHT / 2
                 )
                 bounce_angle = normalized_relative_intersect_y * (math.pi / 4)
-                self.vel["x"] = (
-                    -1 * self.speed * math.cos(bounce_angle)
-                    if self.vel["x"] > 0
-                    else self.speed * math.cos(bounce_angle)
-                )
-                self.vel["y"] = self.speed * math.sin(bounce_angle)
+                self.vel["x"] = round(self.speed * math.cos(bounce_angle), 2)
+                if self.pos["x"] > SCREEN_WIDTH / 2:
+                    self.vel["x"] = -self.vel["x"]
+                self.vel["y"] = round(self.speed * math.sin(bounce_angle), 2)
             else:
                 self.vel["x"] = -self.vel["x"]
         elif direction == "y":
@@ -37,16 +35,14 @@ class Ball:
                     PADDLE_HEIGHT / 2
                 )
                 bounce_angle = normalized_relative_intersect_x * (math.pi / 4)
-                self.vel["y"] = (
-                    -1 * self.speed * math.cos(bounce_angle)
-                    if self.vel["y"] > 0
-                    else self.speed * math.cos(bounce_angle)
-                )
-                self.vel["x"] = -self.speed * math.sin(bounce_angle)
+                self.vel["y"] = round(self.speed * math.cos(bounce_angle), 2)
+                if self.pos["y"] > SCREEN_HEIGHT / 2:
+                    self.vel["y"] = -self.vel["y"]
+                self.vel["x"] = -round(self.speed * math.sin(bounce_angle), 2)
             else:
                 self.vel["y"] = -self.vel["y"]
         self.collision_count += 1
-        if self.collision_count == 5:
+        if self.collision_count == 1:
             self.increase_speed()
             self.collision_count = 0
 

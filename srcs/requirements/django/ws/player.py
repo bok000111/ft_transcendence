@@ -6,10 +6,8 @@ class Player:
         self.idx = idx
         self.channel_name = channel_name
         self.nickname = nickname
-        self.pos = self.initial_position()
+        self.reset_pos()
         self.score = 0
-        self.up = False
-        self.down = False
 
     def initial_position(self):
         if self.idx == 0:
@@ -44,14 +42,17 @@ class Player:
     def move(self):
         if self.idx <= 1:
             if self.up and self.pos["y"] > PADDLE_HEIGHT:
-                self.pos["y"] = max(self.pos["y"] - DEFAULT_SPEED, PADDLE_HEIGHT)
+                self.pos["y"] = max(
+                    self.pos["y"] - DEFAULT_SPEED, PADDLE_HEIGHT)
             elif self.down and self.pos["y"] < SCREEN_HEIGHT - PADDLE_HEIGHT:
                 self.pos["y"] = min(
-                    self.pos["y"] + DEFAULT_SPEED, SCREEN_HEIGHT - PADDLE_HEIGHT
+                    self.pos["y"] + DEFAULT_SPEED, SCREEN_HEIGHT -
+                    PADDLE_HEIGHT
                 )
         else:
             if self.down and self.pos["x"] > PADDLE_HEIGHT:
-                self.pos["x"] = max(self.pos["x"] - DEFAULT_SPEED, PADDLE_HEIGHT)
+                self.pos["x"] = max(
+                    self.pos["x"] - DEFAULT_SPEED, PADDLE_HEIGHT)
             elif self.up and self.pos["x"] < SCREEN_WIDTH - PADDLE_WIDTH:
                 self.pos["x"] = min(
                     self.pos["x"] + DEFAULT_SPEED, SCREEN_WIDTH - PADDLE_WIDTH
@@ -59,4 +60,8 @@ class Player:
 
     def reset_pos(self):
         self.pos = self.initial_position()
+        self.up = False
+        self.down = False
+
+    def reset_score(self):
         self.score = 0
