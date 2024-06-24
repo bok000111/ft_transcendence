@@ -1,10 +1,11 @@
-from result import *
+import os
 import json
 from web3 import Web3
 from solcx import compile_standard, install_solc
-import os
-from dotenv import load_dotenv
 from django.conf import settings
+
+abi_path = settings.BASE_DIR / "blockchain" / "abi.json"
+sol_path = settings.BASE_DIR / "blockchain" / "TournamentContract.sol"
 
 
 class TournamentResultManager:
@@ -20,14 +21,13 @@ class TournamentResultManager:
         if self._initialized:
             return
 
-        load_dotenv()
         self.chain_address = os.getenv("CHAIN_ADDRESS")
         self.private_key = os.getenv("PRIVATE_KEY")
-        self.chain_id = int(os.getenv("CHAIN_ID"))
-        if self.chain_address == "" or self.private_key == "" or self.chain_id == "":
-            raise Exception(
-                "Please set the CHAIN_ADDRESS, PRIVATE_KEY and CHAIN_ID in the .env file."
-            )
+        self.chain_id = os.getenv("CHAIN_ID")
+        if self.chain_address is None or self.private_key is None or self.chain_id is None:
+            raise ValueError(
+                "Please set the CHAIN_ADDRESS, PRIVATE_KEY and CHAIN_ID in the .env file.")
+        self.chain_id = int(self.chain_id)
 
         self.w3 = Web3(Web3.HTTPProvider(provider))
 
@@ -36,12 +36,9 @@ class TournamentResultManager:
             or os.getenv("CONTRACT_ADDRESS") == ""
         ):
             self.__set_initial_settings()
+
         else:
-            with open(
-                str(settings.BASE_DIR) + "/../blockchain/abi.json",
-                "r",
-                encoding="utf-8",
-            ) as file:
+            with open(abi_path, 'r', encoding="utf-8") as file:
                 self.abi = file.read()
             self.contract_address = os.getenv("CONTRACT_ADDRESS")
         self._initialized = True
@@ -58,13 +55,14 @@ class TournamentResultManager:
     def __compile_sol(self):
         solc_version = "0.6.0"
         install_solc(solc_version)
-        sol_path = str(settings.BASE_DIR) + "/../blockchain/TournamentContract.sol"
+        # sol_path = os.path.join(
+        #     settings.BASE_DIR, "/blockchain/TournamentContract.sol")
         try:
             with open(sol_path, "rt", encoding="utf-8") as file:
                 tournament_file = file.read()
         except Exception as e:
             print(e)
-            return
+            return None
 
         compiled_sol = compile_standard(
             {
@@ -93,16 +91,16 @@ class TournamentResultManager:
         ]["evm"]["bytecode"]["object"]
 
         # for get abi
-        if not os.path.exists(str(settings.BASE_DIR) + "/../blockchain/abi.json"):
-            with open(str(settings.BASE_DIR) + "/../blockchain/abi.json", "w") as file:
+        if abi_path.exists() is False:
+            with open(abi_path, "w", encoding="utf-8") as file:
                 json.dump(self.abi, file)
         return bytecode
 
     def __deploy_contract(self, bytecode):
-        nonce = self.w3.eth.get_transaction_count(self.chain_address) + 1
+        nonce = self.w3.eth.get_transaction_count(self.chain_address)
 
-        Tournament = self.w3.eth.contract(abi=self.abi, bytecode=bytecode)
-        transaction = Tournament.constructor().build_transaction(
+        tournament = self.w3.eth.contract(abi=self.abi, bytecode=bytecode)
+        transaction = tournament.constructor().build_transaction(
             {
                 "chainId": self.chain_id,
                 "gasPrice": self.w3.eth.gas_price,
@@ -119,7 +117,8 @@ class TournamentResultManager:
 
     def start_game(self, game_id, timestamp, players):
         nonce = self.w3.eth.get_transaction_count(self.chain_address)
-        started_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
+        started_game = self.w3.eth.contract(
+            address=self.contract_address, abi=self.abi)
         tx = started_game.functions.add_game(
             game_id, timestamp, players
         ).build_transaction(
@@ -140,7 +139,8 @@ class TournamentResultManager:
 
     def save_sub_game(self, game_id, sub_game_info):
         nonce = self.w3.eth.get_transaction_count(self.chain_address)
-        sub_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
+        sub_game = self.w3.eth.contract(
+            address=self.contract_address, abi=self.abi)
         tx = sub_game.functions.add_sub_game(game_id, sub_game_info).build_transaction(
             {
                 "chainId": self.chain_id,
@@ -158,7 +158,8 @@ class TournamentResultManager:
         return tx_receipt
 
     def get_all_tournaments(self):
-        cont = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
+        cont = self.w3.eth.contract(
+            address=self.contract_address, abi=self.abi)
         valid_tournaments = cont.functions.get_valid_tournaments().call()
         all_tournaments = []
         for game_id in valid_tournaments:
@@ -167,7 +168,8 @@ class TournamentResultManager:
         return all_tournaments
 
 
-# tournament_contract = TournamentResultManager(os.getenv("ENDPOINT"))
+# tournament_contract = TournamentResultManager(
+#     "../../blockchain/TournamentContract.sol", os.getenv("ENDPOINT"))
 
 # tournament_contract.start_game(4, 1695940800, [262, 4, 9, 11])
 # tournament_contract.save_sub_game(4, [2, 8, 10])

@@ -8,14 +8,11 @@ from django.contrib.auth import get_user_model
 from django.db.models.query import QuerySet
 
 
-User = get_user_model()
-
-
 class ModelJSONEncoder(DjangoJSONEncoder):
     def default(self, o):
         if isinstance(o, QuerySet):
             return tuple(o)
-        if isinstance(o, User):
+        if isinstance(o, get_user_model()):
             return {
                 "id": o.pk,
                 "username": o.username,

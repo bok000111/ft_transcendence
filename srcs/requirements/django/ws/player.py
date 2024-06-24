@@ -1,8 +1,9 @@
-from .constants import *
+from ws.constants import (BALL_RADIUS, SCREEN_WIDTH, SCREEN_HEIGHT, DEFAULT_SPEED_X,
+                          DEFAULT_SPEED_Y, DEFAULT_SPEED, PADDLE_WIDTH, PADDLE_HEIGHT)
 
 
 class Player:
-    def __init__(self, idx, channel_name, nickname):
+    def __init__(self, idx: int, channel_name: str, nickname: str):
         self.idx = idx
         self.channel_name = channel_name
         self.nickname = nickname
@@ -14,12 +15,14 @@ class Player:
     def initial_position(self):
         if self.idx == 0:
             return {"x": PADDLE_WIDTH, "y": SCREEN_HEIGHT / 2}
-        elif self.idx == 1:
+        if self.idx == 1:
             return {"x": SCREEN_WIDTH - PADDLE_WIDTH, "y": SCREEN_HEIGHT / 2}
-        elif self.idx == 2:
+        if self.idx == 2:
             return {"x": SCREEN_WIDTH / 2, "y": PADDLE_WIDTH}
-        elif self.idx == 3:
+        if self.idx == 3:
             return {"x": SCREEN_WIDTH / 2, "y": SCREEN_HEIGHT - PADDLE_WIDTH}
+
+        raise ValueError("Invalid player index")
 
     # keyevent -> {
     # 1 : x방향 + 키가 눌림.
@@ -32,13 +35,13 @@ class Player:
     # 8 : y방향 - 키 떼짐.
     # }
     def set_state(self, keyevent):
-        if keyevent == 1 or keyevent == 5:
+        if keyevent in (1, 5):
             self.up = True
-        elif keyevent == 2 or keyevent == 6:
+        elif keyevent in (2, 6):
             self.down = True
-        elif keyevent == 3 or keyevent == 7:
+        elif keyevent in (3, 7):
             self.up = False
-        elif keyevent == 4 or keyevent == 8:
+        elif keyevent in (4, 8):
             self.down = False
 
     def move(self):
@@ -47,7 +50,8 @@ class Player:
                 self.pos["y"] = max(self.pos["y"] - DEFAULT_SPEED, 0)
             elif self.down and self.pos["y"] < SCREEN_HEIGHT - PADDLE_HEIGHT:
                 self.pos["y"] = min(
-                    self.pos["y"] + DEFAULT_SPEED, SCREEN_HEIGHT - PADDLE_HEIGHT
+                    self.pos["y"] + DEFAULT_SPEED, SCREEN_HEIGHT -
+                    PADDLE_HEIGHT
                 )
         else:
             if self.down and self.pos["x"] > 0:

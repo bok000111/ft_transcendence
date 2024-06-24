@@ -1,5 +1,3 @@
-import { info } from "./Info.js";
-
 /**
  * 기본 http 통신의 경우,
  * {
@@ -10,6 +8,10 @@ import { info } from "./Info.js";
  * 요런 식으로 들어온다.
  * status code의 경우에는 http response의 status code로 들어온다. ( fail + error )
  */
+export const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+export const BASE_HOST = "localhost";
+export const BASE_URL = "https://localhost:4242/";
+export const BASE_WS_URL = "wss://localhost:4242/ws/";
 
 class API {
     uri;
@@ -26,10 +28,12 @@ class API {
         const httpRequest = {
             method: this.method,
             headers: {
-                "Host": "localhost:8000",
-                "Origin": "http://localhost:8000",
-                "Access-Control-Allow-Origin": "http://localhost:8000",
+                "Host": BASE_HOST,
+                "Origin": BASE_URL,
+                "Access-Control-Allow-Origin": BASE_URL,
+                "X-CSRFToken": csrftoken,
             },
+            mode: "same-origin",
             credentials: "include",
         }
         if (this.method === "POST") {
@@ -49,7 +53,7 @@ class API {
  * recvData = {}
  */
 export const loginAPI = new API(
-    "http://localhost:8000/api/user/login/",
+    `${BASE_URL}api/user/login/`,
     "POST"
 );
 
@@ -58,7 +62,7 @@ export const loginAPI = new API(
  * recvData = {}
  */
 export const signupAPI = new API(
-    "http://localhost:8000/api/user/signup/",
+    `${BASE_URL}api/user/signup/`,
     "POST"
 );
 
@@ -70,12 +74,12 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    "http://localhost:8000/api/user/logout/",
+    `${BASE_URL}api/user/logout/`,
     "POST"
 );
 
 export const meAPI = new API(
-    "http://localhost:8000/api/user/me/",
+    `${BASE_URL}api/user/me/`,
     "GET"
 );
 
@@ -100,6 +104,6 @@ export const meAPI = new API(
  * }
 */
 export const tourResultListAPI = new API(
-    "http://localhost:8000/api/result/",
+    `${BASE_URL}api/result/`,
     "GET"
 );

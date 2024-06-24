@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { loginAPI } from "../../models/API.js";
+import { loginAPI, BASE_URL, BASE_WS_URL} from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -12,7 +12,7 @@ class LoginSubpage extends SubPage {
     response;
 
     connectSocket() {
-        this.sock = new WebSocket("ws://localhost:8000/ws/");
+        this.sock = new WebSocket(BASE_WS_URL);
         this.sock.addEventListener("open", )
     }
 
@@ -78,7 +78,7 @@ class LoginSubpage extends SubPage {
         // oauth -> should be modified
         // now always 
         this.$oauthbtn.addEventListener("click", () => {
-            window.location.href = "http://localhost:8000/oauth/login";
+            window.location.href = `${BASE_URL}oauth/login/`;
             this.parent.parent.init(); // may be removed later
             this.parent.parent.checkLoggedIn(); // may be removed later
         });

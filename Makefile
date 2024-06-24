@@ -9,20 +9,20 @@ MANAGE_PY = ./srcs/requirements/django/manage.py
 all: $(NAME)
 
 $(NAME): mkdir
-	docker compose -f $(COMPOSE_FILE) up --build
+	docker compose --profile prod -f $(COMPOSE_FILE) up --build
 
 dev: mkdir
-	docker compose -f $(COMPOSE_FILE) up --build -d --scale django=0 --wait
+	docker compose --profile dev -f $(COMPOSE_FILE) up --build --wait
 	@${MANAGE_PY} makemigrations
 	@${MANAGE_PY} migrate
 	@${MANAGE_PY} runserver
 
 down:
-	docker compose -f $(COMPOSE_FILE) down
+	docker compose --profile prod -f $(COMPOSE_FILE) down
 
 clean: down
 fclean: clean
-	docker compose -f $(COMPOSE_FILE) down --volumes --remove-orphans
+	docker compose --profile prod -f $(COMPOSE_FILE) down --volumes --remove-orphans
 	docker system prune -af --volumes
 	sudo rm -rf $(DB_DIR) $(STATIC_DIR)
 
