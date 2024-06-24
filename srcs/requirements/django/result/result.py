@@ -1,8 +1,5 @@
 from datetime import datetime
 from django.contrib.auth import get_user_model
-from asgiref.sync import sync_to_async
-
-User = get_user_model()
 
 
 class SubGame:
@@ -16,8 +13,7 @@ class SubGame:
     def determine_winner(self):
         if self.score[0] > self.score[1]:
             return self.players[0]
-        else:
-            return self.players[1]
+        return self.players[1]
 
     def to_dict(self):
         return {
@@ -28,7 +24,8 @@ class SubGame:
         }
 
     def __str__(self):
-        return f"Players: {self.players}, Game Type: {self.game_type}, Score: {self.score}, Winner: {self.winner}"
+        return (f"Players: {self.players}, Game Type: {self.game_type}"
+                f", Score: {self.score}, Winner: {self.winner}")
 
 
 class TournamentResult:
@@ -48,7 +45,7 @@ class TournamentResult:
     def __user_id_to_username(self, user_id):
         # return await sync_to_async(User.objects.get)(id=user_id).username
         # return sync_to_async(User.objects.get(id=user_id).username)()
-        return User.objects.get(pk=user_id).username
+        return get_user_model().objects.get(pk=user_id).username
 
     def __parse(self, split_data):
         self.timestamp = datetime.fromtimestamp(int(split_data[0]))
@@ -75,8 +72,10 @@ class TournamentResult:
         final_game_data = sub_games_data[:3]
         final_game_id = int(final_game_data[0])
         final_score = [int(final_game_data[1]), int(final_game_data[2])]
-        semi_final_winners = [self.sub_games[0].winner, self.sub_games[1].winner]
-        final_game = SubGame(semi_final_winners, final_game_id, "final", final_score)
+        semi_final_winners = [
+            self.sub_games[0].winner, self.sub_games[1].winner]
+        final_game = SubGame(semi_final_winners,
+                             final_game_id, "final", final_score)
         self.sub_games.append(final_game)
 
     def to_dict(self):
@@ -86,7 +85,9 @@ class TournamentResult:
         }
 
     def __str__(self):
-        return f"Timestamp: {self.timestamp}, Sub Games[0]: {self.sub_games[0]}, Sub Games[1]: {self.sub_games[1]}, Sub Games[2]: {self.sub_games[2]}"
+        return (f"Timestamp: {self.timestamp}, Sub Games[0]: "
+                f"{self.sub_games[0]}, Sub Games[1]: {self.sub_games[1]}"
+                f", Sub Games[2]: {self.sub_games[2]}")
 
     def __repr__(self):
         return f"Timestamp: {self.timestamp}, Sub Games: {self.sub_games}"

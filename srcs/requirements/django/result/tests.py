@@ -1,23 +1,23 @@
 # tests.py
-from django.test import TestCase, AsyncClient
-from django.urls import reverse
-from django.contrib.auth import get_user_model
-from result.deploy import TournamentResultManager
-from result.result import TournamentResult
 import os
 import random
 
+from django.test import TransactionTestCase, tag
+from django.urls import reverse
+from django.contrib.auth import get_user_model
+
+from result.deploy import TournamentResultManager
 from user.factories import UserFactory
 
-User = get_user_model()
 
-
-class TournamentResultTest(TestCase):
+class TournamentResultTest(TransactionTestCase):
 
     def setUp(self):
         self.fake_users = [UserFactory() for _ in range(4)]
-        self.tournament_contract = TournamentResultManager(os.getenv("ENDPOINT"))
+        self.tournament_contract = TournamentResultManager(
+            os.getenv("ENDPOINT"))
 
+    @tag("slow")
     def test_tournament_flow(self):
 
         game_id = random.randint(1, 1000000000)
@@ -29,7 +29,7 @@ class TournamentResultTest(TestCase):
         print(arr)
 
         for i in player_ids:
-            print(User.objects.get(pk=i).username)
+            print(get_user_model().objects.get(pk=i).username)
 
         left_win = [10, random.randint(0, 9)]
         right_win = [random.randint(0, 9), 10]
@@ -59,10 +59,11 @@ class TournamentResultTest(TestCase):
         # Assert the tournaments data
         self.assertTrue(len(tournaments) > 0)
 
+    @tag("slow")
     def test_tournament_result_view(self):
 
         # Test the view
-        response = self.client.get(reverse("result"))
+        response = self.client.get(reverse("result"), secure=True)
         self.assertContains(response, "", status_code=200)
 
         data = response.json()
