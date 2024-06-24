@@ -17,10 +17,8 @@ class Ball:
     def bounce(self, direction, paddle_pos=None):
         if direction == "x":
             if paddle_pos is not None:
-                reflective_intersect_y = paddle_pos - self.pos["y"]
-                normalized_relative_intersect_y = reflective_intersect_y / (
-                    PADDLE_HEIGHT / 2
-                )
+                reflective_intersect_y = self.pos["y"] - paddle_pos
+                normalized_relative_intersect_y = reflective_intersect_y / PADDLE_HEIGHT
                 bounce_angle = normalized_relative_intersect_y * (math.pi / 4)
                 self.vel["x"] = round(self.speed * math.cos(bounce_angle), 2)
                 if self.pos["x"] > SCREEN_WIDTH / 2:
@@ -30,10 +28,8 @@ class Ball:
                 self.vel["x"] = -self.vel["x"]
         elif direction == "y":
             if paddle_pos is not None:
-                reflective_intersect_x = paddle_pos - self.pos["x"]
-                normalized_relative_intersect_x = reflective_intersect_x / (
-                    PADDLE_HEIGHT / 2
-                )
+                reflective_intersect_x = self.pos["x"] - paddle_pos
+                normalized_relative_intersect_x = reflective_intersect_x / PADDLE_HEIGHT
                 bounce_angle = normalized_relative_intersect_x * (math.pi / 4)
                 self.vel["y"] = round(self.speed * math.cos(bounce_angle), 2)
                 if self.pos["y"] > SCREEN_HEIGHT / 2:
