@@ -1,10 +1,8 @@
 from api.utils import JsonMixin, JsonAuthRequiredMixin
 from user.forms import UserCreateModelForm, UserLoginForm
 
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import authenticate, login, logout
 from django.views import View
-
-User = get_user_model()
 
 
 class SignUpView(JsonMixin, View):

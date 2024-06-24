@@ -1,20 +1,37 @@
 services:
+  django:
+    build: ./requirements/django/.
+    container_name: django
+    image: django
+    env_file:
+      - .env
+    networks:
+      - intra
+    ports:
+      - "8000:8000"
+    volumes:
+      - static_data:/var/www/static/
+    depends_on:
+      - postgres
+      - redis
+    profiles: ["prod"]
+    restart: always
+
   postgres:
     image: postgres:latest
     # build: ./requirements/postgres/. - 배포시 스크립트 수정해서 사용
     container_name: postgres
     shm_size: 256mb
     # TODO: 환경변수로 설정
-    environment:
-      POSTGRES_DB: ft_transcendence
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - intra
+    profiles: ["prod", "dev"]
     restart: always
 
   redis:
@@ -24,28 +41,33 @@ services:
       - "6379:6379"
     networks:
       - intra
+    profiles: ["prod", "dev"]
     restart: always
 
-  ganache:
-    image: trufflesuite/ganache:latest
-    container_name: ganache
+  nginx:
+    container_name: nginx
+    image: nginx
+    build: ./requirements/nginx
+    env_file:
+      - .env
     ports:
-      - "7545:7545"
+      - 4242:443
+    volumes:
+      - static_data:/var/www/static/
     networks:
       - intra
+    depends_on:
+      - django
+    profiles: ["prod"]
     restart: always
 
-  # 개발중이면 도커 사용 안함
-  # django:
-  #   build: ./backend/.
-  #   container_name: django
-  #   command: python manage.py runserver
+  # ganache:
+  #   image: trufflesuite/ganache:latest
+  #   container_name: ganache
+  #   ports:
+  #     - "7545:7545"
   #   networks:
   #     - intra
-  #   ports:
-  #     - "8000:8000"
-  #   depends_on:
-  #     - postgres
   #   restart: always
 
 volumes:
@@ -55,6 +77,12 @@ volumes:
       type: none
       o: bind
       device: /goinfre/${USER}/postgres_data
+  static_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /goinfre/${USER}/static_data
 
 networks:
   intra:

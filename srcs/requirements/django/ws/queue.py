@@ -33,6 +33,9 @@ class GameQueue:
             uid = self.queue.popleft()
             return (uid, *(self.dict_.pop(uid)))
 
+        def pop(self, amount: int) -> list[tuple[int, str, str]]:
+            return [(uid, *(self.dict_.pop(uid))) for uid in [self.queue.popleft() for _ in range(amount)]]
+
         def remove(self, uid: int):
             self.queue.remove(uid)  # O(n)인데 일단 사용 TODO: 가능하면 개선
             self.dict_.pop(uid)
@@ -74,9 +77,7 @@ class GameQueue:
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
-                matched_uids = [
-                    manager.popleft() for _ in range(game_type.max_player())
-                ]
+                matched_uids = manager.pop(game_type.max_player())
 
                 # 매칭된 유저들을 대기열에서 제거
                 await asyncio.gather(
@@ -87,13 +88,6 @@ class GameQueue:
                         for _, channel_name, _ in matched_uids
                     ],
                 )
-
-                # 임시로 그냥 테스트 출력
-                matched_users = [
-                    (uid, (await self.User.objects.aget(pk=uid)).username, nickname)
-                    for uid, _, nickname in matched_uids
-                ]
-                # print(f"{game_type.name}: {matched_users}")
 
                 # 대충 게임 시작하는 코드 TODO: Game 구현
                 room_manager = RoomManager()

@@ -1,17 +1,19 @@
-import uuid
-from .game import Game
+from ws.game import Game
 
 
-# Game class의 싱글톤 패턴 적용
+# 싱글톤 패턴 적용
 class RoomManager:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
-            cls._instance = super(RoomManager, cls).__new__(cls, *args, **kwargs)
-            cls._instance.rooms = {}
-            cls._instance.room_id = 0
+            cls._instance = super().__new__(cls, *args, **kwargs)
         return cls._instance
+
+    def __init__(self) -> None:
+        self._initialized = True
+        self.rooms = {}
+        self.room_id = 0
 
     async def create_game(self, game_type, matched_users):
         try:
