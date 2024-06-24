@@ -33,6 +33,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         """
         websocket 연결 해제 시 호출
         """
+        print(f"disconnect / type: {self.waiting}")
         if self.waiting is not None:
             async with self.lock:
                 await GameQueue().leave_queue(
@@ -69,7 +70,9 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         try:
-            # print(f"action: {action}")
+            print(f"action: {action}")
+            # if action == WebSocketActionType.LEAVE:
+            #     self.close()
             await self.channel_layer.send(
                 self.channel_name,
                 {
@@ -82,6 +85,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def join_queue(self, event):
         try:  # 대충 입력 검증
+            print(f"event: {event}")
             game_type = GameType(event["message"]["type"])
             nickname = event["message"]["nickname"]
             uid = self.scope["user"].pk
@@ -91,18 +95,19 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
         async with self.lock:
             self.waiting = game_type
+            print(f"uid: {uid}")
             await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
     async def leave_queue(self, event):
         try:  # 대충 입력 검증
-            game_type = GameType(event["message"]["type"])
+            print(f"event: {event}")
             uid = self.scope["user"].pk
         except (ValueError, KeyError):
             await self.send_error(400, "Invalid data")
             return None
 
         async with self.lock:
-            await GameQueue().leave_queue(game_type, uid, self.channel_name)
+            await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
             self.waiting = None
 
     async def wait_queue(self, event):
