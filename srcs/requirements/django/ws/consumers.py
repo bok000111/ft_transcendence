@@ -77,7 +77,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         try:
-            print(f"action: {action}")
+            if action != WebSocketActionType.GAME_INPUT:
+                print(f"action: {action}")
             # if action == WebSocketActionType.LEAVE:
             #     self.close()
             await self.channel_layer.send(
@@ -173,6 +174,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
         elif data == "start":
+            # leave queue
+            self.waiting = None
             await self.send_json(
                 {
                     "code": 4002,  # temp
