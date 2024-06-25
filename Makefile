@@ -12,7 +12,9 @@ $(NAME): mkdir
 	docker compose --profile prod -f $(COMPOSE_FILE) up --build
 
 dev: mkdir
-	docker compose --profile dev -f $(COMPOSE_FILE) up --build --wait
+	docker compose --profile dev -f $(COMPOSE_FILE) up --build
+
+runserver:
 	@${MANAGE_PY} makemigrations
 	@${MANAGE_PY} migrate
 	@${MANAGE_PY} runserver
