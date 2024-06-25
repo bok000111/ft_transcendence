@@ -1,11 +1,11 @@
 import math
+import random
 from .constants import *
 
 
 class Ball:
     def __init__(self):
         self.reset_pos()
-        self.speed = DEFAULT_SPEED
         self.speed_increment = 1.1  # 속도가 증가하는 양
         self.max_speed = MAX_SPEED  # 최대 속도
         self.collision_count = 0
@@ -48,6 +48,27 @@ class Ball:
             self.speed *= self.speed_increment
 
     def reset_pos(self):
-        self.pos = {"x": SCREEN_WIDTH / 2, "y": SCREEN_HEIGHT / 2}
-        self.vel = {"x": DEFAULT_SPEED_X, "y": DEFAULT_SPEED_Y}
         self.speed = DEFAULT_SPEED
+        self.pos = {"x": SCREEN_WIDTH / 2, "y": SCREEN_HEIGHT / 2}
+        min_angle = 15
+        max_angle = 75
+
+        # 랜덤한 각도 설정 (10도에서 80도 사이 또는 100도에서 170도 사이)
+        random_int = random.randint(0, 3)
+        if random_int == 0:
+            angle = random.uniform(min_angle, max_angle)
+        elif random_int == 1:
+            angle = random.uniform(180 - max_angle, 180 - min_angle)
+        elif random_int == 2:
+            angle = random.uniform(180 + min_angle, 180 + max_angle)
+        elif random_int == 3:
+            angle = random.uniform(360 - max_angle, 360 - min_angle)
+
+        # 각도를 라디안으로 변환
+        radian = math.radians(angle)
+        # print angle from radian to degree
+
+        vel_x = round(self.speed * math.cos(radian), 2)
+        vel_y = round(self.speed * math.sin(radian), 2)
+        # self.vel = {"x": vel_x, "y": vel_y}
+        self.vel = {"x": 10, "y": 0}
