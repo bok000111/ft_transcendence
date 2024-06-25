@@ -8,11 +8,9 @@ from web3 import AsyncWeb3
 from web3.exceptions import TimeExhausted
 from web3.middleware import async_construct_simple_cache_middleware
 from web3.middleware.signing import async_construct_sign_and_send_raw_middleware
-from web3.middleware.cache import SIMPLE_CACHE_RPC_WHITELIST
 from web3.utils.caching import SimpleCache
 from web3.types import RPCEndpoint
 from solcx import compile_standard, install_solc
-from channels.layers import get_channel_layer
 
 abi_path = Path(__file__).parent/"contracts" / \
     "TournamentContract.abi.json"
@@ -42,8 +40,9 @@ class TournamentResultManager:
             return
 
         self.lock = asyncio.Lock()
-        self.channel_layer = get_channel_layer()
         self.pending_tx_tasks = {}
+        self.abi = None
+        self.bytecode = None
 
         self.chain_address = os.getenv("BLOCKCHAIN_CHAIN_ADDRESS")
         self.chain_id = os.getenv("BLOCKCHAIN_CHAIN_ID")
@@ -60,7 +59,9 @@ class TournamentResultManager:
             self.private_key = os.getenv("HARDHAT_PRIVATE_KEY")
             self.contract_address = os.getenv("HARDHAT_CONTRACT_ADDRESS")
 
-        if any(x is None for x in (self.chain_address, self.chain_id, self.private_key, self.endpoint)) or not self.chain_id.isdecimal():
+        if any(x is None for x in
+               (self.chain_address, self.chain_id, self.private_key, self.endpoint)
+               ) or not self.chain_id.isdecimal():
             raise ValueError("Please set .env file.")
 
         self.chain_id = int(self.chain_id)
@@ -110,6 +111,7 @@ class TournamentResultManager:
                 return True
             if method in CACHE_WHITELIST:
                 return True
+            return False
 
         self.w3.middleware_onion.add(await async_construct_simple_cache_middleware(
             cache, CACHE_WHITELIST, should_cache_fn,
@@ -175,7 +177,7 @@ class TournamentResultManager:
             "nonce": nonce,
         }
         tx_hash = await tournament.constructor().transact(tx)
-        tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120, poll_latency=1)
+        tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 1)
         self.contract_address = tx_receipt["contractAddress"]
         self.nonce = nonce + 1
 
@@ -203,9 +205,9 @@ class TournamentResultManager:
             self.nonce += 1
 
     async def __transact_task(self, tx_hash):
+        nonce = self.pending_tx_tasks[tx_hash]["nonce"]
         try:
-            nonce = self.pending_tx_tasks[tx_hash]["nonce"]
-            tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120, poll_latency=5)
+            await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 5)
         except TimeExhausted:
             # 대충 리트라이 - 재시도할때는 락걸고 독점적으로 실행
             print(f"Transaction {nonce} timeout.")
@@ -225,11 +227,11 @@ class TournamentResultManager:
         await asyncio.gather(*map(lambda x: x["task"], self.pending_tx_tasks.values()))
 
     async def start_game(self, game_id, timestamp, players):
-        hash = await self.__transact(
+        await self.__transact(
             "add_game", game_id, timestamp, players)
 
     async def save_sub_game(self, game_id, sub_game_info):
-        hash = await self.__transact(
+        await self.__transact(
             "add_sub_game", game_id, sub_game_info)
 
     async def get_tournament(self, game_id):

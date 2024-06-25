@@ -8,9 +8,9 @@ from faker import Faker
 from django.test import TransactionTestCase, AsyncClient
 from django.urls import reverse
 
-from ft_transcendence.tests import timer
-from result.deploy import TournamentResultManager
 from user.factories import UserFactory
+from result.deploy import TournamentResultManager
+from ft_transcendence.tests import timer
 
 faker = Faker()
 
@@ -41,9 +41,9 @@ class TournamentResultTest(TransactionTestCase):
         self.TEST_AMOUNT = 4
         self.client = AsyncClient()
         self.users = UserFactory.create_batch(self.TEST_AMOUNT)
-        asyncio.run(self.asyncSetUp())
+        asyncio.run(self.async_setup())
 
-    async def asyncSetUp(self):
+    async def async_setup(self):
         self.manager = await TournamentResultManager.instance()
 
         # 로컬에서 실행시 블록체인 스냅샷 생성
@@ -77,7 +77,9 @@ class TournamentResultTest(TransactionTestCase):
     async def test_result_view(self):
         self.TEST_AMOUNT = 1
         response = await asyncio.gather(
-            *[func(*args) for func, args in tounament_result_generator(self.manager, self.users, self.TEST_AMOUNT)]
+            *[func(*args) for func, args in tounament_result_generator(
+                self.manager, self.users, self.TEST_AMOUNT
+            )]
         )
 
         await self.manager._wait_all()
@@ -92,7 +94,9 @@ class TournamentResultTest(TransactionTestCase):
 
     async def test_stress_transaction(self):
         response = await asyncio.gather(
-            *[func(*args) for func, args in tounament_result_generator(self.manager, self.users, self.TEST_AMOUNT)]
+            *[func(*args) for func, args in tounament_result_generator(
+                self.manager, self.users, self.TEST_AMOUNT
+            )]
         )
 
         await self.manager._wait_all()
@@ -104,7 +108,9 @@ class TournamentResultTest(TransactionTestCase):
 
     async def test_caching(self):
         response = await asyncio.gather(
-            *[func(*args) for func, args in tounament_result_generator(self.manager, self.users, self.TEST_AMOUNT)]
+            *[func(*args) for func, args in tounament_result_generator(
+                self.manager, self.users, self.TEST_AMOUNT
+            )]
         )
 
         await self.manager._wait_all()
