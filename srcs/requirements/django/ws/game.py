@@ -124,6 +124,11 @@ class Game:
             self.ball.pos["y"] <= BALL_RADIUS
             or self.ball.pos["y"] >= SCREEN_HEIGHT - BALL_RADIUS
         ):
+            self.ball.pos["y"] = (
+                BALL_RADIUS
+                if self.ball.pos["y"] <= BALL_RADIUS
+                else SCREEN_HEIGHT - BALL_RADIUS
+            )
             self.ball.bounce("y")
         # check paddle collision
         if self.ball.pos["x"] <= INTERVAL:

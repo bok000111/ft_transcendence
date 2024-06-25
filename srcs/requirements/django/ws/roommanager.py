@@ -11,7 +11,6 @@ class RoomManager:
             cls._instance = super(RoomManager, cls).__new__(
                 cls, *args, **kwargs)
             cls._instance.rooms = {}
-            cls._instance.user_rooms = {}
         return cls._instance
 
     async def create_game(self, game_type, matched_users):
@@ -24,9 +23,7 @@ class RoomManager:
                 return None
             # matched_user = (uid, channel_name, nickname)
             self.rooms[room_id] = await Game.create(room_id, game_type, matched_users)
-            for uid, _, _ in matched_users:
-                self.user_rooms[uid] = room_id
-            print(f"Info: Game created with room_id: {room_id}")
+
             return room_id
 
         except Exception as e:
