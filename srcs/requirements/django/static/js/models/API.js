@@ -10,8 +10,10 @@
  */
 export const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 export const BASE_HOST = "localhost";
-export const BASE_URL = "https://localhost:4242/";
-export const BASE_WS_URL = "wss://localhost:4242/ws/";
+// export const BASE_URL = "http://localhost:8000/";
+// export const BASE_WS_URL = "ws://localhost:8000/ws/";
+export const BASE_URL = API_URL;
+export const BASE_WS_URL = WS_URL;
 
 class API {
     uri;
@@ -33,7 +35,7 @@ class API {
                 "Access-Control-Allow-Origin": BASE_URL,
                 "X-CSRFToken": csrftoken,
             },
-            mode: "same-origin",
+            // mode: "same-origin",
             credentials: "include",
         }
         if (this.method === "POST") {
