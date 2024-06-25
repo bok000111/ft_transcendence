@@ -105,8 +105,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             self.waiting = game_type
             print(f"uid: {uid}")
             if game_type == GameType.LOCAL:
-                matched_users = [(uid, self.channel_name, "player1"),
-                                 (uid, self.channel_name, "player2")]
+                matched_users = [(uid, self.channel_name, "player"),
+                                 (uid, self.channel_name, "player")]
                 await self.room_manager.start_game(game_type, matched_users)
             else:
                 await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
