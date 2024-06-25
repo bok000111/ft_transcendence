@@ -64,21 +64,6 @@ class GameQueue:
         nickname: str,
     ) -> None:
         async with self._queue_manager[game_type] as manager:
-            # if game_type == GameType.LOCAL:
-            #     matched_uids = [(uid, channel_name, "player1"),
-            #                     (uid, channel_name, "player2")]
-            #     # Game 구현
-            #     room_manager = RoomManager()
-            #     gid = await room_manager.create_game(game_type, matched_uids)
-            #     if gid is None:
-            #         print("Failed to create game")
-            #         return None
-            #     game = room_manager.get_game_instance(gid)
-            #     if game is None:
-            #         print("Failed to get game instance")
-            #         return None
-            #     await game.start()
-            # else:
             if uid in manager:
                 print(f"{game_type.name}: {nickname} is already in queue")
                 return None  # TODO: 이미 대기 중인 경우 에러 보내야함
@@ -92,7 +77,7 @@ class GameQueue:
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
-                matched_uids = [
+                matched_users = [
                     manager.popleft() for _ in range(game_type.max_player())
                 ]
 
@@ -104,13 +89,13 @@ class GameQueue:
                         self.channel_layer.group_discard(
                             f"queue_{game_type.name}", channel_name
                         )
-                        for _, channel_name, _ in matched_uids
+                        for _, channel_name, _ in matched_users
                     ],
                 )
 
                 # Game 구현
                 room_manager = RoomManager()
-                await room_manager.start_game(game_type, matched_uids)
+                await room_manager.start_game(game_type, matched_users)
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
         async with self._queue_manager[game_type] as manager:

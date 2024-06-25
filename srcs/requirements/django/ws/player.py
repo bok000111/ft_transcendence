@@ -53,9 +53,9 @@ class Player:
             if self.down and self.pos["x"] > PADDLE_HEIGHT:
                 self.pos["x"] = max(
                     self.pos["x"] - PADDLE_SPEED, PADDLE_HEIGHT)
-            elif self.up and self.pos["x"] < SCREEN_WIDTH - PADDLE_WIDTH:
+            elif self.up and self.pos["x"] < SCREEN_WIDTH - PADDLE_HEIGHT:
                 self.pos["x"] = min(
-                    self.pos["x"] + PADDLE_SPEED, SCREEN_WIDTH - PADDLE_WIDTH
+                    self.pos["x"] + PADDLE_SPEED, SCREEN_WIDTH - PADDLE_HEIGHT
                 )
 
     def reset_pos(self):

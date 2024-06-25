@@ -52,7 +52,7 @@ class RoomManager:
         if gid is None:
             print("Failed to create game")
             return None
-        game = self.get_game_instance(gid)
+        game = self.rooms[gid]
         if game is None:
             print("Failed to get game instance")
             return None
