@@ -26,7 +26,10 @@ class Game:
     @classmethod
     async def create(cls, id, game_type, matched_users):
         self = cls(id, game_type, matched_users)
-        await self.add_players_to_group(matched_users)
+        if game_type == GameType.LOCAL:
+            await self.channel_layer.group_add(self.group_name, self.players[0].channel_name)
+        else:
+            await self.add_players_to_group(matched_users)
         return self
 
     async def start(self):
