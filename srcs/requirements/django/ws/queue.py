@@ -98,6 +98,9 @@ class GameQueue:
                 await room_manager.start_game(game_type, matched_users)
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
+        if game_type is None:
+            print("already left queue")
+            return None
         async with self._queue_manager[game_type] as manager:
             if uid not in manager:
                 print(f"{game_type.name}: {uid} is not in queue")
