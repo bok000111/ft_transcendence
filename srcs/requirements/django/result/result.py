@@ -45,7 +45,11 @@ class TournamentResult:
     def __user_id_to_username(self, user_id):
         # return await sync_to_async(User.objects.get)(id=user_id).username
         # return sync_to_async(User.objects.get(id=user_id).username)()
-        return get_user_model().objects.get(pk=user_id).username
+        try:
+            return get_user_model().objects.get(pk=user_id).username
+        except get_user_model().DoesNotExist:
+            print(f"User with id {user_id} does not exist.")
+            return "Unknown"
 
     def __parse(self, split_data):
         self.timestamp = datetime.fromtimestamp(int(split_data[0]))
