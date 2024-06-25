@@ -36,6 +36,14 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:4242",
     "https://localhost:4242",
     "https://127.0.0.1:4242",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://localhost:8000",
+    "https://127.0.0.1:8000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://localhost:5500",
+    "https://127.0.0.1:5500",
 ]
 CSRF_COOKIE_SECURE = True
 if DEBUG:
@@ -48,6 +56,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4242",
     "https://localhost:4242",
     "https://127.0.0.1:4242",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "https://localhost:8000",
+    "https://127.0.0.1:8000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://localhost:5500",
+    "https://127.0.0.1:5500",
 ]
 CORS_ALLOW_METHODS = [
     *default_methods,
@@ -57,8 +73,21 @@ CORS_ALLOW_HEADERS = (
     "access-control-allow-origin",
     "origin",
 )
+API_URL = "https://localhost:4242/"
+WS_URL = "wss://localhost:4242/ws/"
+if DEBUG:
+    API_URL = "http://localhost:4242/"
+    WS_URL = "ws://localhost:4242/ws/"
 
-# Application definition
+if os.getenv("VIRTUAL_ENV") is None:
+    if DEBUG:
+        API_URL = "http://localhost:8000/"
+        WS_URL = "ws://localhost:8000/ws/"
+    else:
+        API_URL = "https://localhost:8000/"
+        WS_URL = "wss://localhost:8000/ws/"
+
+    # Application definition
 INSTALLED_APPS = [
     "daphne",  # daphne - ASGI 서버
     "corsheaders",  # cors - cross-origin resource sharing
@@ -139,6 +168,7 @@ if DEBUG:  # 개발시에는 False로 설정
     SECURE_SSL_REDIRECT = False
     SECURE_PROXY_SSL_HEADER = None
 
+# Templates
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -149,6 +179,7 @@ TEMPLATES = [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
+                "ft_transcendence.context_processors.settings_context",
             ],
         },
     },
