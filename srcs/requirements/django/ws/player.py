@@ -2,8 +2,9 @@ from .constants import *
 
 
 class Player:
-    def __init__(self, idx, channel_name, nickname):
+    def __init__(self, idx, uid, channel_name, nickname):
         self.idx = idx
+        self.uid = uid
         self.channel_name = channel_name
         self.nickname = nickname
         self.reset_pos()
