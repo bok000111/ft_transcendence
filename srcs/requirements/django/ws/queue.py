@@ -34,7 +34,10 @@ class GameQueue:
             return (uid, *(self.dict_.pop(uid)))
 
         def pop(self, amount: int) -> list[tuple[int, str, str]]:
-            return [(uid, *(self.dict_.pop(uid))) for uid in [self.queue.popleft() for _ in range(amount)]]
+            return [
+                (uid, *(self.dict_.pop(uid))) for uid in
+                [self.queue.popleft() for _ in range(amount)]
+            ]
 
         def remove(self, uid: int):
             self.queue.remove(uid)  # O(n)인데 일단 사용 TODO: 가능하면 개선
