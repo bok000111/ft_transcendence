@@ -93,7 +93,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def join_queue(self, event):
         try:  # 대충 입력 검증
-            print(f"event: {event}")
+            print(f"join_queue event: {event}")
             game_type = GameType(event["message"]["type"])
             nickname = event["message"]["nickname"]
             uid = self.scope["user"].pk
@@ -113,16 +113,16 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def leave_queue(self, event):
         try:  # 대충 입력 검증
-            print(f"event: {event}")
             uid = self.scope["user"].pk
         except (ValueError, KeyError):
             await self.send_error(400, "Invalid data")
             return None
 
         async with self.lock:
-            if self.waiting != GameType.LOCAL:
+            if self.waiting != GameType.LOCAL or self.waiting is not None:
+                print(f"game_type: {self.waiting}, {uid}")
                 await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
-            self.waiting = None
+                self.waiting = None
 
     async def wait_queue(self, event):
         await self.send_json(
@@ -176,6 +176,12 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         elif data == "start":
             # leave queue
             self.waiting = None
+            uid = self.scope["user"].pk
+            for i in range(len(event["uids"])):
+                if event["uids"][i] == uid:
+                    nickname = game_status["users"][i]
+                    break
+            game_status["my_nickname"] = nickname
             await self.send_json(
                 {
                     "code": 4002,  # temp

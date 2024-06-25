@@ -14,8 +14,8 @@ class Game:
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
         self.players = [
-            Player(idx, channel_name, nickname)
-            for idx, (_, channel_name, nickname) in enumerate(matched_users)
+            Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
+            for idx, (uid, channel_name, nickname) in enumerate(matched_users)
         ]
         self.player_count = len(self.players)
         self.ball = Ball()
@@ -31,14 +31,18 @@ class Game:
 
     async def start(self):
         self.status = "playing"
+        for player in self.players:
+            print(f"Player {player.nickname} joined")
         await self.channel_layer.group_send(
             self.group_name,
             {
                 "type": "game_info",
                 "data": "start",
+                "uids": [player.uid for player in self.players],
                 "message": {
                     "id": self.gid,
                     "type": self.game_type.value,
+                    # "my_nickname": self.players[0].nickname,
                     "users": [player.nickname for player in self.players],
                     "end_score": 5,
                 },
@@ -51,6 +55,7 @@ class Game:
             self.channel_layer.group_add(self.group_name, channel_name)
             for _, channel_name, _ in matched_users
         ]
+        # print
         try:
             await asyncio.gather(*tasks)
         except Exception as e:
