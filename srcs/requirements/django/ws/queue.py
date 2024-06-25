@@ -4,6 +4,7 @@ from ws.enums import GameType
 from ws.roommanager import RoomManager
 from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
+from tournament import TournamentManager
 
 
 class GameQueue:
@@ -96,8 +97,8 @@ class GameQueue:
                 # print(f"{game_type.name}: {matched_users}")
 
                 if game_type == GameType.TOURNAMENT:
-                    tournament = Tournament(mathced_uids)
-                    await tournament.start()
+                    tournament_manager = TournamentManager(matched_users)
+                    await tournament_manager.create_tournament()
                 else:
                     room_manager = RoomManager()
                     gid = await room_manager.create_game(game_type, matched_uids)
