@@ -4,6 +4,7 @@ from ws.enums import GameType
 from .ball import Ball
 from .player import Player
 from .constants import *
+from ws.tournament import TournamentManager
 
 
 class Game:
@@ -21,6 +22,7 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
+        self.tournament_manager = TournamentManager()
         print(self.channel_layer)
 
     @classmethod
@@ -44,10 +46,7 @@ class Game:
                 },
             },
         )
-        g = asyncio.create_task(self.send_game_info())
-        
-        await g
-        return g.result()
+        asyncio.create_task(self.send_game_info())
 
     async def add_players_to_group(self, matched_users):
         tasks = [
@@ -61,7 +60,8 @@ class Game:
 
     async def remove_players_from_group(self):
         tasks = [
-            self.channel_layer.group_discard(self.group_name, player.channel_name)
+            self.channel_layer.group_discard(
+                self.group_name, player.channel_name)
             for player in self.players
         ]
         try:
@@ -79,17 +79,15 @@ class Game:
             await asyncio.sleep(1 / 30)
         if self.status == "end":
             # 게임 종료 처리
+            if self.game_type == GameType.TOURNAMENT:
+                self.tournament_manager.finish_subgame_in_tournament(
+                    self.gid, [self.players[0].score, self.players[1].score])
             await self.channel_layer.group_send(
                 self.group_name,
                 {"type": "game_info", "data": "result", "message": self.result()},
             )
-            await self.channel_layer.group_send(
-                self.group_name,
-                {"type": "new_func", "message": self.result()},
-            )
-            
+
             await self.remove_players_from_group()
-            return 
 
     def update(self):
         for player in self.players:
