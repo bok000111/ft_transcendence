@@ -12,6 +12,8 @@ class AI_Player(Player):
         self.destination = SCREEN_HEIGHT / 2
 
     def get_destination(self, ball):
+        if ball.vel["x"] < 0:
+            return None
         m = ball.vel["y"] / ball.vel["x"]
         intercept = ball.pos["y"] - m * ball.pos["x"]
         dest = (m * (SCREEN_WIDTH - PADDLE_WIDTH) +

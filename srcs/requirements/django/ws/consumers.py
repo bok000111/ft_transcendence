@@ -116,6 +116,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 matched_users = [(uid, self.channel_name, "player"),
                                  (uid, self.channel_name, "player")]
                 await self.room_manager.start_game(game_type, matched_users)
+            elif game_type == GameType.AI:
+                await self.room_manager.start_game(game_type, [(uid, self.channel_name, "player")])
             else:
                 await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
@@ -127,7 +129,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         async with self.lock:
-            if self.waiting != GameType.LOCAL or self.waiting is not None:
+            if self.waiting != GameType.LOCAL and self.waiting != GameType.AI and self.waiting is not None:
                 print(f"game_type: {self.waiting}, {uid}")
                 await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
                 self.waiting = None
