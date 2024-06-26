@@ -29,10 +29,11 @@ class GameType(Enum):
     NORMAL_4 = 1
     TOURNAMENT = 2
     LOCAL = 3
-    AI = 4
+    SUB_GAME = 4
+    AI = 5
 
     def max_player(self) -> int:
-        if self is self.NORMAL_2 or self is self.LOCAL:
+        if self is self.NORMAL_2 or self is self.LOCAL or self is self.SUB_GAME:
             return 2
         if self is self.NORMAL_4 or self is self.TOURNAMENT:
             return 4
@@ -41,7 +42,7 @@ class GameType(Enum):
         return None
 
     def max_client(self) -> int:
-        if self is self.NORMAL_2:
+        if self is self.NORMAL_2 or self is self.SUB_GAME:
             return 2
         if self is self.NORMAL_4 or self is self.TOURNAMENT:
             return 4
