@@ -2,12 +2,12 @@ import asyncio
 from channels.layers import get_channel_layer
 from django.contrib.auth import get_user_model
 from random import shuffle
-from ..result import TournamentResultManager
+from result.deploy import TournamentResultManager
 from dotenv import load_dotenv
 from datetime import datetime
 import os
-from roommanager import RoomManager
-from enums import GameType
+from .roommanager import RoomManager
+from .enums import GameType
 
 User = get_user_model()
 
@@ -72,9 +72,10 @@ class TournamentManager:
             self.sub_game_to_tournament[gid] = self.tournament_id  # lock 필요..?
             self.sub_games[gid] = game_id
 
-        async def finish_subgame(self, gid, scores: int[2]):
+        async def finish_subgame(self, gid, scores):
             game_info = [gid, self.sub_games[gid], scores[0], scores[1]]
-            self.tournament_result_manager.save_sub_game(self.tournament_id, game_info)
+            self.tournament_result_manager.save_sub_game(
+                self.tournament_id, game_info)
             if scores[0] > scores[1]:
                 winner = self.users[0 if self.sub_games[gid] == 2 else 2]
             else:
