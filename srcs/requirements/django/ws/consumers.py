@@ -20,7 +20,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
         self.lock = asyncio.Lock()
         self.waiting: GameType = None
-        self.playing: Game | Tournament = None
+        self.playing: int = None
 
     async def connect(self):
         """
@@ -39,6 +39,14 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 await GameQueue().leave_queue(
                     self.waiting, self.scope["user"].pk, self.channel_name
                 )
+        else:
+            game = self.room_manager.get_game_instance(self.playing)
+            if game is not None:
+                for player in game.players:
+                    if player.uid == self.scope["user"].pk:
+                        player.score = -1
+                        break
+                game.status = "end"
 
         # # self.scope["user"].pk가 RoomManager에 있는지 확인
         # uid = self.scope["user"].pk
@@ -144,12 +152,9 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     async def game_input(self, event):
         gid = event["message"]["game_id"]
         game_instance = self.room_manager.get_game_instance(gid)
-        # print(f"nickname: {event['message']['nickname']}")
-        # print(f"keyevent: {event['message']['keyevent']}")
         if game_instance is None:
             await self.send_error(400, "Invalid game_id")
             return None
-        # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
         game_instance.handle_keyevent(
             event["message"]["nickname"], event["message"]["keyevent"]
         )
@@ -157,38 +162,40 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     async def game_info(self, event):
         game_status = event["message"]
         data = event["data"]
-        if data == "info":
-            await self.send_json(
-                {
-                    "code": 4000,  # temp
-                    "action": "game",
-                    "data": game_status,
-                }
-            )
-        elif data == "result":
-            await self.send_json(
-                {
-                    "code": 4001,  # temp
-                    "action": "end",
-                    "data": game_status,
-                }
-            )
-        elif data == "start":
-            # leave queue
-            self.waiting = None
-            uid = self.scope["user"].pk
-            for i in range(len(event["uids"])):
-                if event["uids"][i] == uid:
-                    nickname = game_status["users"][i]
-                    break
-            game_status["my_nickname"] = nickname
-            await self.send_json(
-                {
-                    "code": 4002,  # temp
-                    "action": "start",
-                    "data": game_status,
-                }
-            )
+        async with self.lock:
+            if data == "info":
+                await self.send_json(
+                    {
+                        "code": 4000,  # temp
+                        "action": "game",
+                        "data": game_status,
+                    }
+                )
+            elif data == "result":
+                await self.send_json(
+                    {
+                        "code": 4001,  # temp
+                        "action": "end",
+                        "data": game_status,
+                    }
+                )
+            elif data == "start":
+                # leave queue
+                self.waiting = None
+                self.playing = game_status["id"]
+                uid = self.scope["user"].pk
+                for i in range(len(event["uids"])):
+                    if event["uids"][i] == uid:
+                        nickname = game_status["users"][i]
+                        break
+                game_status["my_nickname"] = nickname
+                await self.send_json(
+                    {
+                        "code": 4002,  # temp
+                        "action": "start",
+                        "data": game_status,
+                    }
+                )
 
     async def test_response(self, event):
         await self.send_json(event["message"])
