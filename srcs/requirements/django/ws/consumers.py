@@ -33,16 +33,24 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         """
         websocket 연결 해제 시 호출
         """
+        print(f"disconnect / type: {self.waiting}")
         if self.waiting is not None:
             async with self.lock:
                 await GameQueue().leave_queue(
                     self.waiting, self.scope["user"].pk, self.channel_name
                 )
 
-        # TODO: playing 처리
-        # if self.playing is not None:
-        # await self.playing.leave_game(self.scope["user"].pk)
-        pass
+        # # self.scope["user"].pk가 RoomManager에 있는지 확인
+        # uid = self.scope["user"].pk
+        # if uid in self.room_manager.user_rooms:
+        #     gid = self.room_manager.user_rooms[uid]
+        #     game_instance = self.room_manager.get_game_instance(gid)
+        #     if game_instance is not None:
+        #         await game_instance.leave_game(uid)
+        #     del RoomManager.user_rooms[uid]
+
+        # await self.playing.leave_game(uid)
+        # pass
 
     async def send_error(self, code: int, message: str):
         await self.send_json(
@@ -69,6 +77,10 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         try:
+            if action != WebSocketActionType.GAME_INPUT:
+                print(f"action: {action}")
+            # if action == WebSocketActionType.LEAVE:
+            #     self.close()
             await self.channel_layer.send(
                 self.channel_name,
                 {
@@ -81,6 +93,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def join_queue(self, event):
         try:  # 대충 입력 검증
+            print(f"join_queue event: {event}")
             game_type = GameType(event["message"]["type"])
             nickname = event["message"]["nickname"]
             uid = self.scope["user"].pk
@@ -90,19 +103,26 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
         async with self.lock:
             self.waiting = game_type
-            await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
+            print(f"uid: {uid}")
+            if game_type == GameType.LOCAL:
+                matched_users = [(uid, self.channel_name, "player"),
+                                 (uid, self.channel_name, "player")]
+                await self.room_manager.start_game(game_type, matched_users)
+            else:
+                await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
     async def leave_queue(self, event):
         try:  # 대충 입력 검증
-            game_type = GameType(event["message"]["type"])
             uid = self.scope["user"].pk
         except (ValueError, KeyError):
             await self.send_error(400, "Invalid data")
             return None
 
         async with self.lock:
-            await GameQueue().leave_queue(game_type, uid, self.channel_name)
-            self.waiting = None
+            if self.waiting != GameType.LOCAL or self.waiting is not None:
+                print(f"game_type: {self.waiting}, {uid}")
+                await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
+                self.waiting = None
 
     async def wait_queue(self, event):
         await self.send_json(
@@ -124,11 +144,15 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
     async def game_input(self, event):
         gid = event["message"]["game_id"]
         game_instance = self.room_manager.get_game_instance(gid)
+        # print(f"nickname: {event['message']['nickname']}")
+        # print(f"keyevent: {event['message']['keyevent']}")
         if game_instance is None:
             await self.send_error(400, "Invalid game_id")
             return None
         # game_instance에서 nickname에 해당하는 player의 keyevent를 처리
-        game_instance.input(event["message"]["nickname"], event["message"]["keyevent"])
+        game_instance.handle_keyevent(
+            event["message"]["nickname"], event["message"]["keyevent"]
+        )
 
     async def game_info(self, event):
         game_status = event["message"]
@@ -150,6 +174,14 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 }
             )
         elif data == "start":
+            # leave queue
+            self.waiting = None
+            uid = self.scope["user"].pk
+            for i in range(len(event["uids"])):
+                if event["uids"][i] == uid:
+                    nickname = game_status["users"][i]
+                    break
+            game_status["my_nickname"] = nickname
             await self.send_json(
                 {
                     "code": 4002,  # temp

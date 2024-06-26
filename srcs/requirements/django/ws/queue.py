@@ -66,8 +66,11 @@ class GameQueue:
     ) -> None:
         async with self._queue_manager[game_type] as manager:
             if uid in manager:
+                print(f"{game_type.name}: {nickname} is already in queue")
                 return None  # TODO: 이미 대기 중인 경우 에러 보내야함
             manager.append(uid, channel_name, nickname)
+            print(f"{game_type.name}: {nickname}({uid}) joined queue")
+            print(f"{game_type.name}: {len(manager)} users in queue")
             await self.channel_layer.group_add(f"queue_{game_type.name}", channel_name)
 
             # 대기 중인 유저들에게 대기 중인 유저 수 전송
@@ -75,9 +78,11 @@ class GameQueue:
 
             while game_type.max_player() <= len(manager):  # 게임 시작 조건
                 # 게임 인원수 만큼 매칭
-                matched_uids = [
+                matched_users = [
                     manager.popleft() for _ in range(game_type.max_player())
                 ]
+
+                # 매칭된 유저들 중 중복된 유저가 있는지 확인
 
                 # 매칭된 유저들을 대기열에서 제거
                 await asyncio.gather(
@@ -85,37 +90,27 @@ class GameQueue:
                         self.channel_layer.group_discard(
                             f"queue_{game_type.name}", channel_name
                         )
-                        for _, channel_name, _ in matched_uids
+                        for _, channel_name, _ in matched_users
                     ],
                 )
-
-                # 임시로 그냥 테스트 출력
-                matched_users = [
-                    (uid, (await self.User.objects.aget(pk=uid)).username, nickname)
-                    for uid, _, nickname in matched_uids
-                ]
-                # print(f"{game_type.name}: {matched_users}")
 
                 if game_type == GameType.TOURNAMENT:
                     tournament_manager = TournamentManager(matched_users)
                     await tournament_manager.create_tournament()
                 else:
                     room_manager = RoomManager()
-                    gid = await room_manager.create_game(game_type, matched_uids)
-                    if gid is None:
-                        print("Failed to create game")
-                        return None
-                    game = room_manager.get_game_instance(gid)
-                    if game is None:
-                        print("Failed to get game instance")
-                        return None
-                    await game.start()
+                    await room_manager.start_game(game_type, matched_users)
 
     async def leave_queue(self, game_type: GameType, uid: int, channel_name: str):
+        if game_type is None:
+            print("already left queue")
+            return None
         async with self._queue_manager[game_type] as manager:
             if uid not in manager:
+                print(f"{game_type.name}: {uid} is not in queue")
                 return None  # TODO: 대기 중이 아닌 경우 에러 보내야함
             manager.remove(uid)
+            print(f"{game_type.name}: {uid} left queue")
             await self.channel_layer.group_discard(
                 f"queue_{game_type.name}", channel_name
             )
