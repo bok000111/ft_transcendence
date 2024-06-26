@@ -3,6 +3,7 @@ from channels.layers import get_channel_layer
 from ws.enums import GameType
 from .ball import Ball
 from .player import Player
+from .ai_player import AI_Player
 from .constants import *
 
 
@@ -13,10 +14,14 @@ class Game:
         self.gid = id
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
-        self.players = [
-            Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
-            for idx, (uid, channel_name, nickname) in enumerate(matched_users)
-        ]
+        if game_type == GameType.AI:
+            self.players = [(Player(0, matched_users[0][0], matched_users[0][1], matched_users[0][2])),
+                            (AI_Player(1, matched_users[0][0], matched_users[0][1], "mingkang_bot"))]
+        else:
+            self.players = [
+                Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
+                for idx, (uid, channel_name, nickname) in enumerate(matched_users)
+            ]
         self.player_count = len(self.players)
         self.ball = Ball()
         self.status = "waiting"
@@ -28,7 +33,7 @@ class Game:
     @classmethod
     async def create(cls, id, game_type, matched_users):
         self = cls(id, game_type, matched_users)
-        if game_type == GameType.LOCAL:
+        if game_type == GameType.LOCAL or game_type == GameType.AI:
             await self.channel_layer.group_add(self.group_name, self.players[0].channel_name)
         else:
             await self.add_players_to_group(matched_users)
@@ -78,6 +83,10 @@ class Game:
             print(f"An error occurred while removing players from group: {e}")
 
     async def send_game_info(self):
+        if self.game_type == GameType.AI:
+            if self.ball.vel["x"] > 0:
+                self.players[1].get_destination(self.ball)
+                self.players[1].set_state()
         while self.status == "playing":
             await self.channel_layer.group_send(
                 self.group_name,
@@ -147,12 +156,18 @@ class Game:
             ):
                 self.ball.pos["x"] = INTERVAL
                 self.ball.bounce("x", self.players[0].pos["y"])
+                if self.game_type == GameType.AI:
+                    self.players[1].get_destination(self.ball)
+                    self.players[1].set_state()
             elif self.ball.pos["x"] < 0:
                 # update score(함수로 구현할 수도)
                 self.players[1].score += 1
                 self.ball.reset_pos()
                 self.players[0].reset_pos()
                 self.players[1].reset_pos()
+                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
+                    self.players[1].get_destination(self.ball)
+                    self.players[1].set_state()
         elif self.ball.pos["x"] >= SCREEN_WIDTH - INTERVAL:
             if (
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
@@ -165,6 +180,9 @@ class Game:
                 self.ball.reset_pos()
                 self.players[0].reset_pos()
                 self.players[1].reset_pos()
+                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
+                    self.players[1].get_destination(self.ball)
+                    self.players[1].set_state()
 
     def check_collision_4p(self):
         is_loser = [False, False, False, False]
