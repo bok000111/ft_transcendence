@@ -12,8 +12,18 @@ class AI_Player(Player):
         self.destination = SCREEN_HEIGHT / 2
 
     def get_destination(self, ball):
-        self.destination = random.randint(
-            PADDLE_HEIGHT, SCREEN_HEIGHT - PADDLE_HEIGHT)
+        m = ball.vel["y"] / ball.vel["x"]
+        intercept = ball.pos["y"] - m * ball.pos["x"]
+        dest = (m * (SCREEN_WIDTH - PADDLE_WIDTH) +
+                intercept) % (2 * SCREEN_HEIGHT)
+        dest = int(min(dest, 2 * SCREEN_HEIGHT - dest))
+        dest = random.randint(
+            dest - PADDLE_HEIGHT, dest + PADDLE_HEIGHT)
+        if dest < PADDLE_HEIGHT:
+            dest = PADDLE_HEIGHT
+        elif dest > SCREEN_HEIGHT - PADDLE_HEIGHT:
+            dest = SCREEN_HEIGHT - PADDLE_HEIGHT
+        self.destination = dest
 
     def set_state(self):
         # print(f"AI destination: {self.destination}"
