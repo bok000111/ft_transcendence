@@ -4,7 +4,6 @@ from ws.enums import GameType
 from .ball import Ball
 from .player import Player
 from .constants import *
-from ws.tournament import TournamentManager
 
 
 class Game:
@@ -22,6 +21,7 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
+        from .tournament import TournamentManager
         self.tournament_manager = TournamentManager()
         print(self.channel_layer)
 

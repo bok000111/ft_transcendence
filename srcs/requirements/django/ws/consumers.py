@@ -4,7 +4,7 @@ from ws.queue import GameQueue
 from ws.lobby import Lobby
 from ws.game import Game
 from ws.roommanager import RoomManager
-from ws.tournament import Tournament
+# from ws.tournament import Tournament
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth import get_user_model
 
@@ -20,7 +20,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
         self.lock = asyncio.Lock()
         self.waiting: GameType = None
-        self.playing: Game | Tournament = None
+        # self.playing: Game | Tournament = None
 
     async def connect(self):
         """
@@ -33,7 +33,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         """
         websocket 연결 해제 시 호출
         """
-        print(f"disconnect / type: {self.waiting}")
+        # print(f"disconnect / type: {self.waiting}")
         if self.waiting is not None:
             async with self.lock:
                 await GameQueue().leave_queue(
@@ -49,7 +49,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         #         await game_instance.leave_game(uid)
         #     del RoomManager.user_rooms[uid]
 
-        # await self.playing.leave_game(uid)
+        # # await self.playing.leave_game(uid)
         # pass
 
     async def send_error(self, code: int, message: str):

@@ -4,7 +4,7 @@ from ws.enums import GameType
 from ws.roommanager import RoomManager
 from django.contrib.auth import get_user_model
 from channels.layers import get_channel_layer
-from tournament import TournamentManager
+from .tournament import TournamentManager
 
 
 class GameQueue:
