@@ -48,41 +48,33 @@ class TournamentManager:
                 self.nickname = user_info.nickname
 
         def __init__(self, user_ids, tournament_id, sub_game_to_tournament) -> None:
-            self.users = shuffle([self.TournamenetUser(user_id)
-                                 for user_id in user_ids])
+            self.users = shuffle(
+                [self.TournamenetUser(user_id) for user_id in user_ids]
+            )
             self.tournament_id = tournament_id
             self.tournament_result_manager = TournamentResultManager(
-                os.getenv("ENDPOINT"))
+                os.getenv("ENDPOINT")
+            )
             self.sub_games = {}  # gid로 game_id(1, 2, 3) 관리
             self.sub_game_to_tournament = sub_game_to_tournament
             self.winners = []  # 승자 관리(TournamentUser)
 
         async def init_tournament(self):
             self.tournament_result_manager.start_game(
-                datetime.now().timestamp(), self.tournament_id, self.users)
+                datetime.now().timestamp(), self.tournament_id, self.users
+            )
             self.start_subgame([uid for uid in self.users[:2]])
             self.start_subgame([uid for uid in self.users[2:4]])
 
         async def start_subgame(self, matched_uids, game_id):
             room_manager = RoomManager()
-            gid = await room_manager.create_game(GameType.TOURNAMENT, matched_uids)
-            if gid is None:
-                print("Failed to create game")
-                return None
-            game = room_manager.get_game_instance(gid)
-            if game is None:
-                print("Failed to get game instance")
-                return None
+            gid = await room_manager.start_game(GameType.TOURNAMENT, matched_uids)
             self.sub_game_to_tournament[gid] = self.tournament_id  # lock 필요..?
             self.sub_games[gid] = game_id
-            game.start()
-
-            # asyncio.create_task(get_winner(group_name))
 
         async def finish_subgame(self, gid, scores: int[2]):
             game_info = [gid, self.sub_games[gid], scores[0], scores[1]]
-            self.tournament_result_manager.save_sub_game(
-                self.tournament_id, game_info)
+            self.tournament_result_manager.save_sub_game(self.tournament_id, game_info)
             if scores[0] > scores[1]:
                 winner = self.users[0 if self.sub_games[gid] == 2 else 2]
             else:
