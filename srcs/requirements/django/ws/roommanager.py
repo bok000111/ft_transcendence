@@ -55,9 +55,6 @@ class RoomManager:
             print("Failed to get game instance")
             return None
 
-        if game_type != GameType.SUB_GAME:
-            await game.start()
-        else:
-            await game.send_game_info()
+        await game.start()
 
         return gid
