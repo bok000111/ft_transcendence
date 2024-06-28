@@ -1,4 +1,4 @@
- {% load static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-    <div class="co_main co_frame">
+    <div class="co_main co_frame"
         <!-- Title -->
         <div class="title d-flex justify-content-center mt-5">
             <h1 class="display-2 fw-bold z_highest pointer" id="titlePong">PONG</h1>
@@ -53,8 +53,8 @@
 
     <!-- Modal -->
     <div class="modal" id="loginModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl modal-dialog-centered">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
+            <div class="modal-content" id="my-modal-content">
                 <div class="modal-body">
                     <h1 align="center">Logging in ...</h1>
                 </div>
@@ -63,18 +63,20 @@
     </div>
 
     <div class="modal" id="nicknameModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
+        <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
+            <div class="modal-content" id="my-modal-content">
                 <form>
-                    <div class="modal-header">
-                        <h5 class="modal-title">Enter your nickname</h5>
-                    </div>
                     <div class="modal-body">
-                        <input type="text" id="nickname" class="form-control">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Apply</button>
-                        <button id="closeBtn" type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <div class="modal-inner-header nickname-modal-inner">
+                            <div class="modal-title">Enter your nickname</div>
+                        </div>
+                        <div class="modal-inner-body nickname-modal-inner">
+                            <input type="text" id="nickname" placeholder="nickname">
+                        </div>
+                        <div class="modal-inner-footer nickname-modal-inner">
+                            <button type="submit">apply</button>
+                            <button id="closeBtn" type="button" data-dismiss="modal">close</button>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -82,13 +84,18 @@
     </div>
 
     <div class="modal" id="waitingModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Waiting for Game . . .</h5>
-                </div>
+        <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
+            <div class="modal-content" id="my-modal-content">
                 <div class="modal-body">
-                    <h5 id="waiting-status"></h5>
+                    <div class="modal-inner-header">
+                        <div class="modal-title">Waiting for Game . . .</div>
+                    </div>
+                    <div class="modal-inner-body">
+                        <div id="waiting-status"></div>
+                    </div>
+                    <div class="modal-inner-footer">
+                        <button id="closeBtn" type="button" data-dismiss="modal">leave</button>
+                    </div>
                 </div>
             </div>
         </div>
