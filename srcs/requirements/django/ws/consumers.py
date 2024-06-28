@@ -4,12 +4,9 @@ from ws.queue import GameQueue
 from ws.lobby import Lobby
 from ws.game import Game
 from ws.roommanager import RoomManager
+
 # from ws.tournament import Tournament
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.contrib.auth import get_user_model
-
-
-User = get_user_model()
 
 
 class MainConsumer(AsyncJsonWebsocketConsumer):
@@ -113,13 +110,19 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             self.waiting = game_type
             print(f"uid: {uid}")
             if game_type == GameType.LOCAL:
-                matched_users = [(uid, self.channel_name, "player"),
-                                 (uid, self.channel_name, "player")]
+                matched_users = [
+                    (uid, self.channel_name, "player"),
+                    (uid, self.channel_name, "player"),
+                ]
                 await self.room_manager.start_game(game_type, matched_users)
             elif game_type == GameType.AI:
-                await self.room_manager.start_game(game_type, [(uid, self.channel_name, "player")])
+                await self.room_manager.start_game(
+                    game_type, [(uid, self.channel_name, "player")]
+                )
             else:
-                await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
+                await GameQueue().join_queue(
+                    game_type, uid, self.channel_name, nickname
+                )
 
     async def leave_queue(self, event):
         try:  # 대충 입력 검증
@@ -129,7 +132,11 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             return None
 
         async with self.lock:
-            if self.waiting != GameType.LOCAL and self.waiting != GameType.AI and self.waiting is not None:
+            if (
+                self.waiting != GameType.LOCAL
+                and self.waiting != GameType.AI
+                and self.waiting is not None
+            ):
                 print(f"game_type: {self.waiting}, {uid}")
                 await GameQueue().leave_queue(self.waiting, uid, self.channel_name)
                 self.waiting = None

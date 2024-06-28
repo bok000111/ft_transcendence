@@ -1,181 +1,244 @@
-from result import *
-import json
-from web3 import Web3
-from solcx import compile_standard, install_solc
 import os
-from dotenv import load_dotenv
-from django.conf import settings
+import json
+import asyncio
+from pathlib import Path
+from typing import Set, cast
+
+from web3 import AsyncWeb3
+from web3.exceptions import TimeExhausted
+from web3.middleware import async_construct_simple_cache_middleware
+from web3.middleware.signing import async_construct_sign_and_send_raw_middleware
+from web3.utils.caching import SimpleCache
+from web3.types import RPCEndpoint
+from solcx import compile_standard, install_solc
+
+abi_path = Path(__file__).parent/"contracts" / \
+    "TournamentContract.abi.json"
+sol_path = Path(__file__).parent/"contracts"/"TournamentContract.sol"
 
 
 class TournamentResultManager:
     _instance = None
-    _initialized = False
+    _init = False
+    _ainit = False
+
+    @classmethod
+    async def instance(cls):
+        if cls._instance is None:
+            cls._instance = TournamentResultManager()
+            async with cls._instance.lock:
+                await cls._instance.__ainit()
+        return cls._instance
 
     def __new__(cls, *args):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
+            cls._instance = super().__new__(cls, *args)
         return cls._instance
 
-    def __init__(self, provider):
-        if self._initialized:
+    def __init__(self):
+        if self._init:
             return
 
-        load_dotenv()
-        self.chain_address = os.getenv("CHAIN_ADDRESS")
-        self.private_key = os.getenv("PRIVATE_KEY")
-        self.chain_id = int(os.getenv("CHAIN_ID"))
-        if self.chain_address == "" or self.private_key == "" or self.chain_id == "":
-            raise Exception(
-                "Please set the CHAIN_ADDRESS, PRIVATE_KEY and CHAIN_ID in the .env file."
-            )
+        self.lock = asyncio.Lock()
+        self.pending_tx_tasks = {}
+        self.abi = None
+        self.bytecode = None
 
-        self.w3 = Web3(Web3.HTTPProvider(provider))
+        self.chain_address = os.getenv("BLOCKCHAIN_CHAIN_ADDRESS")
+        self.chain_id = os.getenv("BLOCKCHAIN_CHAIN_ID")
+        self.private_key = os.getenv("BLOCKCHAIN_PRIVATE_KEY")
+        self.contract_address = os.getenv("BLOCKCHAIN_CONTRACT_ADDRESS")
+        self.endpoint = os.getenv("BLOCKCHAIN_ENDPOINT")
 
-        if (
-            self.w3.eth.get_transaction_count(self.chain_address) == 0
-            or os.getenv("CONTRACT_ADDRESS") == ""
-        ):
-            self.__set_initial_settings()
-        else:
-            with open(
-                str(settings.BASE_DIR) + "/../blockchain/abi.json",
-                "r",
-                encoding="utf-8",
-            ) as file:
-                self.abi = file.read()
-            self.contract_address = os.getenv("CONTRACT_ADDRESS")
-        self._initialized = True
+        # 디버깅용 로컬 환경 설정이 존재하면 덮어씀
+        hardhat_endpoint = os.getenv("HARDHAT_ENDPOINT")
+        if hardhat_endpoint:
+            self.endpoint = hardhat_endpoint
+            self.chain_id = os.getenv("HARDHAT_CHAIN_ID")
+            self.chain_address = os.getenv("HARDHAT_ACCOUNT")
+            self.private_key = os.getenv("HARDHAT_PRIVATE_KEY")
+            self.contract_address = os.getenv("HARDHAT_CONTRACT_ADDRESS")
 
-    def __set_initial_settings(self):
-        bytecode = self.__compile_sol()
-        contract_address = self.__deploy_contract(bytecode)
-        self.contract_address = str(contract_address)
-        print("The contract address is as follows: " + self.contract_address)
-        print(
-            "Set the above contract address as the CONTRACT_ADDRESS in the .env file."
+        if any(x is None for x in
+               (self.chain_address, self.chain_id, self.private_key, self.endpoint)
+               ) or not self.chain_id.isdecimal():
+            raise ValueError("Please set .env file.")
+
+        self.chain_id = int(self.chain_id)
+
+        # aniit에서 초기화
+        self.w3 = None
+        self.nonce = None
+        self.contract = None
+
+        self._init = True
+
+    async def __ainit(self):
+        if self._ainit:
+            return
+
+        # 블록체인 네트워크와 연결
+        self.w3 = AsyncWeb3(AsyncWeb3.AsyncHTTPProvider(self.endpoint))
+        if not await self.w3.is_connected():
+            raise ConnectionError("Cannot connect to the blockchain.")
+
+        # 미들웨어 추가
+        account = self.w3.eth.account.from_key(self.private_key)
+        self.w3.middleware_onion.add(await async_construct_sign_and_send_raw_middleware(account))
+        self.w3.eth.default_account = account.address
+
+        cache = SimpleCache(256)
+        CACHE_WHITELIST = cast(
+            Set[RPCEndpoint],
+            (
+                "web3_clientVersion",
+                "net_version",
+                # "eth_getBlockTransactionCountByHash",
+                # "eth_getUncleCountByBlockHash",
+                # "eth_getBlockByHash",
+                "eth_getTransactionByHash",
+                "eth_getTransactionByBlockHashAndIndex",
+                "eth_getRawTransactionByHash",
+                "eth_getUncleByBlockHashAndIndex",
+                "eth_chainId",
+                "ech_call",
+            ),
         )
+
+        def should_cache_fn(method, params, _):
+            if method == "eth_call" and self.contract.decode_function_input(
+                    params[0]["data"])[0].fn_name == "get_tournament":
+                return True
+            if method in CACHE_WHITELIST:
+                return True
+            return False
+
+        self.w3.middleware_onion.add(await async_construct_simple_cache_middleware(
+            cache, CACHE_WHITELIST, should_cache_fn,
+        ))
+
+        self.nonce = await self.w3.eth.get_transaction_count(self.chain_address)
+
+        if self.nonce == 0 or self.contract_address is None:
+            # 컨트랙트 주소나 기록이 없으면 컴파일하고 배포
+            self.__compile_sol()
+            self.__backup_abi()
+            await self.__deploy_contract()
+        else:
+            with open(abi_path, 'r', encoding="utf-8") as file:
+                self.abi = file.read()
+        self.contract = self.w3.eth.contract(
+            address=self.contract_address, abi=self.abi)
+
+        self._ainit = True
+
+    @ classmethod
+    def _reset(cls):
+        cls._instance = None
+        cls._init = False
+        cls._ainit = False
 
     def __compile_sol(self):
-        solc_version = "0.6.0"
+        solc_version = os.getenv("SOLC_VERSION")
         install_solc(solc_version)
-        sol_path = str(settings.BASE_DIR) + "/../blockchain/TournamentContract.sol"
-        try:
-            with open(sol_path, "rt", encoding="utf-8") as file:
-                tournament_file = file.read()
-        except Exception as e:
-            print(e)
-            return
 
-        compiled_sol = compile_standard(
-            {
-                "language": "Solidity",
-                "sources": {"TournamentContract.sol": {"content": tournament_file}},
-                "settings": {
-                    "outputSelection": {
-                        "*": {
-                            "*": [
-                                "abi",
-                                "metadata",
-                                "evm.bytecode",
-                                "evm.bytecode.sourceMap",
-                            ]
-                        }
+        if not sol_path.exists():
+            raise FileNotFoundError("Cannot find .sol file.")
+        with open(sol_path, "rt", encoding="utf-8") as file:
+            tournament_sol_data = file.read()
+
+        compiled_sol = compile_standard({
+            "language": "Solidity",
+            "sources": {"TournamentContract.sol": {"content": tournament_sol_data}},
+            "settings": {
+                "outputSelection": {
+                    "*": {
+                        "*": ["abi", "metadata", "evm.bytecode", "evm.bytecode.sourceMap"]
                     }
-                },
+                }
             },
-            solc_version=solc_version,
-        )
-        self.abi = compiled_sol["contracts"]["TournamentContract.sol"][
-            "TournamentContract"
-        ]["abi"]
-        bytecode = compiled_sol["contracts"]["TournamentContract.sol"][
-            "TournamentContract"
-        ]["evm"]["bytecode"]["object"]
+        }, solc_version=solc_version)
 
-        # for get abi
-        if not os.path.exists(str(settings.BASE_DIR) + "/../blockchain/abi.json"):
-            with open(str(settings.BASE_DIR) + "/../blockchain/abi.json", "w") as file:
-                json.dump(self.abi, file)
-        return bytecode
+        contract_info = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]
+        self.abi = contract_info["abi"]
+        self.bytecode = contract_info["evm"]["bytecode"]["object"]
 
-    def __deploy_contract(self, bytecode):
-        nonce = self.w3.eth.get_transaction_count(self.chain_address) + 1
+    async def __deploy_contract(self):
+        """
+        Deploy the contract to the blockchain.
+        초기 배포나 컨트랙트 어드레스가 없을시 사용하므로 트랜잭션을 기다림
+        """
+        nonce = await self.w3.eth.get_transaction_count(self.chain_address)
 
-        Tournament = self.w3.eth.contract(abi=self.abi, bytecode=bytecode)
-        transaction = Tournament.constructor().build_transaction(
-            {
+        tournament = self.w3.eth.contract(abi=self.abi, bytecode=self.bytecode)
+        tx = {
+            "chainId": self.chain_id,
+            "gasPrice": await self.w3.eth.gas_price,
+            "nonce": nonce,
+        }
+        tx_hash = await tournament.constructor().transact(tx)
+        tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 1)
+        self.contract_address = tx_receipt["contractAddress"]
+        self.nonce = nonce + 1
+
+    def __backup_abi(self):
+        with open(abi_path, "wt", encoding="utf-8") as file:
+            file.write(json.dumps(self.abi))
+
+    async def __transact(self, func: str, *args):
+        async with self.lock:
+            nonce = self.nonce
+
+            tx = {
                 "chainId": self.chain_id,
-                "gasPrice": self.w3.eth.gas_price,
-                "from": self.chain_address,
+                "gasPrice": await self.w3.eth.gas_price,
+                # "from": self.chain_address,
                 "nonce": nonce,
             }
-        )
-        signed_txn = self.w3.eth.account.sign_transaction(
-            transaction, private_key=self.private_key
-        )
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        return tx_receipt.contractAddress
-
-    def start_game(self, game_id, timestamp, players):
-        nonce = self.w3.eth.get_transaction_count(self.chain_address)
-        started_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
-        tx = started_game.functions.add_game(
-            game_id, timestamp, players
-        ).build_transaction(
-            {
-                "chainId": self.chain_id,
-                "gasPrice": self.w3.eth.gas_price,
-                "from": self.chain_address,
+            tx_hash = await getattr(self.contract.functions, func)(*args).transact(tx)
+            self.pending_tx_tasks[tx_hash] = {
+                "task": asyncio.create_task(self.__transact_task(tx_hash)),
                 "nonce": nonce,
+                "func": func,
+                "args": args,
             }
-        )
-        signed_txn = self.w3.eth.account.sign_transaction(
-            tx, private_key=self.private_key
-        )
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        # print(started_game.functions.test_start(id).call())
-        return tx_receipt
+            self.nonce += 1
 
-    def save_sub_game(self, game_id, sub_game_info):
-        nonce = self.w3.eth.get_transaction_count(self.chain_address)
-        sub_game = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
-        tx = sub_game.functions.add_sub_game(game_id, sub_game_info).build_transaction(
-            {
-                "chainId": self.chain_id,
-                "gasPrice": self.w3.eth.gas_price,
-                "from": self.chain_address,
-                "nonce": nonce,
-            }
-        )
-        signed_txn = self.w3.eth.account.sign_transaction(
-            tx, private_key=self.private_key
-        )
-        tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-        tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
-        # print(sub_game.functions.test_sub(id).call())
-        return tx_receipt
+    async def __transact_task(self, tx_hash):
+        nonce = self.pending_tx_tasks[tx_hash]["nonce"]
+        try:
+            await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 5)
+        except TimeExhausted:
+            # 대충 리트라이 - 재시도할때는 락걸고 독점적으로 실행
+            print(f"Transaction {nonce} timeout.")
+            return
+        finally:
+            async with self.lock:
+                self.pending_tx_tasks.pop(tx_hash)
 
-    def get_all_tournaments(self):
-        cont = self.w3.eth.contract(address=self.contract_address, abi=self.abi)
-        valid_tournaments = cont.functions.get_valid_tournaments().call()
-        all_tournaments = []
-        for game_id in valid_tournaments:
-            tournament_info = cont.functions.get_tournament(game_id).call()
-            all_tournaments.append(tournament_info)
-        return all_tournaments
+    async def __call(self, func, *args):
+        return await getattr(self.contract.functions, func)(*args).call()
 
+    async def __retry(self, func, *args, attempts=3):
+        # 어떻게 만들지..
+        pass
 
-# tournament_contract = TournamentResultManager(os.getenv("ENDPOINT"))
+    async def _wait_all(self):
+        await asyncio.gather(*map(lambda x: x["task"], self.pending_tx_tasks.values()))
 
-# tournament_contract.start_game(4, 1695940800, [262, 4, 9, 11])
-# tournament_contract.save_sub_game(4, [2, 8, 10])
-# tournament_contract.save_sub_game(4, [3, 10, 2])
-# tournament_contract.save_sub_game(4, [1, 7, 10])
+    async def start_game(self, game_id, timestamp, players):
+        await self.__transact(
+            "add_game", game_id, timestamp, players)
 
-# a = tournament_contract.get_all_tournaments()
-# print(a)
+    async def save_sub_game(self, game_id, sub_game_info):
+        await self.__transact(
+            "add_sub_game", game_id, sub_game_info)
 
-# for res in a:
-#     print(TournamentResult(res))
+    async def get_tournament(self, game_id):
+        return await self.__call("get_tournament", game_id)
+
+    async def get_all_tournaments(self):
+        # TODO: 요청 최적화 필요
+        # 여기 요청이 너무 많으면 429 Too Many Requests 에러 발생할 수 있음
+        tournaments = await self.__call("get_valid_tournaments")
+        return await asyncio.gather(*map(self.get_tournament, tournaments))

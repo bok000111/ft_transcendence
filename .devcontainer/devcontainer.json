@@ -1,9 +1,9 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Python 3",
+	"name": "ft_transcendence",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:1-3.12-bullseye",
+	"image": "mcr.microsoft.com/devcontainers/python:3",
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {
@@ -19,7 +19,7 @@
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo apt-get update && pip3 install --user -r $PWD/srcs/requirements.txt && echo \"alias manage='python $PWD/srcs/requirements/django/manage.py'\" >> /home/vscode/.zshrc && echo 'run ssh-add $HOME/.ssh/id_rsa && eval \"$(ssh-agent -s)\" in host terminal to access github.'",
+	"postCreateCommand": "sudo apt-get update && pip3 install --upgrade pip && pip3 install --user -r $PWD/srcs/requirements/django/requirements.txt && echo \"alias manage='python $PWD/srcs/requirements/django/manage.py'\" >> /home/vscode/.zshrc && sudo mkdir /goinfre && sudo chmod 777 /goinfre && echo 'run ssh-add $HOME/.ssh/id_rsa && eval \"$(ssh-agent -s)\" in host terminal to access github.'",
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
@@ -33,7 +33,8 @@
 				"ms-python.vscode-pylance",
 				"ms-python.black-formatter",
 				"mhutchie.git-graph",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"ms-python.vscode-pylance"
 			],
 			"settings": {
 				"editor.tabSize": 4,

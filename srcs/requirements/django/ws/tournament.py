@@ -3,8 +3,6 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 from random import shuffle
 from result.deploy import TournamentResultManager
-from datetime import datetime
-import os
 from .roommanager import RoomManager
 from .enums import GameType
 
@@ -42,17 +40,18 @@ class TournamentManager:
         self.tournaments[tid].finish_subgame(gid, scores)
 
     class Tournament:
-        def __init__(self, tournament_users, tournament_id, sub_game_to_tournament) -> None:
+        def __init__(
+            self, tournament_users, tournament_id, sub_game_to_tournament
+        ) -> None:
             self.tournament_users = tournament_users
             self.tournament_id = tournament_id
             self.sub_game_to_tournament = sub_game_to_tournament
             self.sub_games = {}  # gid로 game_id(1, 2, 3) 관리
             self.winners = []  # semi final winner
-            self.tournament_result_manager = TournamentResultManager(
-                os.getenv("ENDPOINT")
-            )
+            self.tournament_result_manager = None
 
         async def init_tournament(self):
+            # self.tournament_result_manager = await TournamentResultManager.instance()
             # shuffle(self.tournament_users)
 
             username_list = []
@@ -67,7 +66,8 @@ class TournamentManager:
 
             room_manager = RoomManager()
             tournament_room_id = await room_manager.start_game(
-                GameType.TOURNAMENT, self.tournament_users)
+                GameType.TOURNAMENT, self.tournament_users
+            )
             if tournament_room_id is None:  # error
                 return None
             # lock 필요..?
@@ -76,7 +76,7 @@ class TournamentManager:
             await asyncio.sleep(3)
             await asyncio.gather(
                 self.start_subgame(self.tournament_users[:2], 2),
-                self.start_subgame(self.tournament_users[2:], 3)
+                self.start_subgame(self.tournament_users[2:], 3),
             )
 
         async def start_subgame(self, matched_users, game_id):
