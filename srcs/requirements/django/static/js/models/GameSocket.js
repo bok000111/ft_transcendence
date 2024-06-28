@@ -1,6 +1,12 @@
 import { rootPage } from "../pages/RootPage.js";
-import { info, MODE } from "./Info.js";
-import { BASE_WS_URL } from "./API.js";
+import { info } from "./Info.js";
+
+const STATE = {
+    CONNECTING: 0,
+    OPEN: 1,
+    CLOSING: 2,
+    CLOSED: 3,
+}
 
 export class GameSocket {
     ws;
@@ -9,13 +15,12 @@ export class GameSocket {
         start: (data) => {},
         game: (data) => {},
         end: (data) => {},
-        error: (data) => {},
     };
     url;
 
     constructor() {
         this.ws = null;
-        this.url = BASE_WS_URL;
+        this.url = "ws://localhost:8000/ws/";
     }
 
     setup() {
@@ -26,31 +31,14 @@ export class GameSocket {
     
                 this.handler[obj.action](obj.data);
             });
-            if (info.games.type === MODE.LOCAL) {
-                this.send(JSON.stringify({
-                    action: "join",
-                    data: {
-                        type: info.games.type,
-                        nickname: "player1",
-                    },
-                }));
-                this.send(JSON.stringify({
-                    action: "join",
-                    data: {
-                        type: info.games.type,
-                        nickname: "player2",
-                    },
-                }));
-            }
-            else {
-                this.send(JSON.stringify({
-                    action: "join",
-                    data: {
-                        type: info.games.type,
-                        nickname: document.querySelector("#nickname").value,
-                    },
-                }));
-            }
+            this.send(JSON.stringify({
+                action: "join",
+                data: {
+                    type: info.games.type,
+                    nickname: document.querySelector("#nickname").value,
+                },
+            }));
+            document.querySelector("#nickname").value = "";
         });
         this.ws.addEventListener("close", () => {
             this.ws = null;
@@ -58,7 +46,6 @@ export class GameSocket {
             this.unmount("start");
             this.unmount("game");
             this.unmount("close");
-            this.unmount("error");
             rootPage.curChild.curChild.route("main_page/main_subpage");
         });
         // error event 처리는 어떻게 할 것인가?
@@ -71,7 +58,7 @@ export class GameSocket {
     }
 
     isOpen() {
-        return this.ws !== null;
+        return (this.ws !== null && this.ws.readyState === STATE.OPEN);
     }
 
     send(msg) {

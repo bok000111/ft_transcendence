@@ -1,6 +1,5 @@
 import { gamePage } from "./GamePage.js";
 import { info } from "../../models/Info.js";
-import { gameSocket } from "../../models/GameSocket.js";
 import SubPage from "../SubPage.js";
 
 const WIDTH = 1200;
@@ -67,18 +66,27 @@ class TournamentSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
-            <h3>TOURNAMENT</h3>
+            <h3 id="tournament-title">TOURNAMENT</h3>
             <canvas id="tour-canvas" width="${WIDTH}" height="${HEIGHT}"></canvas>
         `;
 
         this.$cnvs = this.$elem.querySelector("#tour-canvas");
         this.ctx = this.$cnvs.getContext("2d");
 
+        document.querySelector(".co_line5").classList.add("none");
+        document.querySelector(".co_ball1").classList.add("none");
+        document.querySelector(".co_ball2").classList.add("none");
+        document.querySelector(".co_ball3").classList.add("none");
+
         this.draw();
     }
 
     fini() {
         this.$elem.innerHTML = ``;
+        document.querySelector(".co_line5").classList.remove("none");
+        document.querySelector(".co_ball1").classList.remove("none");
+        document.querySelector(".co_ball2").classList.remove("none");
+        document.querySelector(".co_ball3").classList.remove("none");
     }
 };
 
