@@ -10,6 +10,52 @@
     cursor: pointer;
 }
 
+.scoreboard {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+.score-cell, .vs-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #e9ecef;
+}
+.vs-cell {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nickname {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+}
+
+.score {
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 0 0 5px 5px;
+}
+
+#pong_player_area {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.game_bg {
+    position: relative;
+    width: 1440px;
+    height: 1024px;
+    background: #96C757;
+}
+
 .co_main .co_frame .co_line2,
 .co_main .co_frame .co_line3,
 .co_main .co_frame .co_line5,
@@ -125,4 +171,91 @@
     justify-content: center;
     max-height: calc(100vh - 210px);
     overflow-y: auto;
-  }
+}
+
+#titlePong {
+    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+    color: white;
+}
+
+.right-triangle {
+    position: absolute;
+    left: 448px;
+    width: 0px;
+    height: 0px;
+    background-color: transparent;
+    border-top: 0px solid transparent;
+    border-right: 992px solid rgba(11, 5, 64, 0.8);
+    border-left: 0px;
+    border-bottom: 360px solid transparent;
+    z-index: 1;
+ }
+
+/*********** Tournament design ***********/
+
+#tournament-title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #ffffff;
+    -webkit-text-stroke:3px black;
+}
+
+/*********** Modal design ***********/
+
+#my-modal-dialog {
+    max-width: 50%;
+}
+
+#my-modal-content {
+    text-align: center;
+    border-radius: 2rem / 2rem;
+    background-color: rgb(150, 199, 87, 0.8);
+    color: rgb(255, 255, 255);
+}
+
+.nickname-modal-inner {
+    padding: 5% 10%;
+}
+
+.modal-inner-header {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.modal-inner-body input {
+    font-size: 20px;
+    font-weight: normal;
+    border-radius: 2rem / 2rem;
+    width: 100%;
+    border: none;
+    text-align: center;
+    color: #000000;
+}
+
+.modal-inner-body div {
+    padding: 0 0 5% 0;
+    font-size: 30px;
+}
+
+.modal-inner-footer {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.modal-inner-footer button {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 2rem / 2rem;
+    border: none;
+    background-color: #006AB6;
+    margin: 0% 5%;
+    padding: 0% 10%;
+}
+
+#closeBtn {
+    background-color: rgb(189, 189, 189);
+}
