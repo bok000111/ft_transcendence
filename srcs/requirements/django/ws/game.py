@@ -40,7 +40,6 @@ class Game:
         return self
 
     async def start(self):
-        self.status = "playing"
         for player in self.players:
             print(f"Player {player.nickname} joined")
         await self.channel_layer.group_send(
@@ -58,7 +57,9 @@ class Game:
                 },
             },
         )
-        asyncio.create_task(self.send_game_info())
+
+        if self.game_type != GameType.TOURNAMENT:
+            asyncio.create_task(self.send_game_info())
 
     async def add_players_to_group(self, matched_users):
         tasks = [
@@ -83,6 +84,8 @@ class Game:
             print(f"An error occurred while removing players from group: {e}")
 
     async def send_game_info(self):
+        self.status = "playing"
+
         if self.game_type == GameType.AI:
             if self.ball.vel["x"] > 0:
                 self.players[1].get_destination(self.ball)

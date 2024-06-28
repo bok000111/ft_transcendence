@@ -1,8 +1,8 @@
+import asyncio
 from asgiref.sync import sync_to_async
 from django.contrib.auth import get_user_model
 from random import shuffle
 from result.deploy import TournamentResultManager
-from dotenv import load_dotenv
 from datetime import datetime
 import os
 from .roommanager import RoomManager
@@ -31,9 +31,10 @@ class TournamentManager:
         tournament = self.Tournament(
             tournament_users, self.tournament_id, self.sub_game_to_tournament
         )
-        tournament.init_tournament()
+        await tournament.init_tournament()
         self.tournaments[self.tournament_id] = tournament
         self.tournament_id += 1
+        print("self.tournament_id: ", self.tournament_id)
 
     # gid로 subgame이 끝났음을 알림
     async def finish_subgame_in_tournament(self, gid, scores):
@@ -53,26 +54,42 @@ class TournamentManager:
 
         async def init_tournament(self):
             shuffle(self.tournament_users)
+
             username_list = []
+            print("self.tournament_users: ", self.tournament_users)
             for user in self.tournament_users:
                 user_info = await sync_to_async(User.objects.get)(pk=user[0])
                 username_list.append(user_info.username)
-            self.tournament_result_manager.start_game(
-                datetime.now().timestamp(), self.tournament_id, username_list
+            print(username_list)
+            # self.tournament_result_manager.start_game(
+            #     datetime.now().timestamp(), self.tournament_id, username_list
+            # )
+
+            room_manager = RoomManager()
+            tournament_room_id = await room_manager.start_game(GameType.TOURNAMENT, self.tournament_users)
+            if tournament_room_id is None:  # error
+                return None
+            # lock 필요..?
+            self.sub_game_to_tournament[tournament_room_id] = self.tournament_id
+
+            await asyncio.gather(
+                self.start_subgame(
+                    [uid for uid in self.tournament_users[:2]], 2),
+                self.start_subgame(
+                    [uid for uid in self.tournament_users[2:]], 3)
             )
-            self.start_subgame([uid for uid in self.tournament_users[:2]], 2)
-            self.start_subgame([uid for uid in self.tournament_users[2:4]], 3)
 
         async def start_subgame(self, matched_users, game_id):
             room_manager = RoomManager()
-            gid = await room_manager.start_game(GameType.TOURNAMENT, matched_users)
-            self.sub_game_to_tournament[gid] = self.tournament_id  # lock 필요..?
+            gid = await room_manager.start_game(GameType.SUB_GAME, matched_users)
+            if gid is None:  # error
+                return
             self.sub_games[gid] = game_id
 
         async def finish_subgame(self, gid, scores):
-            game_info = [gid, self.sub_games[gid], scores[0], scores[1]]
-            self.tournament_result_manager.save_sub_game(
-                self.tournament_id, game_info)
+            # game_info = [gid, self.sub_games[gid], scores[0], scores[1]]
+            # self.tournament_result_manager.save_sub_game(
+            #     self.tournament_id, game_info)
 
             if self.sub_games[gid] == 1:
                 for x in self.sub_games:
