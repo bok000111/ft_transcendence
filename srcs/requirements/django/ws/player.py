@@ -43,26 +43,28 @@ class Player:
     # 8 : y방향 - 키 떼짐.
     # }
     def set_state(self, keyevent):
-        if keyevent in (1, 5):
+        if keyevent in (1, 6):
             self.up = True
-        elif keyevent in (2, 6):
+        elif keyevent in (2, 5):
             self.down = True
-        elif keyevent in (3, 7):
+        elif keyevent in (3, 8):
             self.up = False
-        elif keyevent in (4, 8):
+        elif keyevent in (4, 7):
             self.down = False
 
     def move(self):
         if self.idx <= 1:
             if self.up and self.pos["y"] > PADDLE_HEIGHT:
-                self.pos["y"] = max(self.pos["y"] - PADDLE_SPEED, PADDLE_HEIGHT)
+                self.pos["y"] = max(
+                    self.pos["y"] - PADDLE_SPEED, PADDLE_HEIGHT)
             elif self.down and self.pos["y"] < SCREEN_HEIGHT - PADDLE_HEIGHT:
                 self.pos["y"] = min(
                     self.pos["y"] + PADDLE_SPEED, SCREEN_HEIGHT - PADDLE_HEIGHT
                 )
         else:
             if self.down and self.pos["x"] > PADDLE_HEIGHT:
-                self.pos["x"] = max(self.pos["x"] - PADDLE_SPEED, PADDLE_HEIGHT)
+                self.pos["x"] = max(
+                    self.pos["x"] - PADDLE_SPEED, PADDLE_HEIGHT)
             elif self.up and self.pos["x"] < SCREEN_WIDTH - PADDLE_HEIGHT:
                 self.pos["x"] = min(
                     self.pos["x"] + PADDLE_SPEED, SCREEN_WIDTH - PADDLE_HEIGHT
