@@ -26,15 +26,21 @@ class ToastNot {
 
     makeAlert(winner) {
         this.init();
-        this.$winnerText = this.$toastContainer.querySelector("#winner_text");
+        this.$winnerText = this.$toastContainer.querySelector("#winner_txt");
+        
+        let temp_txt = document.createElement("div");
 
-        let temp_txt = "Winner :";
+        temp_txt.innerHTML = `Winner :`;
+
         for(let i = 0; i < winner.length; i++) {
-            temp_txt += " ";
-            temp_txt += winner[i];
+            temp_txt.innerHTML += ` `;
+            temp_txt.innerHTML += `${winner[i]}`;
+            if (i + 1 !== winner.length) {
+                temp_txt.innerHTML += `,`;
+            }
         }
 
-        this.$winnerText = temp_txt;
+        this.$winnerText.appendChild(temp_txt);
         this.toastEl = this.$toastContainer.querySelector("#winner_toast");
         this.toast = new bootstrap.Toast(this.toastEl, {
             animation: true,
