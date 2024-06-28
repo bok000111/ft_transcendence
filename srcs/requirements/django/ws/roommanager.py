@@ -1,5 +1,6 @@
 import uuid
 from .game import Game
+from .enums import GameType
 
 
 # Game class의 싱글톤 패턴 적용
@@ -53,4 +54,5 @@ class RoomManager:
         if game is None:
             print("Failed to get game instance")
             return None
-        await game.start()
+        end_score = 7 if game_type is GameType.NORMAL_4 else 5
+        await game.start(end_score)

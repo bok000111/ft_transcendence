@@ -26,6 +26,7 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
+        self.end_score = 5
         print(self.channel_layer)
 
     @classmethod
@@ -37,8 +38,9 @@ class Game:
             await self.add_players_to_group(matched_users)
         return self
 
-    async def start(self):
+    async def start(self, end_score):
         self.status = "playing"
+        self.end_score = end_score
         for player in self.players:
             print(f"Player {player.nickname} joined")
         await self.channel_layer.group_send(
@@ -52,7 +54,7 @@ class Game:
                     "type": self.game_type.value,
                     # "my_nickname": self.players[0].nickname,
                     "users": [player.nickname for player in self.players],
-                    "end_score": 5,
+                    "end_score": end_score,
                 },
             },
         )
@@ -107,14 +109,14 @@ class Game:
         self.check_collision()
         # check game end(임시)
         if self.player_count == 2:
-            if self.players[0].score >= 5 or self.players[1].score >= 5:
+            if self.players[0].score >= self.end_score or self.players[1].score >= self.end_score:
                 self.status = "end"
         elif self.player_count == 4:
             if (
-                self.players[0].score >= 5
-                or self.players[1].score >= 5
-                or self.players[2].score >= 5
-                or self.players[3].score >= 5
+                self.players[0].score >= self.end_score
+                or self.players[1].score >= self.end_score
+                or self.players[2].score >= self.end_score
+                or self.players[3].score >= self.end_score
             ):
                 self.status = "end"
 
