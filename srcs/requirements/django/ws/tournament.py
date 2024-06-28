@@ -49,6 +49,7 @@ class TournamentManager:
             self.sub_games = {}  # gid로 game_id(1, 2, 3) 관리
             self.winners = []  # semi final winner
             self.tournament_result_manager = None
+            self.room_manager = RoomManager()
 
         async def init_tournament(self):
             # self.tournament_result_manager = await TournamentResultManager.instance()
@@ -64,8 +65,7 @@ class TournamentManager:
             #     datetime.now().timestamp(), self.tournament_id, username_list
             # )
 
-            room_manager = RoomManager()
-            tournament_room_id = await room_manager.start_game(
+            tournament_room_id = await self.room_manager.start_game(
                 GameType.TOURNAMENT, self.tournament_users
             )
             if tournament_room_id is None:  # error
@@ -81,8 +81,7 @@ class TournamentManager:
 
         async def start_subgame(self, matched_users, game_id):
             print(matched_users)
-            room_manager = RoomManager()
-            gid = await room_manager.start_game(GameType.SUB_GAME, matched_users)
+            gid = await self.room_manager.start_game(GameType.SUB_GAME, matched_users)
             if gid is None:  # error
                 return
             print("subgame gid: ", gid)
