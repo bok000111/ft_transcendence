@@ -31,10 +31,10 @@ class TournamentManager:
         tournament = self.Tournament(
             tournament_users, self.tournament_id, self.sub_game_to_tournament
         )
-        await tournament.init_tournament()
         self.tournaments[self.tournament_id] = tournament
         self.tournament_id += 1
         print("self.tournament_id: ", self.tournament_id)
+        await tournament.init_tournament()
 
     # gid로 subgame이 끝났음을 알림
     async def finish_subgame_in_tournament(self, gid, scores):
@@ -66,12 +66,14 @@ class TournamentManager:
             # )
 
             room_manager = RoomManager()
-            tournament_room_id = await room_manager.start_game(GameType.TOURNAMENT, self.tournament_users)
+            tournament_room_id = await room_manager.start_game(
+                GameType.TOURNAMENT, self.tournament_users)
             if tournament_room_id is None:  # error
                 return None
             # lock 필요..?
             self.sub_game_to_tournament[tournament_room_id] = self.tournament_id
 
+            await asyncio.sleep(3)
             await asyncio.gather(
                 self.start_subgame(self.tournament_users[:2], 2),
                 self.start_subgame(self.tournament_users[2:], 3)
@@ -83,7 +85,7 @@ class TournamentManager:
             gid = await room_manager.start_game(GameType.SUB_GAME, matched_users)
             if gid is None:  # error
                 return
-            print(gid)
+            print("subgame gid: ", gid)
             self.sub_games[gid] = game_id
 
         async def finish_subgame(self, gid, scores):
@@ -103,4 +105,4 @@ class TournamentManager:
 
             self.winners.append(winner)
             if len(self.winners) == 2:
-                self.start_subgame(self.winners, 1)
+                await self.start_subgame(self.winners, 1)

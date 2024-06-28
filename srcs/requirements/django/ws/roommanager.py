@@ -56,5 +56,4 @@ class RoomManager:
             return None
 
         await game.start()
-
         return gid

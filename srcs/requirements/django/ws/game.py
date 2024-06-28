@@ -41,7 +41,7 @@ class Game:
 
     async def start(self):
         for player in self.players:
-            print(f"Player {player.nickname} joined")
+            print(f"Player {player.nickname} joined in {self.game_type}")
         await self.channel_layer.group_send(
             self.group_name,
             {
@@ -58,8 +58,6 @@ class Game:
             },
         )
 
-        if self.game_type == GameType.SUB_GAME:
-            asyncio.sleep(3)
         if self.game_type != GameType.TOURNAMENT:
             asyncio.create_task(self.send_game_info())
 
