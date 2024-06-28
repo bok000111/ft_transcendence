@@ -15,86 +15,79 @@ from pathlib import Path
 from corsheaders.defaults import default_methods, default_headers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-
-def load_dotenv(file_path):
-    with open(file_path, encoding="utf-8") as f:
-        for line in f:
-            # Remove leading/trailing whitespace
-            line = line.strip()
-            # Ignore comments and empty lines
-            if line.startswith("#") or not line:
-                continue
-            # Split at the first `=` character
-            key, value = line.split("=", 1)
-            # Remove leading/trailing whitespace from key and value
-            key = key.strip()
-            value = value.strip()
-            # Set the environment variable
-            os.environ[key] = value
-
-
-# TODO: 배포시 False로 변경
-DEBUG = True
-
-if DEBUG:
-    load_dotenv(os.path.join(BASE_DIR, "../../.env"))
-
+DEBUG = os.getenv("DJANGO_DEBUG") == "True"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # TODO: 나중에 환경변수로 변경
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "[::1]",
+    "ft-transcendence",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:5500",
+    "http://localhost:4242",
+    "http://127.0.0.1:4242",
+    "https://localhost:4242",
+    "https://127.0.0.1:4242",
     "http://localhost:8000",
-    "http://localhost:8080",
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5500",
     "http://127.0.0.1:8000",
-    "http://127.0.0.1:8080",
+    "https://localhost:8000",
+    "https://127.0.0.1:8000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://localhost:5500",
+    "https://127.0.0.1:5500",
 ]
-CSRF_COOKIE_SECURE = False  # 개발시에는 False로 설정
+CSRF_COOKIE_SECURE = True
+if DEBUG:
+    CSRF_COOKIE_SECURE = False  # 개발시에는 False로 설정
 CSRF_COOKIE_SAMESITE = "Lax"
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost",
-    "http://localhost:3000",
-    "http://localhost:5500",
+    "http://localhost:4242",
+    "http://127.0.0.1:4242",
+    "https://localhost:4242",
+    "https://127.0.0.1:4242",
     "http://localhost:8000",
-    "http://localhost:8080",
-    "http://127.0.0.1",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5500",
     "http://127.0.0.1:8000",
-    "http://127.0.0.1:8080",
+    "https://localhost:8000",
+    "https://127.0.0.1:8000",
+    "http://localhost:5500",
+    "http://127.0.0.1:5500",
+    "https://localhost:5500",
+    "https://127.0.0.1:5500",
 ]
-
 CORS_ALLOW_METHODS = [
     *default_methods,
 ]
-
 CORS_ALLOW_HEADERS = (
     *default_headers,
     "access-control-allow-origin",
     "origin",
 )
+API_URL = "https://localhost:4242/"
+WS_URL = "wss://localhost:4242/ws/"
+if DEBUG:
+    API_URL = "http://localhost:4242/"
+    WS_URL = "ws://localhost:4242/ws/"
 
+if os.getenv("VIRTUAL_ENV") is None:
+    if DEBUG:
+        API_URL = "http://localhost:8000/"
+        WS_URL = "ws://localhost:8000/ws/"
+    else:
+        API_URL = "https://localhost:8000/"
+        WS_URL = "wss://localhost:8000/ws/"
 
-# Application definition
-
+    # Application definition
 INSTALLED_APPS = [
     "daphne",  # daphne - ASGI 서버
     "corsheaders",  # cors - cross-origin resource sharing
@@ -103,77 +96,51 @@ INSTALLED_APPS = [
     "ws",  # websocket 라우팅
     "oauth",  # 42 OAuth
     "user",  # 유저 관리
-    "channels",  # channels - websocket
     "result",  # 결과 페이지 - 블록체인으로 관리
-    "django.contrib.admin",
+    "channels",  # channels - websocket
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "django.contrib.messages",
     "django.contrib.staticfiles",
 ]
-
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    # "django.middleware.csrf.CsrfViewMiddleware", - 임시로 CSRF 보안 비활성화
+    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
-
 ROOT_URLCONF = "ft_transcendence.urls"
 CHANNEL_URLCONF = "ws.routing"
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [
-            os.path.join(BASE_DIR, "../frontend/"),
-        ],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
-
 WSGI_APPLICATION = "ft_transcendence.wsgi.application"
 ASGI_APPLICATION = "ft_transcendence.asgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-
-# TODO: 나중에 환경변수로 변경
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "ft_transcendence",
-        "USER": "postgres",
-        "PASSWORD": "postgres",
-        "HOST": "localhost",  # PostgreSQL이 로컬에 설치된 경우
-        "PORT": "5432",  # 기본 PostgreSQL 포트
+        "NAME": os.getenv("POSTGRES_DB"),
+        "USER": os.getenv("POSTGRES_USER"),
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": os.getenv("POSTGRES_HOST"),
+        "PORT": os.getenv("POSTGRES_PORT"),
     }
 }
-
+# 개발시에는 도커 네트워크 외부에서 접속 가능하도록 설정
+if os.getenv("VIRTUAL_ENV") is None:
+    DATABASES["default"]["HOST"] = "localhost"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
-
+# 개발시에는 속도를 위해 MD5 사용
 if DEBUG:
-    # 개발시에는 속도를 위해 MD5 사용
     PASSWORD_HASHERS = [
         "django.contrib.auth.hashers.MD5PasswordHasher",
     ]
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
@@ -189,53 +156,82 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 AUTH_USER_MODEL = "user.User"
-
 SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-
 SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = False  # 개발시에는 False로 설정
-SESSION_COOKIE_HTTPONLY = False  # 개발시에는 False로 설정
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+if DEBUG:  # 개발시에는 False로 설정
+    SESSION_COOKIE_SECURE = False
+    SESSION_COOKIE_HTTPONLY = False
+    SECURE_SSL_REDIRECT = False
+    SECURE_PROXY_SSL_HEADER = None
+
+# Templates
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [BASE_DIR / "ft_transcendence/templates"],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "ft_transcendence.context_processors.settings_context",
+            ],
+        },
+    },
+]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
-
 LANGUAGE_CODE = "ko-kr"
-
 TIME_ZONE = "Asia/Seoul"
-
 USE_I18N = True
-
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
-
 STATIC_URL = "static/"
-
-STATICFILES_DIRS = [
-    os.path.abspath(os.path.join(BASE_DIR, "../frontend/")),
+STATIC_ROOT = "/var/www/static/"
+STATICFILES_DIRS = [  # 개발시에만 사용
+    BASE_DIR / "static",
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
-
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+# Django Channels
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [
+                (
+                    os.getenv("REDIS_HOST"),
+                    os.getenv("REDIS_PORT"),
+                )
+            ],
         },
     },
 }
+if os.getenv("VIRTUAL_ENV") is None:
+    CHANNEL_LAYERS["default"]["CONFIG"]["hosts"] = [
+        ("localhost", 6379),
+    ]
 
 
 # 42 OAuth
-OAUTH_42_URL = "https://api.intra.42.fr/oauth/authorize"
+OAUTH_42_URL = os.getenv("OAUTH_42_URL")
 OAUTH_42_CLIENT_ID = os.getenv("OAUTH_42_CLIENT_ID")
 OAUTH_42_CLIENT_SECRET = os.getenv("OAUTH_42_CLIENT_SECRET")
-OAUTH_42_REDIRECT_URI = "http://localhost:8000/oauth/callback/"
-OAUTH_42_TOKEN_URL = "https://api.intra.42.fr/oauth/token"
+OAUTH_42_REDIRECT_URI = os.getenv("OAUTH_42_REDIRECT_URI")
+OAUTH_42_TOKEN_URL = os.getenv("OAUTH_42_TOKEN_URL")
+
+# Silence system check
+# self-signed certificate를 사용하면서 hsts를 사용하면 브라우저에서 접속이 안될 수 있어서 비활성화
+SILENCED_SYSTEM_CHECKS = ["security.W004"]

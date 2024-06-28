@@ -1,22 +1,42 @@
 import asyncio
 from channels.layers import get_channel_layer
 from ws.enums import GameType
-from .ball import Ball
-from .player import Player
-from .ai_player import AI_Player
-from .constants import *
+from ws.ball import Ball
+from ws.player import Player
+from ws.ai_player import AI_Player
+from ws.constants import (
+    BALL_RADIUS,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    DEFAULT_SPEED,
+    MAX_SPEED,
+    PADDLE_WIDTH,
+    PADDLE_HEIGHT,
+    PADDLE_SPEED,
+    INTERVAL,
+)
 
 
 class Game:
     # 2인용 게임, 4인용 게임 구분
     # matched_user = tuple(uid, channel_name, nickname)
-    def __init__(self, id, game_type, matched_users):
-        self.gid = id
+    def __init__(self, gid: int, game_type: GameType, matched_users: list):
+        self.gid = gid
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
         if game_type == GameType.AI:
-            self.players = [(Player(0, matched_users[0][0], matched_users[0][1], matched_users[0][2])),
-                            (AI_Player(1, matched_users[0][0], matched_users[0][1], "mingkang_bot"))]
+            self.players = [
+                (
+                    Player(
+                        0, matched_users[0][0], matched_users[0][1], matched_users[0][2]
+                    )
+                ),
+                (
+                    AI_Player(
+                        1, matched_users[0][0], matched_users[0][1], "mingkang_bot"
+                    )
+                ),
+            ]
         else:
             self.players = [
                 Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
@@ -27,6 +47,7 @@ class Game:
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
         from .tournament import TournamentManager
+
         self.tournament_manager = TournamentManager()
         print(self.channel_layer)
 
@@ -34,7 +55,9 @@ class Game:
     async def create(cls, id, game_type, matched_users):
         self = cls(id, game_type, matched_users)
         if game_type == GameType.LOCAL or game_type == GameType.AI:
-            await self.channel_layer.group_add(self.group_name, self.players[0].channel_name)
+            await self.channel_layer.group_add(
+                self.group_name, self.players[0].channel_name
+            )
         else:
             await self.add_players_to_group(matched_users)
         return self
@@ -69,18 +92,17 @@ class Game:
         # print
         try:
             await asyncio.gather(*tasks)
-        except Exception as e:
+        except (asyncio.TimeoutError, asyncio.CancelledError) as e:
             print(f"An error occurred while adding players to group: {e}")
 
     async def remove_players_from_group(self):
         tasks = [
-            self.channel_layer.group_discard(
-                self.group_name, player.channel_name)
+            self.channel_layer.group_discard(self.group_name, player.channel_name)
             for player in self.players
         ]
         try:
             await asyncio.gather(*tasks)
-        except Exception as e:
+        except (asyncio.TimeoutError, asyncio.CancelledError) as e:
             print(f"An error occurred while removing players from group: {e}")
 
     async def send_game_info(self):
@@ -101,7 +123,8 @@ class Game:
             # 게임 종료 처리
             if self.game_type == GameType.TOURNAMENT:
                 self.tournament_manager.finish_subgame_in_tournament(
-                    self.gid, [self.players[0].score, self.players[1].score])
+                    self.gid, [self.players[0].score, self.players[1].score]
+                )
             await self.channel_layer.group_send(
                 self.group_name,
                 {"type": "game_info", "data": "result", "message": self.result()},
@@ -253,6 +276,7 @@ class Game:
         }
 
     def result(self):
+        max_score = max(self.players, key=lambda player: player.score).score
         return {
             "id": self.gid,
             "type": self.game_type.value,

@@ -6,12 +6,9 @@ from django.conf import settings
 from django.contrib.auth import get_user_model, login
 
 
-User = get_user_model()
-
-
 class OauthLoginView(View):
-    ft_auth_url = f"{settings.OAUTH_42_URL}?client_id={settings.OAUTH_42_CLIENT_ID}\
-        &redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code"
+    ft_auth_url = (f"{settings.OAUTH_42_URL}?client_id={settings.OAUTH_42_CLIENT_ID}"
+                   f"&redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code")
 
     def get(self, request):
         if request.user.is_authenticated:
@@ -26,6 +23,8 @@ class OauthCallbackView(View):
         code = request.GET.get("code")
         if not code:
             return redirect("oauth_login")
+
+        user_model = get_user_model()
 
         token_data = {
             "grant_type": "authorization_code",
@@ -60,9 +59,11 @@ class OauthCallbackView(View):
         username = user_data.get("login")
 
         try:
-            user = User.objects.get(email=email, username=username, oauth=True)
-        except User.DoesNotExist:
-            user = User.objects.create_user(email=email, username=username, oauth=True)
+            user = user_model.objects.get(
+                email=email, username=username, oauth=True)
+        except user_model.DoesNotExist:
+            user = user_model.objects.create_user(
+                email=email, username=username, oauth=True)
             user.set_unusable_password()
             user.save()
 

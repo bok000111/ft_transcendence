@@ -1,5 +1,6 @@
 import { rootPage } from "../pages/RootPage.js";
 import { info, MODE } from "./Info.js";
+import { BASE_WS_URL } from "./API.js";
 
 export class GameSocket {
     ws;
@@ -14,7 +15,7 @@ export class GameSocket {
 
     constructor() {
         this.ws = null;
-        this.url = "ws://localhost:8000/ws/";
+        this.url = BASE_WS_URL;
     }
 
     setup() {

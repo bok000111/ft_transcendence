@@ -59,7 +59,10 @@ def logout(cookies):
 
 @contextmanager
 def timer(name: str = ""):
-    start = end = perf_counter()
-    yield lambda: end - start
-    end = perf_counter()
-    print(f"{name} took {end - start:.6f} seconds")
+    start = perf_counter()
+    end = None
+    try:
+        yield lambda: (perf_counter() - start) if end is None else (end - start)
+    finally:
+        end = perf_counter()
+        print(f"{name} took {end - start:.6f} seconds")

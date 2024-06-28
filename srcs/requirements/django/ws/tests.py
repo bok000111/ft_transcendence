@@ -2,11 +2,9 @@
 
 
 import asyncio
-from functools import reduce
-from asgiref.sync import async_to_sync, sync_to_async
 from channels.testing import WebsocketCommunicator
 from django.contrib.auth import get_user_model
-from django.test import TransactionTestCase, AsyncClient
+from django.test import TransactionTestCase, AsyncClient, tag
 from django.urls import reverse
 from django.conf import settings
 from faker import Faker
@@ -26,12 +24,12 @@ def channels_reverse(name, *args, **kwargs):
 
 
 async def build_communicator(user):
-    headers = [(b"origin", b"http://localhost")]
+    headers = [(b"origin", b"https://localhost:4242")]
     if user is not None:
         async_client = AsyncClient()
         await async_client.aforce_login(user)
         headers = [
-            (b"origin", b"http://localhost"),
+            (b"origin", b"https://localhost:4242"),
             (b"cookie", async_client.cookies.output(header="", sep=";").encode()),
         ]
     return WebsocketCommunicator(
@@ -60,7 +58,8 @@ class WebSocketTest(TransactionTestCase):
 
         with timer(f"reject {self.TEST_AMOUNT} unauthorized users"):
             for future in asyncio.as_completed(
-                [communicator.connect(timeout=100) for communicator in communicators]
+                [communicator.connect(timeout=100)
+                 for communicator in communicators]
             ):
                 connected, _ = await future
                 self.assertFalse(connected)
@@ -72,11 +71,13 @@ class WebSocketTest(TransactionTestCase):
 
         with timer(f"connect {self.TEST_AMOUNT} users"):
             for future in asyncio.as_completed(
-                [communicator.connect(timeout=100) for communicator in communicators]
+                [communicator.connect(timeout=100)
+                 for communicator in communicators]
             ):
                 connected, _ = await future
                 self.assertTrue(connected)
 
+    @tag("slow")
     async def test_ws_join(self):
         communicators = await asyncio.gather(
             *[build_communicator(user) for user in self.users]

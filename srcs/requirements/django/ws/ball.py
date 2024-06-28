@@ -1,6 +1,16 @@
 import math
 import random
-from .constants import *
+from ws.constants import (
+    BALL_RADIUS,
+    SCREEN_WIDTH,
+    SCREEN_HEIGHT,
+    DEFAULT_SPEED,
+    MAX_SPEED,
+    PADDLE_WIDTH,
+    PADDLE_HEIGHT,
+    PADDLE_SPEED,
+    INTERVAL,
+)
 
 
 class Ball:
