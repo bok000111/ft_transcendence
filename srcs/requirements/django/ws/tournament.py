@@ -53,14 +53,14 @@ class TournamentManager:
             )
 
         async def init_tournament(self):
-            shuffle(self.tournament_users)
+            # shuffle(self.tournament_users)
 
             username_list = []
             print("self.tournament_users: ", self.tournament_users)
             for user in self.tournament_users:
                 user_info = await sync_to_async(User.objects.get)(pk=user[0])
                 username_list.append(user_info.username)
-            print(username_list)
+            print("username list for blockchain: ", username_list)
             # self.tournament_result_manager.start_game(
             #     datetime.now().timestamp(), self.tournament_id, username_list
             # )
@@ -73,17 +73,17 @@ class TournamentManager:
             self.sub_game_to_tournament[tournament_room_id] = self.tournament_id
 
             await asyncio.gather(
-                self.start_subgame(
-                    [uid for uid in self.tournament_users[:2]], 2),
-                self.start_subgame(
-                    [uid for uid in self.tournament_users[2:]], 3)
+                self.start_subgame(self.tournament_users[:2], 2),
+                self.start_subgame(self.tournament_users[2:], 3)
             )
 
         async def start_subgame(self, matched_users, game_id):
+            print(matched_users)
             room_manager = RoomManager()
             gid = await room_manager.start_game(GameType.SUB_GAME, matched_users)
             if gid is None:  # error
                 return
+            print(gid)
             self.sub_games[gid] = game_id
 
         async def finish_subgame(self, gid, scores):

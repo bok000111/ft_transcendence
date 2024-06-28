@@ -58,6 +58,8 @@ class Game:
             },
         )
 
+        if self.game_type == GameType.SUB_GAME:
+            asyncio.sleep(3)
         if self.game_type != GameType.TOURNAMENT:
             asyncio.create_task(self.send_game_info())
 
