@@ -35,13 +35,13 @@ class Player:
     # 8 : y방향 - 키 떼짐.
     # }
     def set_state(self, keyevent):
-        if keyevent in (1, 5):
+        if keyevent in (1, 6):
             self.up = True
-        elif keyevent in (2, 6):
+        elif keyevent in (2, 5):
             self.down = True
-        elif keyevent in (3, 7):
+        elif keyevent in (3, 8):
             self.up = False
-        elif keyevent in (4, 8):
+        elif keyevent in (4, 7):
             self.down = False
 
     def move(self):
