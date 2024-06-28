@@ -4,7 +4,7 @@ export const MODE = {
     TOURNAMENT: 2,
     LOCAL: 3,
     SUB_GAME: 4,
-    // AI: 5,
+    AI: 5,
 }
 
 class Info {

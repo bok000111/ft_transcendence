@@ -19,6 +19,9 @@ class MainSubpage extends SubPage {
     nicknameModal;
     $nickname;
 
+    $waitingModal;
+    waitingModal;
+
     nicknameModalCloseHandler = () => {
         if (this.$nicknameModal.classList.contains("show")) {
             this.nicknameModal.hide();
@@ -26,28 +29,37 @@ class MainSubpage extends SubPage {
         gameSocket.close();
     };
 
+    waitingModalCloseHandler = () => {
+        if (this.$waitingModal.classList.contains("show")) {
+            this.waitingModal.hide();
+        }
+        gameSocket.close();
+    };
+
+    AILocalHandler = () => {
+        gameSocket.setup();
+
+        gameSocket.mount("end", (data) => {
+            gameSocket.unmount("end");
+            gameSocket.close();
+            toastNot.makeAlert(data.winner);
+        });
+
+        gameSocket.mount("start", (data) => {
+            gameSocket.unmount("start");
+
+            info.curGame = data;
+            this.route("game_page/pong_subpage");
+        });
+    };
+
     nicknameModalSubmitHandler = (event) => {
         event.preventDefault();
-        if (this.$nickname.value === "???") {
+        if (this.$nickname.value === "???" || this.$nickname.value === "") {
             alert("Invalid Nickname...");
             return;
         }
-        if (gameSocket.isOpen()) {
-            gameSocket.send(JSON.stringify({
-                action: "join",
-                data: {
-                    type: info.games.type,
-                    nickname: this.$nickname.value,
-                },
-            }));
-            return;
-        }
         gameSocket.setup();
-        // 닉네임이 겹친 경우
-        gameSocket.mount("error", (data) => {
-            alert("Nickname already exists!");
-            this.$nickname.value = "";
-        });
 
         gameSocket.mount("wait", (data) => {
             if (this.$nicknameModal.classList.contains("show")) {
@@ -57,7 +69,6 @@ class MainSubpage extends SubPage {
             if (!this.$waitingModal.classList.contains("show")) {
                 this.waitingModal.show();
             }
-            gameSocket.unmount("error");
         });
 
         gameSocket.mount("end", (data) => {
@@ -75,9 +86,8 @@ class MainSubpage extends SubPage {
 
         gameSocket.mount("start", (data) => {
             if (info.games.type !== MODE.SUB_GAME) {
-                info.games.myNickname = this.$nickname.value;
+                info.games.myNickname = data.my_nickname;
                 gameSocket.unmount("wait");
-                gameSocket.unmount("error");
 
                 this.waitingModal.hide();
             }
@@ -93,9 +103,6 @@ class MainSubpage extends SubPage {
         });
     };
 
-    $waitingModal;
-    waitingModal;
-
     init() {
         this.$elem.innerHTML = `
             <div class="container z_highest">
@@ -103,32 +110,32 @@ class MainSubpage extends SubPage {
                     <div class="col-md-6 col-lg-4">
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="aiGame" class="btn btn-warning btn-lg w-100">AI MODE</button>
+                                <button id="aiGame" class="btn btn-light btn-lg w-100">AI MODE</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="localGame" class="btn btn-warning btn-lg w-100">LOCAL MODE</button>
+                                <button id="localGame" class="btn btn-light btn-lg w-100">LOCAL MODE</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="normalGame-2" class="btn btn-warning btn-lg w-100">NORMAL MODE - 2</button>
+                                <button id="normalGame-2" class="btn btn-light btn-lg w-100">NORMAL MODE - 2</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="normalGame-4" class="btn btn-warning btn-lg w-100">NORMAL MODE - 4</button>
+                                <button id="normalGame-4" class="btn btn-light btn-lg w-100">NORMAL MODE - 4</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="tourGame" class="btn btn-warning btn-lg w-100">TOURNAMENT MODE</button>
+                                <button id="tourGame" class="btn btn-light btn-lg w-100">TOURNAMENT MODE</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
                             <div class="col">
-                                <button id="tourResult" class="btn btn-warning btn-lg w-100">TOURNAMENT RESULT</button>
+                                <button id="tourResult" class="btn btn-light btn-lg w-100">TOURNAMENT RESULT</button>
                             </div>
                         </div>
                         <div class="row mb-4 pt-4 pb-3">
@@ -150,11 +157,11 @@ class MainSubpage extends SubPage {
         this.$tourResultBtn = this.$elem.querySelector("#tourResult");
 
         this.$nicknameModal = document.querySelector("#nicknameModal");
-        this.nicknameModal = new bootstrap.Modal(this.$nicknameModal, {});
+        this.nicknameModal = new bootstrap.Modal(this.$nicknameModal, { backdrop: "static", keyboard: false });
         this.$nickname = this.$nicknameModal.querySelector("#nickname");
 
         this.$waitingModal = document.querySelector("#waitingModal");
-        this.waitingModal = new bootstrap.Modal(this.$waitingModal, {});
+        this.waitingModal = new bootstrap.Modal(this.$waitingModal, { backdrop: "static", keyboard: false });
         
         if (gameSocket.isOpen()) {
             gameSocket.send(JSON.stringify({
@@ -174,37 +181,15 @@ class MainSubpage extends SubPage {
                 alert(`Logout: ${e.message}`);
             }
         });
-        // this.$aiGameBtn.addEventListener("click", () => {
-        //     this.nicknameModal.show();
-        //     info.games.type = MODE.AI;
-        //     info.games.maxPlayers = 2;
-        // });
+        this.$aiGameBtn.addEventListener("click", () => {
+            info.games.type = MODE.AI;
+            info.games.maxPlayers = 2;
+            this.AILocalHandler();
+        });
         this.$localGameBtn.addEventListener("click", () => {
             info.games.type = MODE.LOCAL;
             info.games.maxPlayers = 2;
-
-            gameSocket.setup();
-            
-            gameSocket.mount("wait", (data) => {
-                gameSocket.unmount("wait");
-                this.$waitingModal.querySelector("#waiting-status").textContent = `(2/2)`;
-                this.waitingModal.show();
-            });
-
-            gameSocket.mount("end", (data) => {
-                gameSocket.unmount("end");
-                gameSocket.close();
-            });
-
-            gameSocket.mount("start", (data) => {
-                gameSocket.unmount("wait");
-                gameSocket.unmount("start");
-                
-                this.waitingModal.hide();
-
-                info.curGame = data;
-                this.route("game_page/pong_subpage");
-            });
+            this.AILocalHandler();
         });
         this.$normalGame_2Btn.addEventListener("click", () => {
             this.nicknameModal.show();
@@ -227,6 +212,7 @@ class MainSubpage extends SubPage {
 
         this.$nicknameModal.addEventListener("submit", this.nicknameModalSubmitHandler);
         this.$nicknameModal.querySelector("#closeBtn").addEventListener("click", this.nicknameModalCloseHandler);
+        this.$waitingModal.querySelector("#closeBtn").addEventListener("click", this.waitingModalCloseHandler);
     }
 
     fini() {
