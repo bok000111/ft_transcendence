@@ -1,4 +1,5 @@
 import asyncio
+import random
 from channels.layers import get_channel_layer
 from ws.enums import GameType
 from .ball import Ball
@@ -131,7 +132,7 @@ class Game:
 
     def update_score(self, winner: Player):
         winner.score += 1
-        self.ball.reset_pos()
+        self.ball.reset_pos(random.randint(1, 2))
         self.players[0].reset_pos()
         self.players[1].reset_pos()
         if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
@@ -217,7 +218,7 @@ class Game:
             elif self.ball.pos["y"] > SCREEN_HEIGHT:
                 is_loser[3] = True
         if True in is_loser:
-            self.ball.reset_pos()
+            self.ball.reset_pos(random.randint(1, 4))
             for i in range(4):
                 self.players[i].reset_pos()
                 if not is_loser[i]:
