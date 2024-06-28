@@ -48,18 +48,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         break
                 game.status = "end"
 
-        # # self.scope["user"].pk가 RoomManager에 있는지 확인
-        # uid = self.scope["user"].pk
-        # if uid in self.room_manager.user_rooms:
-        #     gid = self.room_manager.user_rooms[uid]
-        #     game_instance = self.room_manager.get_game_instance(gid)
-        #     if game_instance is not None:
-        #         await game_instance.leave_game(uid)
-        #     del RoomManager.user_rooms[uid]
-
-        # await self.playing.leave_game(uid)
-        # pass
-
     async def send_error(self, code: int, message: str):
         await self.send_json(
             {
@@ -87,8 +75,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         try:
             if action != WebSocketActionType.GAME_INPUT:
                 print(f"action: {action}")
-            # if action == WebSocketActionType.LEAVE:
-            #     self.close()
             await self.channel_layer.send(
                 self.channel_name,
                 {
@@ -100,7 +86,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(400, "Invalid action")
 
     async def join_queue(self, event):
-        try:  # 대충 입력 검증
+        try:
             print(f"join_queue event: {event}")
             game_type = GameType(event["message"]["type"])
             nickname = event["message"]["nickname"]
@@ -122,7 +108,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 await GameQueue().join_queue(game_type, uid, self.channel_name, nickname)
 
     async def leave_queue(self, event):
-        try:  # 대충 입력 검증
+        try:
             uid = self.scope["user"].pk
         except (ValueError, KeyError):
             await self.send_error(400, "Invalid data")
@@ -143,14 +129,14 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    # message:{
-    #     "action": "game_input",
-    #     "data": {
-    #         "game_id": Int,
-    #         "nickname": String,
-    #         "keyevent": Int
-    #     },
-    # }
+    '''
+    message:{
+        "game_id": Int,
+        "nickname": String,
+        "keyevent": Int
+    }
+    '''
+
     async def game_input(self, event):
         gid = event["message"]["game_id"]
         game_instance = self.room_manager.get_game_instance(gid)
@@ -182,7 +168,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                     }
                 )
             elif data == "start":
-                # leave queue
                 self.waiting = None
                 self.playing = game_status["id"]
                 uid = self.scope["user"].pk
@@ -198,9 +183,3 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-
-    async def test_response(self, event):
-        await self.send_json(event["message"])
-
-    async def _test_response(self, event):
-        await self.send_json(event["message"])

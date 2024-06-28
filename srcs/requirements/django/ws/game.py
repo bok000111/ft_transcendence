@@ -8,7 +8,6 @@ from .constants import *
 
 
 class Game:
-    # 2인용 게임, 4인용 게임 구분
     # matched_user = tuple(uid, channel_name, nickname)
     def __init__(self, id, game_type, matched_users):
         self.gid = id
@@ -52,7 +51,6 @@ class Game:
                 "message": {
                     "id": self.gid,
                     "type": self.game_type.value,
-                    # "my_nickname": self.players[0].nickname,
                     "users": [player.nickname for player in self.players],
                     "end_score": end_score,
                 },
@@ -65,7 +63,6 @@ class Game:
             self.channel_layer.group_add(self.group_name, channel_name)
             for _, channel_name, _ in matched_users
         ]
-        # print
         try:
             await asyncio.gather(*tasks)
         except Exception as e:
@@ -132,6 +129,15 @@ class Game:
         elif self.player_count == 4:
             self.check_collision_4p()
 
+    def update_score(self, winner: Player):
+        winner.score += 1
+        self.ball.reset_pos()
+        self.players[0].reset_pos()
+        self.players[1].reset_pos()
+        if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
+            self.players[1].get_destination(self.ball)
+            self.players[1].set_state()
+
     def check_collision_2p(self):
         # check wall collision
         if (
@@ -156,14 +162,7 @@ class Game:
                     self.players[1].get_destination(self.ball)
                     self.players[1].set_state()
             elif self.ball.pos["x"] < 0:
-                # update score(함수로 구현할 수도)
-                self.players[1].score += 1
-                self.ball.reset_pos()
-                self.players[0].reset_pos()
-                self.players[1].reset_pos()
-                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
-                    self.players[1].get_destination(self.ball)
-                    self.players[1].set_state()
+                self.update_score(self.players[1])
         elif self.ball.pos["x"] >= SCREEN_WIDTH - INTERVAL:
             if (
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
@@ -172,13 +171,7 @@ class Game:
                 self.ball.pos["x"] = SCREEN_WIDTH - INTERVAL
                 self.ball.bounce("x", self.players[1].pos["y"])
             elif self.ball.pos["x"] > SCREEN_WIDTH:
-                self.players[0].score += 1
-                self.ball.reset_pos()
-                self.players[0].reset_pos()
-                self.players[1].reset_pos()
-                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
-                    self.players[1].get_destination(self.ball)
-                    self.players[1].set_state()
+                self.update_score(self.players[0])
 
     def check_collision_4p(self):
         is_loser = [False, False, False, False]
