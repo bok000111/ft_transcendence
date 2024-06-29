@@ -1,4 +1,5 @@
 import { rootPage } from "../pages/RootPage.js";
+import { gamePage } from "../pages/game/GamePage.js";
 import { info } from "./Info.js";
 
 const STATE = {
@@ -47,6 +48,7 @@ export class GameSocket {
             this.unmount("game");
             this.unmount("close");
             rootPage.curChild.curChild.route("main_page/main_subpage");
+            gamePage.curChild = gamePage.child["pong_subpage"];
         });
         // error event 처리는 어떻게 할 것인가?
     }

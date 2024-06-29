@@ -87,7 +87,6 @@ class MainSubpage extends SubPage {
                 gameSocket.unmount("start");
                 gameSocket.unmount("end");
                 gameSocket.close();
-                gamePage.curChild = gamePage.child["pong_subpage"];
             }
         });
 
