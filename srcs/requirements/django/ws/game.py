@@ -1,6 +1,5 @@
 import asyncio
 import random
-from channels.layers import get_channel_layer
 from ws.enums import GameType
 from ws.ball import Ball
 from ws.player import Player
@@ -20,22 +19,19 @@ from ws.constants import (
 
 class Game:
     # matched_user = tuple(uid, channel_name, nickname)
-    def __init__(self, gid: int, game_type: GameType, matched_users: list):
+    def __init__(
+        self, gid: int, game_type: GameType, matched_users: list, channel_layer
+    ):
         self.gid = gid
         self.group_name = f"game_{self.gid}"
         self.game_type = game_type
         if game_type == GameType.AI:
             self.players = [
-                (
-                    Player(
-                        0, matched_users[0][0], matched_users[0][1], matched_users[0][2]
-                    )
+                Player(
+                    0, matched_users[0][0], matched_users[0][1], matched_users[0][2]
                 ),
-                (
-                    AI_Player(
-                        1, matched_users[0][0], matched_users[0][1], "mingkang_bot"
-                    )
-                ),
+                AI_Player(1, matched_users[0][0],
+                          matched_users[0][1], "mingkang_bot"),
             ]
         elif game_type == GameType.SUB_GAME:
             self.players = [
@@ -50,15 +46,14 @@ class Game:
         self.player_count = len(self.players)
         self.ball = Ball()
         self.status = "waiting"
-        self.channel_layer = get_channel_layer()
+        self.channel_layer = channel_layer
         self.end_score = 5
         # from .tournament import TournamentManager
         # self.tournament_manager = TournamentManager()
-        print(self.channel_layer)
 
     @classmethod
-    async def create(cls, id, game_type, matched_users):
-        self = cls(id, game_type, matched_users)
+    async def create(cls, id, game_type, matched_users, channel_layer):
+        self = cls(id, game_type, matched_users, channel_layer)
         if game_type == GameType.LOCAL or game_type == GameType.AI:
             await self.channel_layer.group_add(
                 self.group_name, self.players[0].channel_name
@@ -130,6 +125,16 @@ class Game:
             # if self.game_type == GameType.TOURNAMENT:
             #     self.tournament_manager.finish_subgame_in_tournament(
             #         self.gid, [self.players[0].score, self.players[1].score])
+            if self.game_type == GameType.SUB_GAME:
+                print(f"Game {self.gid} ended")
+                await self.channel_layer.group_send(
+                    "tournament_1",
+                    {
+                        "type": "game_info",
+                        "data_type": "result",
+                        "message": self.result(),
+                    },
+                )
             await self.channel_layer.group_send(
                 self.group_name,
                 {"type": "game_info", "data_type": "result",
