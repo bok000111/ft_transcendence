@@ -95,7 +95,6 @@ class GameQueue:
                 )
 
                 if game_type == GameType.TOURNAMENT:
-                    await asyncio.sleep(1)
                     tournament_manager = TournamentManager()
                     # user_ids = [user[0] for user in matched_users]
                     tournament = await tournament_manager.create_tournament(
