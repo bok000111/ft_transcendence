@@ -49,6 +49,31 @@
     overflow-y: auto;
 }
 
+#tour_list {
+    max-height: 700px;
+    max-width: 814px;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+#tour_list .accordion-item {
+    background-color: transparent;
+}
+
+#tour_list .accordion-button {
+    background-color: transparent;
+    color: white;
+}
+
+#tour_list .accordion-body {
+    background-color: transparent;
+    color: white;
+}
+
+.font_white {
+    color: white;
+}
+
 .game_bg {
     position: relative;
     width: 1440px;
@@ -193,12 +218,12 @@
 
 /*********** Tournament design ***********/
 
-#tournament-title {
+.sub-title {
     text-align: center;
     font-size: 40px;
     font-weight: bold;
     color: #ffffff;
-    -webkit-text-stroke:3px black;
+    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
 }
 
 /*********** Modal design ***********/
