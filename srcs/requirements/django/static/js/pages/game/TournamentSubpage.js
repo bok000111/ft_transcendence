@@ -2,8 +2,8 @@ import { gamePage } from "./GamePage.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
-const WIDTH = 1200;
-const HEIGHT = 900;
+const WIDTH = 1440;
+const HEIGHT = 700;
 const GRID_X = WIDTH / 8;
 const GRID_Y = HEIGHT / 4;
 const RECT_X = GRID_X;

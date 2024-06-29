@@ -76,7 +76,12 @@ class MainSubpage extends SubPage {
             toastNot.makeAlert(data.winner);
             if (data.type === MODE.SUB_GAME) {
                 info.changeState(data.winner[0]);
-                rootPage.curChild.curChild.route("game_page/tournament_subpage");
+                if (info.curGame.id === data.id) {
+                    rootPage.curChild.curChild.route("game_page/tournament_subpage");
+                }
+                else if (rootPage.curChild.curChild.selfName === "tournament_subpage") {
+                    rootPage.curChild.curChild.draw();
+                }
             }
             else {
                 gameSocket.unmount("start");
