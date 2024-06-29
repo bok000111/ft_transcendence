@@ -3,6 +3,7 @@ import { logoutAPI } from "../../models/API.js"
 import { gameSocket } from "../../models/GameSocket.js";
 import { info, MODE } from "../../models/Info.js";
 import { rootPage } from "../RootPage.js";
+import { gamePage } from "../game/GamePage.js"
 import { toastNot } from "../../models/Notification.js"
 import SubPage from "../SubPage.js"
 
@@ -75,7 +76,12 @@ class MainSubpage extends SubPage {
             toastNot.makeAlert(data.winner);
             if (data.type === MODE.SUB_GAME) {
                 info.changeState(data.winner[0]);
-                rootPage.curChild.curChild.route("game_page/tournament_subpage");
+                if (info.curGame.id === data.id) {
+                    rootPage.curChild.curChild.route("game_page/tournament_subpage");
+                }
+                else if (rootPage.curChild.curChild.selfName === "tournament_subpage") {
+                    rootPage.curChild.curChild.draw();
+                }
             }
             else {
                 gameSocket.unmount("start");
@@ -85,14 +91,15 @@ class MainSubpage extends SubPage {
         });
 
         gameSocket.mount("start", (data) => {
-            if (info.games.type !== MODE.SUB_GAME) {
+            if (data.type !== MODE.SUB_GAME) {
                 info.games.myNickname = data.my_nickname;
                 gameSocket.unmount("wait");
 
                 this.waitingModal.hide();
             }
 
-            if (info.games.type === MODE.TOURNAMENT) {
+            if (data.type === MODE.TOURNAMENT) {
+                gamePage.curChild = gamePage.child["tournament_subpage"];
                 info.initState(data.users);
                 this.route("game_page/tournament_subpage");
             }

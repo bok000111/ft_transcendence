@@ -61,16 +61,16 @@ services:
     profiles: ["prod"]
     restart: always
 
-  hardhat:
-    container_name: hardhat
-    image: hardhat
-    build: ./requirements/hardhat
-    networks:
-      - intra
-    ports:
-      - "8545:8545"
-    profiles: ["dev"]
-    restart: always
+  # hardhat:
+  #   container_name: hardhat
+  #   image: hardhat
+  #   build: ./requirements/hardhat
+  #   networks:
+  #     - intra
+  #   ports:
+  #     - "8545:8545"
+  #   profiles: ["dev"]
+  #   restart: always
 
 volumes:
   postgres_data:

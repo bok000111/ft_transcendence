@@ -50,6 +50,7 @@ class Info {
 
     changeState(winner) {
         for (let i = 1; i < 8; ++i) {
+            console.dir(this.games);
             if (this.games.state[i].name === winner) {
                 if (i % 2 === 0) {
                     this.games.state[i + 1].lose = true;
