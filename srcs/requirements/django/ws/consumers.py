@@ -45,18 +45,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         break
                 game.status = "end"
 
-        # # self.scope["user"].pk가 RoomManager에 있는지 확인
-        # uid = self.scope["user"].pk
-        # if uid in self.room_manager.user_rooms:
-        #     gid = self.room_manager.user_rooms[uid]
-        #     game_instance = self.room_manager.get_game_instance(gid)
-        #     if game_instance is not None:
-        #         await game_instance.leave_game(uid)
-        #     del RoomManager.user_rooms[uid]
-
-        # # await self.playing.leave_game(uid)
-        # pass
-
     async def send_error(self, code: int, message: str):
         await self.send_json(
             {
@@ -84,8 +72,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         try:
             if action != WebSocketActionType.GAME_INPUT:
                 print(f"action: {action}")
-            # if action == WebSocketActionType.LEAVE:
-            #     self.close()
             await self.channel_layer.send(
                 self.channel_name,
                 {
@@ -97,7 +83,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             await self.send_error(400, "Invalid action")
 
     async def join_queue(self, event):
-        try:  # 대충 입력 검증
+        try:
             print(f"join_queue event: {event}")
             game_type = GameType(event["message"]["type"])
             nickname = event["message"]["nickname"]
@@ -125,7 +111,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 )
 
     async def leave_queue(self, event):
-        try:  # 대충 입력 검증
+        try:
             uid = self.scope["user"].pk
         except (ValueError, KeyError):
             await self.send_error(400, "Invalid data")
@@ -150,14 +136,14 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    # message:{
-    #     "action": "game_input",
-    #     "data": {
-    #         "game_id": Int,
-    #         "nickname": String,
-    #         "keyevent": Int
-    #     },
-    # }
+    '''
+    message:{
+        "game_id": Int,
+        "nickname": String,
+        "keyevent": Int
+    }
+    '''
+
     async def game_input(self, event):
         gid = event["message"]["game_id"]
         game_instance = self.room_manager.get_game_instance(gid)
@@ -170,9 +156,9 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def game_info(self, event):
         game_status = event["message"]
-        data = event["data"]
+        data_type = event["data_type"]
         async with self.lock:
-            if data == "info":
+            if data_type == "info":
                 await self.send_json(
                     {
                         "code": 4000,  # temp
@@ -180,7 +166,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-            elif data == "result":
+            elif data_type == "result":
                 await self.send_json(
                     {
                         "code": 4001,  # temp
@@ -188,8 +174,10 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-            elif data == "start":
-                # leave queue
+                if game_status["type"] != GameType.SUB_GAME.value:
+                    self.room_manager.remove_room(self.playing)
+
+            elif data_type == "start":
                 self.waiting = None
                 self.playing = game_status["id"]
                 uid = self.scope["user"].pk
@@ -206,66 +194,28 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                     }
                 )
 
-    async def test_response(self, event):
-        await self.send_json(event["message"])
+    async def tournament_info(self, event):
+        info = event["message"]
+        uid = self.scope["user"].pk
+        for i in range(len(event["uids"])):
+            if event["uids"][i] == uid:
+                nickname = info["users"][i]
+                break
+        info["my_nickname"] = nickname
+        await self.send_json(
+            {
+                "code": 4003,  # temp
+                "action": "start",
+                "data": info,
+            }
+        )
 
-    async def _test_response(self, event):
-        await self.send_json(event["message"])
-
-    # async def join_room(self, room_type):
-    #     # room_type은 0~3 사이의 정수여야 함
-    #     if not isinstance(room_type, int) or room_type < 0 or room_type > 3:
-    #         await self.close(code=4003, reason="invalid room_type")
-
-    #     if self.room_type is not None:
-    #         await self.close(code=4004, reason="already joined room")
-
-    #     self.room_type = room_type
-
-    #     if self.room_type == RoomType.LOCAL.value:
-    #         await self.send_json(
-    #             {"action": "ready_to_start", "room_type": self.room_type}
-    #         )
-    #     else:
-    #         await self.join_group(self.room_type)
-
-    # async def join_group(self, room_type):
-    #     async with self.users_lock:
-    #         # user_set에 이미 있으면 오류
-    #         if self.user in WSConsumer.user_set:
-    #             await self.close(code=4004, reason="already joined room")
-    #         WSConsumer.waiting_users[room_type].append(self)
-    #         WSConsumer.user_set.add(self.user)
-    #         if (
-    #             len(WSConsumer.waiting_users[room_type])
-    #             >= WSConsumer.required_users[room_type]
-    #         ):
-    #             # 방 생성
-    #             WSConsumer.room_ids[room_type] += 1
-    #             users = [
-    #                 WSConsumer.waiting_users[room_type].popleft()
-    #                 for _ in range(WSConsumer.required_users[room_type])
-    #             ]
-    #             room_name = self.get_room_name(
-    #                 room_type, WSConsumer.room_ids[room_type]
-    #             )
-    #             for user in users:
-    #                 await self.channel_layer.group_add(room_name, user.channel_name)
-    #                 await user.send_json(
-    #                     {
-    #                         "action": "ready_to_start",
-    #                         "room_type": room_type,
-    #                         "group_name": room_name,
-    #                         "user_list": [u.user.username for u in users],
-    #                     }
-    #                 )
-
-    # # 방 타입과 id를 받아서 해당 방 이름을 반환
-    # def get_room_name(self, room_type, room_id):
-    #     match room_type:
-    #         case RoomType.NORMAL_2.value:
-    #             return f"room_normal_2_{room_id}"
-    #         case RoomType.NORMAL_4.value:
-    #             return f"room_normal_4_{room_id}"
-    #         case RoomType.TOURNAMENT.value:
-    #             return f"room_tournament_{room_id}"
+    async def tournament_result(self, event):
+        result = event["message"]
+        await self.send_json(
+            {
+                "code": 4004,  # temp
+                "action": "end",
+                "data": result,
+            }
+        )
