@@ -98,7 +98,7 @@ class GameQueue:
                     tournament_manager = TournamentManager()
                     # user_ids = [user[0] for user in matched_users]
                     tournament = await tournament_manager.create_tournament(
-                        matched_users
+                        matched_users, self.channel_layer
                     )
                     print(f"tournament: {tournament}")
                     await asyncio.create_task(tournament.start_tournament())
