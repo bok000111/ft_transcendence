@@ -7,7 +7,7 @@ class TourResultListSubpage extends SubPage {
 
     async init() {
         this.$elem.innerHTML = `
-          <h2 class="text-center">Tournament Result</h2>
+          <h2 class="text-center sub-title">Tournament Result</h2>
           <div class="accordion accordion-flush" id="tour_list">
           </div>
         `;
@@ -45,7 +45,7 @@ class TourResultListSubpage extends SubPage {
             accordionItem.className = "accordion-item";
             accordionItem.innerHTML = `
                 <h2 class="accordion-header" id="flush-heading${i}">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${i}" aria-expanded="false" aria-controls="flush-collapse${i}">
+                    <button class="accordion-button collapsed" id="custom_btn" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${i}" aria-expanded="false" aria-controls="flush-collapse${i}">
                         ${tourResultListAPI.recvData.data[i].timestamp}
                     </button>
                 </h2>

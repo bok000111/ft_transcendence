@@ -125,9 +125,8 @@ class PongSubpage extends Subpage {
         this.$commonBg.classList.remove("co_main");
         this.$commonBg.classList.remove("co_frame");
         this.$commonBg.classList.add("game_bg");
-        this.$Bgelem = document.createElement("div");
-        this.$Bgelem.classList.add("right-triangle");
-        document.body.prepend(this.$Bgelem);
+        this.$Bgelem = document.querySelector(".right-triangle");
+        this.$Bgelem.classList.remove("none");
 
         this.$line2 = document.querySelector(".co_line2");
         this.$line2.classList.add("none");
@@ -185,7 +184,7 @@ class PongSubpage extends Subpage {
         this.$commonBg.classList.add("co_frame");
         this.$commonBg.classList.add("co_main");
         this.$commonBg.classList.remove("game_bg");
-        document.body.removeChild(this.$Bgelem);
+        this.$Bgelem.classList.add("none");
     }
 
     // case : default
