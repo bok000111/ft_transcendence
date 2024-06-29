@@ -2,8 +2,8 @@ import { gamePage } from "./GamePage.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
-const WIDTH = 1200;
-const HEIGHT = 900;
+const WIDTH = 1440;
+const HEIGHT = 700;
 const GRID_X = WIDTH / 8;
 const GRID_Y = HEIGHT / 4;
 const RECT_X = GRID_X;
@@ -66,7 +66,7 @@ class TournamentSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
-            <h3 id="tournament-title">TOURNAMENT</h3>
+            <h3 class="sub-title">TOURNAMENT</h3>
             <canvas id="tour-canvas" width="${WIDTH}" height="${HEIGHT}"></canvas>
         `;
 
