@@ -17,6 +17,11 @@ class Game:
         if game_type == GameType.AI:
             self.players = [(Player(0, matched_users[0][0], matched_users[0][1], matched_users[0][2])),
                             (AI_Player(1, matched_users[0][0], matched_users[0][1], "mingkang_bot"))]
+        elif game_type == GameType.SUB_GAME:
+            self.players = [
+                Player(idx, uid, channel_name, nickname)
+                for idx, (uid, channel_name, nickname) in enumerate(matched_users)
+            ]
         else:
             self.players = [
                 Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
@@ -27,8 +32,8 @@ class Game:
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
         self.end_score = 5
-        from .tournament import TournamentManager
-        self.tournament_manager = TournamentManager()
+        # from .tournament import TournamentManager
+        # self.tournament_manager = TournamentManager()
         print(self.channel_layer)
 
     @classmethod
@@ -41,7 +46,7 @@ class Game:
         return self
 
     async def start(self, end_score):
-        # self.status = "playing"
+        self.status = "playing"
         self.end_score = end_score
         for player in self.players:
             print(f"Player {player.nickname} joined")
@@ -49,7 +54,7 @@ class Game:
             self.group_name,
             {
                 "type": "game_info",
-                "data": "start",
+                "data_type": "start",
                 "uids": [player.uid for player in self.players],
                 "message": {
                     "id": self.gid,
@@ -60,8 +65,8 @@ class Game:
             },
         )
 
-        if self.game_type != GameType.TOURNAMENT:
-            asyncio.create_task(self.send_game_info())
+        # if self.game_type != GameType.TOURNAMENT:
+        asyncio.create_task(self.send_game_info())
 
     async def add_players_to_group(self, matched_users):
         tasks = [
@@ -94,18 +99,19 @@ class Game:
         while self.status == "playing":
             await self.channel_layer.group_send(
                 self.group_name,
-                {"type": "game_info", "data": "info", "message": self.info()},
+                {"type": "game_info", "data_type": "info", "message": self.info()},
             )
             self.update()
             await asyncio.sleep(1 / 60)
         if self.status == "end":
             # 게임 종료 처리
-            if self.game_type == GameType.TOURNAMENT:
-                self.tournament_manager.finish_subgame_in_tournament(
-                    self.gid, [self.players[0].score, self.players[1].score])
+            # if self.game_type == GameType.TOURNAMENT:
+            #     self.tournament_manager.finish_subgame_in_tournament(
+            #         self.gid, [self.players[0].score, self.players[1].score])
             await self.channel_layer.group_send(
                 self.group_name,
-                {"type": "game_info", "data": "result", "message": self.result()},
+                {"type": "game_info", "data_type": "result",
+                    "message": self.result()},
             )
 
             await self.remove_players_from_group()
@@ -260,3 +266,7 @@ class Game:
                 if player.score == max([player.score for player in self.players])
             ],
         }
+
+    def get_winner(self):
+        # player 2명 일 때 사용
+        return self.players[0].uid if self.players[0].score > self.players[1].score else self.players[1].uid

@@ -149,9 +149,9 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
 
     async def game_info(self, event):
         game_status = event["message"]
-        data = event["data"]
+        data_type = event["data_type"]
         async with self.lock:
-            if data == "info":
+            if data_type == "info":
                 await self.send_json(
                     {
                         "code": 4000,  # temp
@@ -159,7 +159,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-            elif data == "result":
+            elif data_type == "result":
                 await self.send_json(
                     {
                         "code": 4001,  # temp
@@ -167,7 +167,10 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-            elif data == "start":
+                if game_status["type"] != GameType.SUB_GAME.value:
+                    self.room_manager.remove_room(self.playing)
+
+            elif data_type == "start":
                 self.waiting = None
                 self.playing = game_status["id"]
                 uid = self.scope["user"].pk
@@ -183,3 +186,29 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
+
+    async def tournament_info(self, event):
+        info = event["message"]
+        uid = self.scope["user"].pk
+        for i in range(len(event["uids"])):
+            if event["uids"][i] == uid:
+                nickname = info["users"][i]
+                break
+        info["my_nickname"] = nickname
+        await self.send_json(
+            {
+                "code": 4003,  # temp
+                "action": "start",
+                "data": info,
+            }
+        )
+
+    async def tournament_result(self, event):
+        result = event["message"]
+        await self.send_json(
+            {
+                "code": 4004,  # temp
+                "action": "end",
+                "data": result,
+            }
+        )

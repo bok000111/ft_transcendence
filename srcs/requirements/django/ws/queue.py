@@ -97,7 +97,10 @@ class GameQueue:
                 if game_type == GameType.TOURNAMENT:
                     tournament_manager = TournamentManager()
                     # user_ids = [user[0] for user in matched_users]
-                    await tournament_manager.create_tournament(matched_users)
+                    tid = await tournament_manager.create_tournament(matched_users)
+                    tournament = tournament_manager.get_tournament(tid)
+                    print(f"tournament: {tournament}")
+                    await asyncio.create_task(tournament.start_tournament())
                 else:
                     room_manager = RoomManager()
                     await room_manager.start_game(game_type, matched_users)
