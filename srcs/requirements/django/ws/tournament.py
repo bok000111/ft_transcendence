@@ -30,7 +30,7 @@ class TournamentManager:
         self.tournament_id = 0
 
     async def create_tournament(self, tournament_users):
-        tournament = self.Tournament(
+        tournament = await self.Tournament.create(
             tournament_users, self.tournament_id, self.sub_game_to_tournament
         )
         # await tournament.init_tournament()
@@ -76,43 +76,61 @@ class TournamentManager:
             await self.add_players_to_tournament(tournament_users)
             return self
 
+        async def start_subgame(self, matched_users):
+            self.games.append(
+                await self.room_manager.start_game(GameType.SUB_GAME, matched_users)
+            )
+
+        # async def wait_for_game_end(self, game_id):
+        #     while self.room_manager.check_status(game_id) != "end":
+        #         await asyncio.sleep(1)
+
         async def start_tournament(self):
-            for user in self.tournament_users:
-                print('\033[95m' + f"tournament user: {user[2]}" + '\033[0m')
             await self.channel_layer.group_send(
                 self.tournament_name,
-                {"type": "tournament_info", "message": self.tournament_info()},
+                {
+                    "type": "tournament_info",
+                    "uids": [user[0] for user in self.tournament_users],
+                    "message": self.tournament_info(),
+                },
             )
-            # add (+ idx) to make it 4 players
 
-            await asyncio.sleep(2)
-            game1 = asyncio.create_task(
-                self.room_manager.start_game(
-                    GameType.SUB_GAME, self.tournament_users[:2]
-                )
+            # await asyncio.sleep(2)
+            await asyncio.gather(
+                self.start_subgame(self.tournament_users[:2]),
+                self.start_subgame(self.tournament_users[2:]),
             )
-            game2 = asyncio.create_task(
-                self.room_manager.start_game(
-                    GameType.SUB_GAME, self.tournament_users[2:]
-                )
-            )
-            self.games.append(await game1)
-            self.games.append(await game2)
+            # game1 = asyncio.create_task(
+            #     self.room_manager.start_game(
+            #         GameType.SUB_GAME, self.tournament_users[:2]
+            #     )
+            # )
+            # game2 = asyncio.create_task(
+            #     self.room_manager.start_game(
+            #         GameType.SUB_GAME, self.tournament_users[2:]
+            #     )
+            # )
+            # self.games.append(await game1)
+            # self.games.append(await game2)
             # send group message(end)
-            game1_instance = self.room_manager.get_game_instance(self.games[0])
-            game2_instance = self.room_manager.get_game_instance(self.games[1])
+            # game1_instance = self.room_manager.get_game_instance(self.games[0])
+            # game2_instance = self.room_manager.get_game_instance(self.games[1])
 
             # games 둘 다 끝날 때까지 대기(game 나중에 끝나면 제거해주기)
             while (
                 self.room_manager.check_status(self.games[0]) != "end"
                 or self.room_manager.check_status(self.games[1]) != "end"
             ):
-                print('\033[95m' + "game1: ",
-                      self.room_manager.check_status(self.games[0]) + '\033[0m')
-                print('\033[95m' + "game2: ",
-                      self.room_manager.check_status(self.games[1]) + '\033[0m')
+                print(
+                    "\033[95m" + "game1: ",
+                    self.room_manager.check_status(self.games[0]) + "\033[0m",
+                )
+                print(
+                    "\033[95m" + "game2: ",
+                    self.room_manager.check_status(self.games[1]) + "\033[0m",
+                )
                 await asyncio.sleep(1)
-            await asyncio.sleep(2)
+            # await asyncio.sleep(2)
             # final game
             final_users = []
             if (
@@ -159,15 +177,13 @@ class TournamentManager:
 
         async def add_players_to_tournament(self, players):
             tasks = [
-                self.channel_layer.group_add(
-                    self.tournament_name, channel_name)
+                self.channel_layer.group_add(self.tournament_name, channel_name)
                 for _, channel_name, _ in players
             ]
             try:
                 await asyncio.gather(*tasks)
             except Exception as e:
-                print(
-                    f"An error occurred while adding players to tournament: {e}")
+                print(f"An error occurred while adding players to tournament: {e}")
 
         async def init_tournament(self):
             shuffle(self.tournament_users)

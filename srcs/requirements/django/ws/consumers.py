@@ -136,13 +136,13 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
-    '''
+    """
     message:{
         "game_id": Int,
         "nickname": String,
         "keyevent": Int
     }
-    '''
+    """
 
     async def game_input(self, event):
         gid = event["message"]["game_id"]
@@ -195,6 +195,7 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 )
 
     async def tournament_info(self, event):
+        print("\033[92m" + f"tournament_info: {event}" + "\033[0m")
         info = event["message"]
         uid = self.scope["user"].pk
         for i in range(len(event["uids"])):

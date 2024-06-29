@@ -30,15 +30,13 @@ class Ball:
 
     def bounce_paddle(self, paddle_pos, axis):
         if axis == "x":
-            bounce_angle = self.get_bounce_angle(
-                self.pos["y"] - paddle_pos)
+            bounce_angle = self.get_bounce_angle(self.pos["y"] - paddle_pos)
             self.vel["x"] = round(self.speed * math.cos(bounce_angle), 2)
             if self.pos["x"] > SCREEN_WIDTH / 2:
                 self.vel["x"] = -self.vel["x"]
             self.vel["y"] = round(self.speed * math.sin(bounce_angle), 2)
         elif axis == "y":
-            bounce_angle = self.get_bounce_angle(
-                self.pos["x"] - paddle_pos)
+            bounce_angle = self.get_bounce_angle(self.pos["x"] - paddle_pos)
             self.vel["y"] = round(self.speed * math.cos(bounce_angle), 2)
             if self.pos["y"] > SCREEN_HEIGHT / 2:
                 self.vel["y"] = -self.vel["y"]
