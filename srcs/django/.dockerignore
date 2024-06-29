@@ -1,0 +1,8 @@
+**/.git
+**/*docker-compose.yml
+**/*dockerfile
+**/.dockerignore
+**/.pylintrc
+**/*tests.py
+**/*factories.py
+**/__pycache__

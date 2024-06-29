@@ -19,7 +19,7 @@
 		}
 	},
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "sudo apt-get update && pip3 install --upgrade pip && pip3 install --user -r $PWD/srcs/requirements/django/requirements.txt && echo \"alias manage='python $PWD/srcs/requirements/django/manage.py'\" >> /home/vscode/.zshrc && sudo mkdir /goinfre && sudo chmod 777 /goinfre && echo 'run ssh-add $HOME/.ssh/id_rsa && eval \"$(ssh-agent -s)\" in host terminal to access github.'",
+	"postCreateCommand": "sudo apt-get update && pip3 install --upgrade pip && pip3 install --user -r $PWD/srcs/django/requirements.txt && echo \"alias manage='python $PWD/srcs/django/manage.py'\" >> /home/vscode/.zshrc && echo 'run ssh-add $HOME/.ssh/id_rsa && eval \"$(ssh-agent -s)\" in host terminal to access github.'",
 	// Configure tool-specific properties.
 	"customizations": {
 		"vscode": {
