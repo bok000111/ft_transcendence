@@ -8,6 +8,7 @@ class LoginSubpage extends SubPage {
     $oauthbtn;
     $loginbtn;
     $signupbtn;
+    $loginModal;
     loginModal;
     response;
 
@@ -46,12 +47,25 @@ class LoginSubpage extends SubPage {
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
-        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), {});
+        this.$loginModal = this.$elem.querySelector("#loginModal");
+        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), { backdrop: "static", keyboard: false });
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
             // 모달 띄우기
             this.loginModal.show();
+
+            this.$loginModal.addEventListener("submit", (event) => {
+                event.preventDefault();
+                /**
+                 * --- try
+                 * await jwt 토큰
+                 * this.loginModal.hide();
+                 * this.route("main_page/main_subpage");
+                 * --- catch
+                 * alert("JWT failed..");
+                 */
+            });
 
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,

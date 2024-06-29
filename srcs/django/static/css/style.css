@@ -16,7 +16,9 @@
     background-color: #f8f9fa;
     padding: 20px;
 }
-.score-cell, .vs-cell {
+
+.score-cell,
+.vs-cell {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -25,6 +27,7 @@
     padding: 20px;
     background-color: #e9ecef;
 }
+
 .vs-cell {
     font-size: 24px;
     font-weight: bold;
@@ -106,7 +109,8 @@
 }
 
 .co_main {
-    box-sizing: border-box;;
+    box-sizing: border-box;
+    ;
     width: 1440px;
     height: 1024px;
     background: #006AB6;
@@ -203,7 +207,7 @@
 }
 
 #titlePong {
-    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+    text-shadow: -3px -3px 0 #000, 0 -3px 0 #000, 3px -3px 0 #000, 3px 0 0 #000, 3px 3px 0 #000, 0 3px 0 #000, -3px 3px 0 #000, -3px 0 0 #000;
     color: white;
 }
 
@@ -218,7 +222,7 @@
     border-left: 0px;
     border-bottom: 360px solid transparent;
     z-index: 1;
- }
+}
 
 /*********** Tournament design ***********/
 
@@ -227,7 +231,7 @@
     font-size: 40px;
     font-weight: bold;
     color: #ffffff;
-    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+    text-shadow: -3px -3px 0 #000, 0 -3px 0 #000, 3px -3px 0 #000, 3px 0 0 #000, 3px 3px 0 #000, 0 3px 0 #000, -3px 3px 0 #000, -3px 0 0 #000;
 }
 
 /*********** Modal design ***********/
@@ -243,7 +247,7 @@
     color: rgb(255, 255, 255);
 }
 
-.nickname-modal-inner {
+.inner-padding {
     padding: 5% 10%;
 }
 
