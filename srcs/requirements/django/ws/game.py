@@ -1,4 +1,5 @@
 import asyncio
+import random
 from channels.layers import get_channel_layer
 from ws.enums import GameType
 from ws.ball import Ball
@@ -18,7 +19,6 @@ from ws.constants import (
 
 
 class Game:
-    # 2인용 게임, 4인용 게임 구분
     # matched_user = tuple(uid, channel_name, nickname)
     def __init__(self, gid: int, game_type: GameType, matched_users: list):
         self.gid = gid
@@ -37,6 +37,11 @@ class Game:
                     )
                 ),
             ]
+        elif game_type == GameType.SUB_GAME:
+            self.players = [
+                Player(idx, uid, channel_name, nickname)
+                for idx, (uid, channel_name, nickname) in enumerate(matched_users)
+            ]
         else:
             self.players = [
                 Player(idx, uid, channel_name, nickname + "_" + str(idx + 1))
@@ -46,9 +51,9 @@ class Game:
         self.ball = Ball()
         self.status = "waiting"
         self.channel_layer = get_channel_layer()
-        from .tournament import TournamentManager
-
-        self.tournament_manager = TournamentManager()
+        self.end_score = 5
+        # from .tournament import TournamentManager
+        # self.tournament_manager = TournamentManager()
         print(self.channel_layer)
 
     @classmethod
@@ -62,34 +67,34 @@ class Game:
             await self.add_players_to_group(matched_users)
         return self
 
-    async def start(self):
+    async def start(self, end_score):
+        self.status = "playing"
+        self.end_score = end_score
         for player in self.players:
             print(f"Player {player.nickname} joined in {self.game_type}")
         await self.channel_layer.group_send(
             self.group_name,
             {
                 "type": "game_info",
-                "data": "start",
+                "data_type": "start",
                 "uids": [player.uid for player in self.players],
                 "message": {
                     "id": self.gid,
                     "type": self.game_type.value,
-                    # "my_nickname": self.players[0].nickname,
                     "users": [player.nickname for player in self.players],
-                    "end_score": 5,
+                    "end_score": end_score,
                 },
             },
         )
 
-        if self.game_type != GameType.TOURNAMENT:
-            asyncio.create_task(self.send_game_info())
+        # if self.game_type != GameType.TOURNAMENT:
+        asyncio.create_task(self.send_game_info())
 
     async def add_players_to_group(self, matched_users):
         tasks = [
             self.channel_layer.group_add(self.group_name, channel_name)
             for _, channel_name, _ in matched_users
         ]
-        # print
         try:
             await asyncio.gather(*tasks)
         except (asyncio.TimeoutError, asyncio.CancelledError) as e:
@@ -115,19 +120,18 @@ class Game:
         while self.status == "playing":
             await self.channel_layer.group_send(
                 self.group_name,
-                {"type": "game_info", "data": "info", "message": self.info()},
+                {"type": "game_info", "data_type": "info", "message": self.info()},
             )
             self.update()
             await asyncio.sleep(1 / 60)
         if self.status == "end":
             # 게임 종료 처리
-            if self.game_type == GameType.TOURNAMENT:
-                self.tournament_manager.finish_subgame_in_tournament(
-                    self.gid, [self.players[0].score, self.players[1].score]
-                )
+            # if self.game_type == GameType.TOURNAMENT:
+            #     self.tournament_manager.finish_subgame_in_tournament(
+            #         self.gid, [self.players[0].score, self.players[1].score])
             await self.channel_layer.group_send(
                 self.group_name,
-                {"type": "game_info", "data": "result", "message": self.result()},
+                {"type": "game_info", "data_type": "result", "message": self.result()},
             )
 
             await self.remove_players_from_group()
@@ -139,14 +143,17 @@ class Game:
         self.check_collision()
         # check game end(임시)
         if self.player_count == 2:
-            if self.players[0].score >= 5 or self.players[1].score >= 5:
+            if (
+                self.players[0].score >= self.end_score
+                or self.players[1].score >= self.end_score
+            ):
                 self.status = "end"
         elif self.player_count == 4:
             if (
-                self.players[0].score >= 5
-                or self.players[1].score >= 5
-                or self.players[2].score >= 5
-                or self.players[3].score >= 5
+                self.players[0].score >= self.end_score
+                or self.players[1].score >= self.end_score
+                or self.players[2].score >= self.end_score
+                or self.players[3].score >= self.end_score
             ):
                 self.status = "end"
 
@@ -161,6 +168,15 @@ class Game:
             self.check_collision_2p()
         elif self.player_count == 4:
             self.check_collision_4p()
+
+    def update_score(self, winner: Player):
+        winner.score += 1
+        self.ball.reset_pos(random.randint(1, 2))
+        self.players[0].reset_pos()
+        self.players[1].reset_pos()
+        if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
+            self.players[1].get_destination(self.ball)
+            self.players[1].set_state()
 
     def check_collision_2p(self):
         # check wall collision
@@ -186,14 +202,7 @@ class Game:
                     self.players[1].get_destination(self.ball)
                     self.players[1].set_state()
             elif self.ball.pos["x"] < 0:
-                # update score(함수로 구현할 수도)
-                self.players[1].score += 1
-                self.ball.reset_pos()
-                self.players[0].reset_pos()
-                self.players[1].reset_pos()
-                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
-                    self.players[1].get_destination(self.ball)
-                    self.players[1].set_state()
+                self.update_score(self.players[1])
         elif self.ball.pos["x"] >= SCREEN_WIDTH - INTERVAL:
             if (
                 self.players[1].pos["y"] - PADDLE_HEIGHT <= self.ball.pos["y"]
@@ -202,13 +211,7 @@ class Game:
                 self.ball.pos["x"] = SCREEN_WIDTH - INTERVAL
                 self.ball.bounce("x", self.players[1].pos["y"])
             elif self.ball.pos["x"] > SCREEN_WIDTH:
-                self.players[0].score += 1
-                self.ball.reset_pos()
-                self.players[0].reset_pos()
-                self.players[1].reset_pos()
-                if self.game_type == GameType.AI and self.ball.vel["x"] > 0:
-                    self.players[1].get_destination(self.ball)
-                    self.players[1].set_state()
+                self.update_score(self.players[0])
 
     def check_collision_4p(self):
         is_loser = [False, False, False, False]
@@ -254,7 +257,7 @@ class Game:
             elif self.ball.pos["y"] > SCREEN_HEIGHT:
                 is_loser[3] = True
         if True in is_loser:
-            self.ball.reset_pos()
+            self.ball.reset_pos(random.randint(1, 4))
             for i in range(4):
                 self.players[i].reset_pos()
                 if not is_loser[i]:
@@ -287,3 +290,11 @@ class Game:
                 if player.score == max([player.score for player in self.players])
             ],
         }
+
+    def get_winner(self):
+        # player 2명 일 때 사용
+        return (
+            self.players[0].uid
+            if self.players[0].score > self.players[1].score
+            else self.players[1].uid
+        )

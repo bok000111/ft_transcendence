@@ -48,6 +48,11 @@ class RoomManager:
         else:
             print(f"Warning: Room ID {room_id} not found")
 
+    def check_status(self, room_id):
+        if room_id not in self.rooms:
+            return None
+        return self.rooms[room_id].status
+
     async def start_game(self, game_type, matched_users):
         gid = await self.create_game(game_type, matched_users)
         if gid is None:
@@ -57,6 +62,11 @@ class RoomManager:
         if game is None:
             print("Failed to get game instance")
             return None
+        end_score = 7 if game_type is GameType.NORMAL_4 else 5
 
-        await game.start()
+        # if game_type != GameType.SUB_GAME:
+        await game.start(end_score)
+        # else:
+        #     await game.send_game_info()
+
         return gid
