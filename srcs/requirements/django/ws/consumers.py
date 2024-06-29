@@ -174,8 +174,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-                if game_status["type"] != GameType.SUB_GAME.value:
-                    self.room_manager.remove_room(self.playing)
+                # if game_status["type"] != GameType.SUB_GAME.value:
+                #     self.room_manager.remove_room(self.playing)
 
             elif data_type == "start":
                 self.waiting = None

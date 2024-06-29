@@ -102,7 +102,8 @@ class Game:
 
     async def remove_players_from_group(self):
         tasks = [
-            self.channel_layer.group_discard(self.group_name, player.channel_name)
+            self.channel_layer.group_discard(
+                self.group_name, player.channel_name)
             for player in self.players
         ]
         try:
@@ -131,7 +132,8 @@ class Game:
             #         self.gid, [self.players[0].score, self.players[1].score])
             await self.channel_layer.group_send(
                 self.group_name,
-                {"type": "game_info", "data_type": "result", "message": self.result()},
+                {"type": "game_info", "data_type": "result",
+                    "message": self.result()},
             )
 
             await self.remove_players_from_group()
