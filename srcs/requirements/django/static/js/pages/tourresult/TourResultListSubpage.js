@@ -45,7 +45,7 @@ class TourResultListSubpage extends SubPage {
             accordionItem.className = "accordion-item";
             accordionItem.innerHTML = `
                 <h2 class="accordion-header" id="flush-heading${i}">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${i}" aria-expanded="false" aria-controls="flush-collapse${i}">
+                    <button class="accordion-button collapsed" id="custom_btn" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse${i}" aria-expanded="false" aria-controls="flush-collapse${i}">
                         ${tourResultListAPI.recvData.data[i].timestamp}
                     </button>
                 </h2>
