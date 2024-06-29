@@ -78,7 +78,7 @@ class TournamentManager:
 
         async def start_tournament(self):
             for user in self.tournament_users:
-                print(f"tournament user: {user[2]}")
+                print('\033[95m' + f"tournament user: {user[2]}" + '\033[0m')
             await self.channel_layer.group_send(
                 self.tournament_name,
                 {"type": "tournament_info", "message": self.tournament_info()},
@@ -98,11 +98,19 @@ class TournamentManager:
             )
             self.games.append(await game1)
             self.games.append(await game2)
+            # send group message(end)
+            game1_instance = self.room_manager.get_game_instance(self.games[0])
+            game2_instance = self.room_manager.get_game_instance(self.games[1])
+
             # games 둘 다 끝날 때까지 대기(game 나중에 끝나면 제거해주기)
             while (
                 self.room_manager.check_status(self.games[0]) != "end"
                 or self.room_manager.check_status(self.games[1]) != "end"
             ):
+                print('\033[95m' + "game1: ",
+                      self.room_manager.check_status(self.games[0]) + '\033[0m')
+                print('\033[95m' + "game2: ",
+                      self.room_manager.check_status(self.games[1]) + '\033[0m')
                 await asyncio.sleep(1)
             await asyncio.sleep(2)
             # final game
@@ -146,8 +154,8 @@ class TournamentManager:
                 },
             )
             # remove games
-            for game in self.games:
-                self.room_manager.remove_room(game)
+            # for game in self.games:
+            #     self.room_manager.remove_room(game)
 
         async def add_players_to_tournament(self, players):
             tasks = [

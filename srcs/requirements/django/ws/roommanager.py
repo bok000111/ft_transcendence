@@ -58,6 +58,7 @@ class RoomManager:
         if gid is None:
             print("Failed to create game")
             return None
+        print('\033[92m' + f"Game created with gid: {gid}" + '\033[0m')
         game = self.rooms[gid]
         if game is None:
             print("Failed to get game instance")
