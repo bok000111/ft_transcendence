@@ -7,12 +7,16 @@ class TourResultListSubpage extends SubPage {
 
     async init() {
         this.$elem.innerHTML = `
-          <h2 class="text-center">Tournament Result</h2>
+          <h2 class="text-center sub-title">Tournament Result</h2>
           <div class="accordion accordion-flush" id="tour_list">
           </div>
         `;
 
         this.$tourList = this.$elem.querySelector("#tour_list");
+        (document.querySelector(".co_ball1")).classList.add("none");
+        (document.querySelector(".co_ball2")).classList.add("none");
+        (document.querySelector(".co_ball3")).classList.add("none");
+        (document.querySelector(".co_line5")).classList.add("none");
 
         try {
             await tourResultListAPI.request();
@@ -20,7 +24,13 @@ class TourResultListSubpage extends SubPage {
             if (tourResultListAPI.recvData && tourResultListAPI.recvData.data) {
                 this.drawItems();
             } else {
-                throw new Error("No data received");
+                if (!(tourResultListAPI.recvData.data)) {
+                    alert("Tournament result doesn't exist...");
+                    this.route("main_page/main_subpage");        
+                }
+                else {
+                    throw new Error("No data received");
+                }
             }
         }
         catch {
@@ -48,7 +58,7 @@ class TourResultListSubpage extends SubPage {
             let tableItem = document.querySelector(`#detailTable-${i}`);
             tableItem.innerHTML = `
             <table class="table">
-            <thead>
+            <thead class="font_white">
                 <tr>
                 <th scope="col">VS</th>
                 <th scope="col">type</th>
@@ -56,7 +66,7 @@ class TourResultListSubpage extends SubPage {
                 <th scope="col">score</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="font_white">
                 <tr>
                 <th scope="row">${tourResultListAPI.recvData.data[i].sub_games[0].players[0]} vs ${tourResultListAPI.recvData.data[i].sub_games[0].players[1]}</th>
                 <td>${tourResultListAPI.recvData.data[i].sub_games[0].game_type}</td>
@@ -82,6 +92,10 @@ class TourResultListSubpage extends SubPage {
 
     fini() {
         this.$elem.innerHTML = ``;
+        (document.querySelector(".co_ball1")).classList.remove("none");
+        (document.querySelector(".co_ball2")).classList.remove("none");
+        (document.querySelector(".co_ball3")).classList.remove("none");
+        (document.querySelector(".co_line5")).classList.remove("none");
     }
 }
 

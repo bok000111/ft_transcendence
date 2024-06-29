@@ -66,7 +66,7 @@ class TournamentSubpage extends SubPage {
 
     init() {
         this.$elem.innerHTML = `
-            <h3 id="tournament-title">TOURNAMENT</h3>
+            <h3 class="sub-title">TOURNAMENT</h3>
             <canvas id="tour-canvas" width="${WIDTH}" height="${HEIGHT}"></canvas>
         `;
 
