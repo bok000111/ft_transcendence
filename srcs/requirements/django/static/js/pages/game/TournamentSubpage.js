@@ -51,18 +51,60 @@ class TournamentSubpage extends SubPage {
         this.ctx.fillStyle = "#006AB6";
         this.ctx.fillRect(0, 0, this.$cnvs.width, this.$cnvs.height);
 
-        this.ctx.beginPath();
-        this.ctx.strokeStyle = "black";
         this.ctx.lineWidth = 5;
+
+        this.ctx.beginPath();
+        this.ctx.strokeStyle = info.games.state[2].lose || info.games.state[3].lose ? "#FFFF99" : "black";
         this.drawLine(4, 1, 4, 2);
-        this.drawLine(2, 2, 6, 2);
-        this.drawLine(2, 2, 2, 4);
-        this.drawLine(6, 2, 6, 4);
-        this.drawLine(1, 4, 3, 4);
-        this.drawLine(5, 4, 7, 4);
+        this.ctx.stroke();
+
+        // pos[2]
+        this.ctx.strokeStyle = info.games.state[3].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 2, 4, 2);
+        this.drawLine(2, 2, 2, 3);
+        this.ctx.stroke();
+
+        // pos[3]
+        this.ctx.strokeStyle = info.games.state[2].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(4, 2, 6, 2);
+        this.drawLine(6, 2, 6, 3);
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = info.games.state[4].lose || info.games.state[5].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 3, 2, 4);
+        this.ctx.stroke();
+        // pos[4]
+        this.ctx.strokeStyle = info.games.state[5].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(1, 4, 2, 4);
         this.drawLine(1, 4, 1, 5);
+        this.ctx.stroke();
+
+        // pos[5]
+        this.ctx.strokeStyle = info.games.state[4].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 4, 3, 4);
         this.drawLine(3, 4, 3, 5);
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = info.games.state[6].lose || info.games.state[7].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(6, 3, 6, 4);
+        this.ctx.stroke();
+        // pos[6]
+        this.ctx.strokeStyle = info.games.state[7].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
         this.drawLine(5, 4, 5, 5);
+        this.drawLine(5, 4, 6, 4);
+        this.ctx.stroke();
+
+        // pos[7]
+        this.ctx.strokeStyle = info.games.state[6].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(6, 4, 7, 4);
         this.drawLine(7, 4, 7, 5);
         this.ctx.stroke();
 
