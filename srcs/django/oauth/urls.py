@@ -4,6 +4,6 @@ from django.urls import path
 
 
 urlpatterns = [
-    path("login/", views.OauthLoginView.as_view(), name="oauth_login"),
-    path("callback/", views.OauthCallbackView.as_view(), name="oauth_callback"),
+    path("login/", views.oauth_login, name="oauth_login"),
+    path("callback/", views.oauth_callback, name="oauth_callback"),
 ]

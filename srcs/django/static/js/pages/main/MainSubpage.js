@@ -1,5 +1,5 @@
 import { mainPage } from "./MainPage.js"
-import { logoutAPI } from "../../models/API.js"
+import { logoutAPI, updateAccessToken } from "../../models/API.js"
 import { gameSocket } from "../../models/GameSocket.js";
 import { info, MODE } from "../../models/Info.js";
 import { rootPage } from "../RootPage.js";
@@ -169,7 +169,7 @@ class MainSubpage extends SubPage {
 
         this.$waitingModal = document.querySelector("#waitingModal");
         this.waitingModal = new bootstrap.Modal(this.$waitingModal, { backdrop: "static", keyboard: false });
-        
+
         if (gameSocket.isOpen()) {
             gameSocket.send(JSON.stringify({
                 action: "leave",
@@ -177,11 +177,11 @@ class MainSubpage extends SubPage {
             }));
             gameSocket.close();
         }
-        
-        this.$logoutBtn.addEventListener("click" , async() => {
+        this.$logoutBtn.addEventListener("click", async () => {
             logoutAPI.sendData = {};
             try {
                 await logoutAPI.request();
+                updateAccessToken(null);
                 this.route("auth_page/login_subpage");
             }
             catch (e) {

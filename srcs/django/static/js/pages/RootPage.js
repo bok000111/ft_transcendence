@@ -18,7 +18,7 @@ export default class RootPage extends Component {
         this.setEvent();
     }
 
-    setEvent() {}
+    setEvent() { }
 
     mount(child, childName) {
         this.child[childName] = child;
@@ -27,7 +27,7 @@ export default class RootPage extends Component {
         }
     }
 
-    requestShift(nextChildName) {}
+    requestShift(nextChildName) { }
 
     childShift(nextChildName) {
         this.curChild.fini();
@@ -77,7 +77,7 @@ export default class RootPage extends Component {
     //     }
     // }
 
-    fini() {}
+    fini() { }
 };
 
 // we should call rootPage.init(); in main.js

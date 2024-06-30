@@ -39,7 +39,8 @@ class GameType(Enum):
             return 4
         if self is self.AI:
             return 1
-        return None
+        # not reachable
+        return 0
 
     def max_client(self) -> int:
         if self is self.NORMAL_2 or self is self.SUB_GAME:
@@ -48,4 +49,5 @@ class GameType(Enum):
             return 4
         if self is self.LOCAL or self is self.AI:
             return 1
-        return None
+        # not reachable
+        return 0
