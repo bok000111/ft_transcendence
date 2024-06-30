@@ -20,7 +20,7 @@ from ws.constants import (
 class Game:
     # matched_user = tuple(uid, channel_name, nickname)
     def __init__(
-        self, gid: int, game_type: GameType, matched_users: list, channel_layer, end_event=None
+        self, gid: int, game_type: GameType, matched_users: list, channel_layer
     ):
         self.gid = gid
         self.group_name = f"game_{self.gid}"
@@ -48,13 +48,13 @@ class Game:
         self.status = "waiting"
         self.channel_layer = channel_layer
         self.end_score = 5
-        self.end_event = end_event
+        self.end_event = None
         # from .tournament import TournamentManager
         # self.tournament_manager = TournamentManager()
 
     @classmethod
-    async def create(cls, id, game_type, matched_users, channel_layer, end_event=None):
-        self = cls(id, game_type, matched_users, channel_layer, end_event)
+    async def create(cls, id, game_type, matched_users, channel_layer):
+        self = cls(id, game_type, matched_users, channel_layer)
         if game_type == GameType.LOCAL or game_type == GameType.AI:
             await self.channel_layer.group_add(
                 self.group_name, self.players[0].channel_name
@@ -277,7 +277,6 @@ class Game:
         }
 
     def result(self):
-        max_score = max(self.players, key=lambda player: player.score).score
         return {
             "id": self.gid,
             "type": self.game_type.value,
