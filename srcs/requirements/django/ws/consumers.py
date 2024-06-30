@@ -193,7 +193,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                         "data": game_status,
                     }
                 )
-                # await asyncio.sleep(2)
 
     async def tournament_info(self, event):
         print("\033[92m" + f"tournament_info: {event}" + "\033[0m")
@@ -211,7 +210,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 "data": info,
             }
         )
-        await asyncio.sleep(2)
 
     async def tournament_result(self, event):
         result = event["message"]
