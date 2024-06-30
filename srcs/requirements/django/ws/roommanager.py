@@ -19,7 +19,7 @@ class RoomManager:
         self.room_id = 0
         self.channel_layer = get_channel_layer()
 
-    async def create_game(self, game_type, matched_users):
+    async def create_game(self, game_type, matched_users, game_event=None):
         try:
             # uuid의 int값을 사용하여 room_id 생성(범위 제한, overflow 방지)
 
@@ -29,7 +29,7 @@ class RoomManager:
                 return None
             # matched_user = (uid, channel_name, nickname)
             self.rooms[room_id] = await Game.create(
-                room_id, game_type, matched_users, self.channel_layer
+                room_id, game_type, matched_users, self.channel_layer, game_event
             )
 
             return room_id
@@ -57,8 +57,8 @@ class RoomManager:
             return None
         return self.rooms[room_id].status
 
-    async def start_game(self, game_type, matched_users):
-        gid = await self.create_game(game_type, matched_users)
+    async def start_game(self, game_type, matched_users, game_event=None):
+        gid = await self.create_game(game_type, matched_users, game_event)
         if gid is None:
             print("Failed to create game")
             return None
