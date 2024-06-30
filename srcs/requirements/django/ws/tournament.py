@@ -64,10 +64,8 @@ class TournamentManager:
             self.tournament_id = tournament_id
             self.tournament_name = f"tournament_{tournament_id}"
             self.games = []
-            # self.tournament_result_manager = TournamentResultManager(
-            #     os.getenv("ENDPOINT")
-            # )
             self.channel_layer = get_channel_layer()
+            self.tournament_result_manager = None
 
         @classmethod
         async def create(cls, tournament_users, tournament_id, sub_game_to_tournament):
@@ -76,16 +74,26 @@ class TournamentManager:
             await self.add_players_to_tournament(tournament_users)
             return self
 
-        async def start_subgame(self, matched_users):
-            self.games.append(
-                await self.room_manager.start_game(GameType.SUB_GAME, matched_users)
-            )
+        async def start_subgame(self, matched_users, game_id):
+            gid = await self.room_manager.start_game(GameType.SUB_GAME, matched_users)
+            self.games.append((gid, game_id))
 
-        # async def wait_for_game_end(self, game_id):
-        #     while self.room_manager.check_status(game_id) != "end":
-        #         await asyncio.sleep(1)
+        async def save_subgame(self, gid, game_id):
+            game_instance = await self.room_manager.get_game_instance(gid)
+            scores = game_instance.get_scores()
+            game_info = [game_id] + scores
+            self.tournament_result_manager.save_sub_game(
+                self.tournament_id, game_info)
+            # async def wait_for_game_end(self, game_id):
+            #     while self.room_manager.check_status(game_id) != "end":
+            #         await asyncio.sleep(1)
 
         async def start_tournament(self):
+            # self.tournament_result_manager = await TournamentResultManager.instance()
+            # user_ids = [user[0] for user in self.tournament_users]
+            # self.tournament_result_manager.start_game(
+            #     datetime.now().timestamp(), self.tournament_id, user_ids
+            # )
             await self.channel_layer.group_send(
                 self.tournament_name,
                 {
@@ -97,8 +105,8 @@ class TournamentManager:
 
             # await asyncio.sleep(2)
             await asyncio.gather(
-                self.start_subgame(self.tournament_users[:2]),
-                self.start_subgame(self.tournament_users[2:]),
+                self.start_subgame(self.tournament_users[:2], 2),
+                self.start_subgame(self.tournament_users[2:], 3),
             )
             # game1 = asyncio.create_task(
             #     self.room_manager.start_game(
@@ -130,8 +138,10 @@ class TournamentManager:
                     self.room_manager.check_status(self.games[1]) + "\033[0m",
                 )
                 await asyncio.sleep(1)
-            # await asyncio.sleep(2)
-            # final game
+
+            # for game in self.games:
+            #     await self.save_subgame(game[0], game[1])
+
             final_users = []
             if (
                 self.tournament_users[0][0]
@@ -171,22 +181,25 @@ class TournamentManager:
                     },
                 },
             )
+            # await self.save_subgame(final_game.gid, 1)
             # remove games
             # for game in self.games:
             #     self.room_manager.remove_room(game)
 
         async def add_players_to_tournament(self, players):
             tasks = [
-                self.channel_layer.group_add(self.tournament_name, channel_name)
+                self.channel_layer.group_add(
+                    self.tournament_name, channel_name)
                 for _, channel_name, _ in players
             ]
             try:
                 await asyncio.gather(*tasks)
             except Exception as e:
-                print(f"An error occurred while adding players to tournament: {e}")
+                print(
+                    f"An error occurred while adding players to tournament: {e}")
 
         async def init_tournament(self):
-            shuffle(self.tournament_users)
+            # shuffle(self.tournament_users)
 
             username_list = []
             print("self.tournament_users: ", self.tournament_users)
