@@ -74,10 +74,10 @@ class TournamentManager:
             self.winners.append(winner)
             if len(self.winners) == 2:
                 gid = await self.room_manager.start_game(GameType.SUB_GAME, self.winners)
-                final_game = self.room_manager.get_game_instance(gid)
+                result = self.room_manager.get_game_instance(gid).result()
                 await self.channel_layer.group_send(
                     self.tournament_name,
-                    {"type": "game_info", "data_type": "result", "message": final_game.result()})
+                    {"type": "game_info", "data_type": "result", "message": result})
                 await asyncio.sleep(3)
                 await self.channel_layer.group_send(
                     self.tournament_name,
@@ -86,8 +86,8 @@ class TournamentManager:
                         "message": {
                             "id": self.tournament_id,
                             "type": GameType.TOURNAMENT.value,
-                            "users": self.tournament_users,
-                            "winner": final_game.result()["winner"],
+                            "users": [user[2] for user in self.tournament_users],
+                            "winner": result["winner"],
                         },
                     },
                 )
@@ -102,14 +102,11 @@ class TournamentManager:
             return self
 
         async def start_subgame(self, users):
-            print("start_subgame: ", users)
-            # 나중에 event 넣는 부분 리팩토링 하기
             gid = await self.room_manager.start_game(GameType.SUB_GAME, users)
             game = self.room_manager.get_game_instance(gid)
             await self.channel_layer.group_send(
                 self.tournament_name,
                 {"type": "game_info", "data_type": "result", "message": game.result()})
-            print("end_subgame gid: ", gid)
             winner_id = game.get_winner()
             if len(self.winners) < 2:
                 for user in self.tournament_users:
@@ -135,12 +132,4 @@ class TournamentManager:
                 "type": GameType.TOURNAMENT.value,
                 "users": [user[2] for user in self.tournament_users],
                 "end_score": 7,
-            }
-
-        def tournament_result(self):
-            return {
-                "id": self.tournament_id,
-                "type": GameType.TOURNAMENT.value,
-                "users": [user[2] for user in self.tournament_users],
-                "winner": [self.final_winner],
             }
