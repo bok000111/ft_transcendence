@@ -57,7 +57,7 @@ class Info {
                 else {
                     this.games.state[i - 1].lose = true;
                 }
-                this.games.state[i / 2].name = winner;
+                this.games.state[Math.floor(i / 2)].name = winner;
                 break;
             }
         }
