@@ -123,7 +123,7 @@ class TournamentManager:
                 self.tournament_id, game_info
             )
 
-        async def start_subgame(self, users):
+        async def start_subgame(self, users, game_id):
             print("start_subgame: ", users)
             # 나중에 event 넣는 부분 리팩토링 하기
             gid = await self.room_manager.start_game(GameType.SUB_GAME, users)
