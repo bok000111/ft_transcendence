@@ -203,8 +203,18 @@
 }
 
 #titlePong {
-    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+    -webkit-text-stroke: 3px #000;
+    text-shadow:
+        2px 2px 0 #000, -2px -2px 0 #000,
+        2px -2px 0 #000, -2px 2px 0 #000,
+        2px 0 0 #000, -2px 0 0 #000,
+        0 2px 0 #000, 0 -2px 0 #000,
+        2px 2px 0 #000, -2px -2px 0 #000,
+        2px -2px 0 #000, -2px 2px 0 #000,
+        2px 0 0 #000, -2px 0 0 #000,
+        0 2px 0 #000, 0 -2px 0 #000;
     color: white;
+    margin-left: 180px;
 }
 
 .right-triangle {
