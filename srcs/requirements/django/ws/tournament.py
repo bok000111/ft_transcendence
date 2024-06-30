@@ -27,18 +27,17 @@ class TournamentManager:
         if self._initialized:
             return
         self.tournaments = {}  # tournament_id로 Tournament 인스턴스 관리
-        self.tournament_id = uuid.uuid4().int & (1 << 32) - 1
 
     async def create_tournament(self, tournament_users, channel_layer):
+        tournament_id = uuid.uuid4().int & (1 << 32) - 1
         tournament = await self.Tournament.create(
             tournament_users,
-            self.tournament_id,
+            tournament_id,
             channel_layer,
         )
         # await tournament.init_tournament()
-        self.tournaments[self.tournament_id] = tournament
-        self.tournament_id += 1
-        print("self.tournament_id: ", self.tournament_id)
+        self.tournaments[tournament_id] = tournament
+        print("tournament_id: ", tournament_id)
         return tournament
 
     def get_tournament(self, tid):
@@ -71,10 +70,12 @@ class TournamentManager:
             print("update_winner: ", winner)
             self.winners.append(winner)
             if len(self.winners) == 2:
+
                 gid = await self.room_manager.start_game(
                     GameType.SUB_GAME, self.winners
                 )
                 final_game = self.room_manager.get_game_instance(gid)
+                result = final_game.result()
                 score = final_game.get_scores()
                 await self.save_subgame(score, 1)
                 await self.channel_layer.group_send(
@@ -82,7 +83,7 @@ class TournamentManager:
                     {
                         "type": "game_info",
                         "data_type": "result",
-                        "message": final_game.result(),
+                        "message": result,
                     },
                 )
                 await asyncio.sleep(3)
@@ -93,8 +94,8 @@ class TournamentManager:
                         "message": {
                             "id": self.tournament_id,
                             "type": GameType.TOURNAMENT.value,
-                            "users": self.tournament_users,
-                            "winner": final_game.result()["winner"],
+                            "users": [user[2] for user in self.tournament_users],
+                            "winner": result["winner"],
                         },
                     },
                 )
@@ -109,7 +110,8 @@ class TournamentManager:
             user_ids = [user[0] for user in self.tournament_users]
             self.tournament_result_manager = await TournamentResultManager.instance()
             print(
-                "\033[95m" + f"timestamp: {int(datetime.now().timestamp())}" + "\033[0m"
+                "\033[95m" +
+                f"timestamp: {int(datetime.now().timestamp())}" + "\033[0m"
             )
             await self.tournament_result_manager.start_game(
                 self.tournament_id, int(datetime.now().timestamp()), user_ids
@@ -130,9 +132,7 @@ class TournamentManager:
             game = self.room_manager.get_game_instance(gid)
             await self.channel_layer.group_send(
                 self.tournament_name,
-                {"type": "game_info", "data_type": "result", "message": game.result()},
-            )
-            print("end_subgame gid: ", gid)
+                {"type": "game_info", "data_type": "result", "message": game.result()})
             winner_id = game.get_winner()
             score = game.get_scores()
             await self.save_subgame(score, game_id)
@@ -144,13 +144,15 @@ class TournamentManager:
 
         async def add_players_to_tournament(self, players):
             tasks = [
-                self.channel_layer.group_add(self.tournament_name, channel_name)
+                self.channel_layer.group_add(
+                    self.tournament_name, channel_name)
                 for _, channel_name, _ in players
             ]
             try:
                 await asyncio.gather(*tasks)
             except Exception as e:
-                print(f"An error occurred while adding players to tournament: {e}")
+                print(
+                    f"An error occurred while adding players to tournament: {e}")
 
         def tournament_info(self):
             return {
@@ -158,12 +160,4 @@ class TournamentManager:
                 "type": GameType.TOURNAMENT.value,
                 "users": [user[2] for user in self.tournament_users],
                 "end_score": 7,
-            }
-
-        def tournament_result(self):
-            return {
-                "id": self.tournament_id,
-                "type": GameType.TOURNAMENT.value,
-                "users": [user[2] for user in self.tournament_users],
-                "winner": [self.final_winner],
             }
