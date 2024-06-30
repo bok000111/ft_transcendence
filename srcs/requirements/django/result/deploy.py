@@ -207,7 +207,7 @@ class TournamentResultManager:
         tx_hash = await tournament.constructor().transact(tx)
         tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 1)
         self.contract_address = tx_receipt["contractAddress"]
-        print("contract address: ", self.contract_address)
+        print("\033[95m" + "contract address: ", self.contract_address + "\033[0m")
         self.nonce = nonce + 1
 
     def __backup_abi(self):
