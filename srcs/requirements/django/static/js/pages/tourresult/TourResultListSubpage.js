@@ -22,11 +22,17 @@ class TourResultListSubpage extends SubPage {
             await tourResultListAPI.request();
             
             if (tourResultListAPI.recvData && tourResultListAPI.recvData.data) {
-                this.drawItems();
+                if (tourResultListAPI.recvData.data.length === 0) {
+                    alert("Tournament result doesn't exist...");
+                    this.route("main_page/main_subpage");
+                }
+                else {
+                    this.drawItems();
+                }
             } else {
                 if (!(tourResultListAPI.recvData.data)) {
                     alert("Tournament result doesn't exist...");
-                    this.route("main_page/main_subpage");        
+                    this.route("main_page/main_subpage");
                 }
                 else {
                     throw new Error("No data received");
@@ -49,7 +55,7 @@ class TourResultListSubpage extends SubPage {
                         ${tourResultListAPI.recvData.data[i].timestamp}
                     </button>
                 </h2>
-                <div id="flush-collapse${i}" class="accordion-collapse collapse" aria-labelledby="flush-heading${i}" data-bs-parent="#list_example">
+                <div id="flush-collapse${i}" class="accordion-collapse collapse" aria-labelledby="flush-heading${i}" data-bs-parent="#tour_list">
                     <div class="accordion-body" id="detailTable-${i}"></div>
                 </div>`;
             
