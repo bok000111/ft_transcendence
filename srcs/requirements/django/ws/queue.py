@@ -100,8 +100,20 @@ class GameQueue:
                     tournament = await tournament_manager.create_tournament(
                         matched_users, self.channel_layer
                     )
-                    print(f"tournament: {tournament}")
-                    await asyncio.create_task(tournament.start_tournament())
+                    await self.channel_layer.group_send(
+                        tournament.tournament_name,
+                        {
+                            "type": "tournament_info",
+                            "uids": [user[0] for user in tournament.tournament_users],
+                            "message": tournament.tournament_info(),
+                        },
+                    )
+                    asyncio.gather(
+                        tournament.start_subgame(
+                            tournament.tournament_users[:2]),
+                        tournament.start_subgame(
+                            tournament.tournament_users[2:])
+                    )
                 else:
                     room_manager = RoomManager()
                     await room_manager.start_game(game_type, matched_users)
