@@ -68,17 +68,14 @@ class RoomManager:
         if game is None:
             print("Failed to get game instance")
             return None
-        end_score = 7 if game_type is GameType.NORMAL_4 else 5
+        end_score = 7 if game_type is GameType.NORMAL_4 or game_type is GameType.SUB_GAME else 5
         if game_type is GameType.SUB_GAME:
             event = asyncio.Event()
             event.clear()
             game.end_event = event
-            print("Sub game event set")
-
-        # if game_type != GameType.SUB_GAME:
-        await game.start(end_score)
-        await event.wait()
-        # else:
-        #     await game.send_game_info()
+            await game.start(end_score)
+            await event.wait()
+        else:
+            await game.start(end_score)
 
         return gid

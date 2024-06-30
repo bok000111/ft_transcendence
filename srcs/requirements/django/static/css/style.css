@@ -95,6 +95,10 @@
     z-index: -1;
 }
 
+.main-page .col .btn {
+    border: 2px solid black;
+}
+
 .auth-page,
 .main-page,
 .tour-lobby-page,
@@ -125,7 +129,7 @@
 
 .co_line2 {
     position: absolute;
-    width: 1418px;
+    width: 1440px;
     height: 0px;
     left: 0px;
     top: 100px;
@@ -135,7 +139,7 @@
 /* Line 3 */
 .co_line3 {
     position: absolute;
-    width: 1418px;
+    width: 1440px;
     height: 0px;
     left: 0px;
     top: 924px;
@@ -146,7 +150,7 @@
 /* Line 5 */
 .co_line5 {
     position: absolute;
-    width: 1418px;
+    width: 1440px;
     height: 0px;
     left: 0px;
     top: 512px;
@@ -203,8 +207,18 @@
 }
 
 #titlePong {
-    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+    -webkit-text-stroke: 3px #000;
+    text-shadow:
+        2px 2px 0 #000, -2px -2px 0 #000,
+        2px -2px 0 #000, -2px 2px 0 #000,
+        2px 0 0 #000, -2px 0 0 #000,
+        0 2px 0 #000, 0 -2px 0 #000,
+        2px 2px 0 #000, -2px -2px 0 #000,
+        2px -2px 0 #000, -2px 2px 0 #000,
+        2px 0 0 #000, -2px 0 0 #000,
+        0 2px 0 #000, 0 -2px 0 #000;
     color: white;
+    margin-left: 180px;
 }
 
 .right-triangle {
