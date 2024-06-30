@@ -17,6 +17,27 @@ class LoginSubpage extends SubPage {
         this.sock.addEventListener("open", )
     }
 
+    loginModalSubmitHandler = async (event) => {
+        event.preventDefault();
+
+        try {
+            // await jwt token;
+            this.loginModal.hide();
+            this.route("main_page/main_subpage");
+        }
+        catch {
+            alert("Authentication failed..");
+            this.loginModal.hide();
+            // 실패 시 바로 닫아버리기..?
+        }
+    };
+
+    loginModalCloseHandler = () => {
+        this.loginModal.hide();
+        // 무슨 신호를 백한테 보내야 하나?
+        // 명세..?
+    };
+
     async init() {
         this.$elem.innerHTML = `
             <div class="container z_highest">
@@ -52,20 +73,6 @@ class LoginSubpage extends SubPage {
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
-            // 모달 띄우기
-            this.loginModal.show();
-
-            this.$loginModal.addEventListener("submit", (event) => {
-                event.preventDefault();
-                /**
-                 * --- try
-                 * await jwt 토큰
-                 * this.loginModal.hide();
-                 * this.route("main_page/main_subpage");
-                 * --- catch
-                 * alert("JWT failed..");
-                 */
-            });
 
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
@@ -75,13 +82,11 @@ class LoginSubpage extends SubPage {
                 await loginAPI.request();
                 info.myID = loginAPI.recvData.data.user.id;
                 info.myUsername = loginAPI.recvData.data.user.username;
-                this.loginModal.hide();
-                this.route("main_page/main_subpage");
+                this.$loginModal.addEventListener("submit", this.loginModalSubmitHandler);
+                this.loginModal.show();
             }
             catch (e) {
-                // location.href = location.origin + location.pathname;
                 alert(`Login: ${e.message}`);
-                this.loginModal.hide();
             }
         });
 
