@@ -78,6 +78,7 @@ class TournamentManager:
                 gid = await self.room_manager.start_game(GameType.SUB_GAME, self.winners, game_event)
                 await game_event.wait()
                 final_game = self.room_manager.get_game_instance(gid)
+                await asyncio.sleep(3)
                 await self.channel_layer.group_send(
                     self.tournament_name,
                     {
@@ -100,11 +101,6 @@ class TournamentManager:
             await self.add_players_to_tournament(tournament_users)
             return self
 
-        # async def wait_for_game_end(self, game_id, event):
-        #     while self.room_manager.check_status(game_id) != "end":
-        #         await asyncio.sleep(1)
-        #     event.set()
-
         async def start_subgame(self, users):
             print("start_subgame: ", users)
             game_event = asyncio.Event()
@@ -119,77 +115,6 @@ class TournamentManager:
                     if user[0] == winner_id:
                         await self.update_winner(user)
                         break
-
-        # async def start_tournament(self):
-        #     game1_event = asyncio.Event()
-        #     game1_event.clear()
-        #     game2_event = asyncio.Event()
-        #     game2_event.clear()
-
-        #     game1_id = await self.room_manager.start_game(
-        #         GameType.SUB_GAME, self.tournament_users[:2]
-        #     )
-        #     game2_id = await self.room_manager.start_game(
-        #         GameType.SUB_GAME, self.tournament_users[2:]
-        #     )
-        #     print("start_tournament: ", game1_id, game2_id)
-        #     self.games.append(game1_id)
-        #     self.games.append(game2_id)
-
-        #     asyncio.create_task(self.wait_for_game_end(game1_id, game1_event))
-        #     asyncio.create_task(self.wait_for_game_end(game2_id, game2_event))
-
-        #     await game1_event.wait()
-        #     await game2_event.wait()
-
-        #     # final game
-        #     final_users = []
-        #     if (
-        #         self.tournament_users[0][0]
-        #         == self.room_manager.get_game_instance(self.games[0]).get_winner()
-        #     ):
-        #         final_users.append(self.tournament_users[0])
-        #         print(f"winner1: {self.tournament_users[0][2]}")
-        #     else:
-        #         final_users.append(self.tournament_users[1])
-        #         print(f"winner1: {self.tournament_users[1][2]}")
-        #     if (
-        #         self.tournament_users[2][0]
-        #         == self.room_manager.get_game_instance(self.games[1]).get_winner()
-        #     ):
-        #         final_users.append(self.tournament_users[2])
-        #         print(f"winner2: {self.tournament_users[2][2]}")
-        #     else:
-        #         final_users.append(self.tournament_users[3])
-        #         print(f"winner2: {self.tournament_users[3][2]}")
-        #     print(f"final_users: {final_users[0][2]}, {final_users[1][2]}")
-
-        #     final_game_event = asyncio.Event()
-        #     final_game_id = await self.room_manager.start_game(
-        #         GameType.SUB_GAME, final_users
-        #     )
-        #     print("final_game_id: ", final_game_id)
-        #     self.games.append(final_game_id)
-
-        #     await self.wait_for_game_end(final_game_id, final_game_event)
-        #     await final_game_event.wait()
-
-        #     final_game = self.room_manager.get_game_instance(self.games[2])
-        #     await self.channel_layer.group_send(
-        #         self.tournament_name,
-        #         {
-        #             "type": "tournament_result",
-        #             "message": {
-        #                 "id": self.tournament_id,
-        #                 "type": GameType.TOURNAMENT.value,
-        #                 "users": self.tournament_users,
-        #                 "winner": final_game.result()["winner"],
-        #             },
-        #         },
-        #     )
-        #     # remove games
-        #     # for game in self.games:
-        #     #     self.room_manager.remove_room(game)
 
         async def add_players_to_tournament(self, players):
             tasks = [
@@ -207,7 +132,6 @@ class TournamentManager:
             return {
                 "id": self.tournament_id,
                 "type": GameType.TOURNAMENT.value,
-                # [nickname1, nickname2, nickname3, nickname4]
                 "users": [user[2] for user in self.tournament_users],
                 "end_score": 7,
             }
