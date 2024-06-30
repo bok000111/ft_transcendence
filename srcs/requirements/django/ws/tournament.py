@@ -78,6 +78,9 @@ class TournamentManager:
                 gid = await self.room_manager.start_game(GameType.SUB_GAME, self.winners, game_event)
                 await game_event.wait()
                 final_game = self.room_manager.get_game_instance(gid)
+                await self.channel_layer.group_send(
+                    self.tournament_name,
+                    {"type": "game_info", "data_type": "result", "message": final_game.result()})
                 await asyncio.sleep(3)
                 await self.channel_layer.group_send(
                     self.tournament_name,
@@ -105,10 +108,14 @@ class TournamentManager:
             print("start_subgame: ", users)
             game_event = asyncio.Event()
             game_event.clear()
+            # 나중에 event 넣는 부분 리팩토링 하기
             gid = await self.room_manager.start_game(GameType.SUB_GAME, users, game_event)
             await game_event.wait()
-            print("end_subgame gid: ", gid)
             game = self.room_manager.get_game_instance(gid)
+            await self.channel_layer.group_send(
+                self.tournament_name,
+                {"type": "game_info", "data_type": "result", "message": game.result()})
+            print("end_subgame gid: ", gid)
             winner_id = game.get_winner()
             if len(self.winners) < 2:
                 for user in self.tournament_users:

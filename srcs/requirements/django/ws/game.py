@@ -126,12 +126,12 @@ class Game:
         if self.status == "end":
             if (self.game_type == GameType.SUB_GAME):
                 self.end_event.set()
-            await self.channel_layer.group_send(
-                self.group_name,
-                {"type": "game_info", "data_type": "result",
-                    "message": self.result()},
-            )
-
+            else:
+                await self.channel_layer.group_send(
+                    self.group_name,
+                    {"type": "game_info", "data_type": "result",
+                        "message": self.result()},
+                )
             await self.remove_players_from_group()
 
     def update(self):
