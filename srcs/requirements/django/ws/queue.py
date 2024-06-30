@@ -66,9 +66,18 @@ class GameQueue:
         nickname: str,
     ) -> None:
         async with self._queue_manager[game_type] as manager:
-            if uid in manager:
-                print(f"{game_type.name}: {nickname} is already in queue")
-                return None  # TODO: 이미 대기 중인 경우 에러 보내야함
+            if nickname.isalnum() == False or len(nickname) > 6:
+                print(nickname.isalnum(), len(nickname))
+                print(f"{game_type.name}: {nickname} is invalid")
+                await self.channel_layer.send(
+                    channel_name,
+                    {
+                        "type": "receive_error",
+                        "code": 4000,
+                        "message": "Invalid nickname format",
+                    },
+                )
+                return None  # 닉네임 형식이 잘못된 경우 에러
             manager.append(uid, channel_name, nickname)
             print(f"{game_type.name}: {nickname}({uid}) joined queue")
             print(f"{game_type.name}: {len(manager)} users in queue")
@@ -109,8 +118,10 @@ class GameQueue:
                         },
                     )
                     asyncio.gather(
-                        tournament.start_subgame(tournament.tournament_users[:2], 2),
-                        tournament.start_subgame(tournament.tournament_users[2:], 3),
+                        tournament.start_subgame(
+                            tournament.tournament_users[:2], 2),
+                        tournament.start_subgame(
+                            tournament.tournament_users[2:], 3),
                     )
                 else:
                     room_manager = RoomManager()
