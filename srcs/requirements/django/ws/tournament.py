@@ -71,15 +71,21 @@ class TournamentManager:
             print("update_winner: ", winner)
             self.winners.append(winner)
             if len(self.winners) == 2:
-                game_event = asyncio.Event()
-                game_event.clear()
                 gid = await self.room_manager.start_game(
-                    GameType.SUB_GAME, self.winners, game_event
+                    GameType.SUB_GAME, self.winners
                 )
-                await game_event.wait()
                 final_game = self.room_manager.get_game_instance(gid)
                 score = final_game.get_scores()
                 await self.save_subgame(score, 1)
+                await self.channel_layer.group_send(
+                    self.tournament_name,
+                    {
+                        "type": "game_info",
+                        "data_type": "result",
+                        "message": final_game.result(),
+                    },
+                )
+                await asyncio.sleep(3)
                 await self.channel_layer.group_send(
                     self.tournament_name,
                     {
@@ -117,16 +123,16 @@ class TournamentManager:
                 self.tournament_id, game_info
             )
 
-        async def start_subgame(self, users, game_id):
+        async def start_subgame(self, users):
             print("start_subgame: ", users)
-            game_event = asyncio.Event()
-            game_event.clear()
-            gid = await self.room_manager.start_game(
-                GameType.SUB_GAME, users, game_event
-            )
-            await game_event.wait()
-            print("end_subgame gid: ", gid)
+            # 나중에 event 넣는 부분 리팩토링 하기
+            gid = await self.room_manager.start_game(GameType.SUB_GAME, users)
             game = self.room_manager.get_game_instance(gid)
+            await self.channel_layer.group_send(
+                self.tournament_name,
+                {"type": "game_info", "data_type": "result", "message": game.result()},
+            )
+            print("end_subgame gid: ", gid)
             winner_id = game.get_winner()
             score = game.get_scores()
             await self.save_subgame(score, game_id)
@@ -150,7 +156,6 @@ class TournamentManager:
             return {
                 "id": self.tournament_id,
                 "type": GameType.TOURNAMENT.value,
-                # [nickname1, nickname2, nickname3, nickname4]
                 "users": [user[2] for user in self.tournament_users],
                 "end_score": 7,
             }
