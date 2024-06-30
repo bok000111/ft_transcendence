@@ -55,6 +55,7 @@ class GameQueue:
             return
         self._queue_manager = {t: self._QueueManager() for t in GameType}
         self._initialized = True
+        self.tournament_manager = TournamentManager()
 
     # TODO: LOCAL 게임 처리 구현
     async def join_queue(
@@ -95,9 +96,8 @@ class GameQueue:
                 )
 
                 if game_type == GameType.TOURNAMENT:
-                    tournament_manager = TournamentManager()
                     # user_ids = [user[0] for user in matched_users]
-                    tournament = await tournament_manager.create_tournament(
+                    tournament = await self.tournament_manager.create_tournament(
                         matched_users
                     )
                     print(f"tournament: {tournament}")

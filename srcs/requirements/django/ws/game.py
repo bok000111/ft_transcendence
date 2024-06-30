@@ -300,3 +300,6 @@ class Game:
             if self.players[0].score > self.players[1].score
             else self.players[1].uid
         )
+
+    def get_scores(self):
+        return [player.score for player in self.players]

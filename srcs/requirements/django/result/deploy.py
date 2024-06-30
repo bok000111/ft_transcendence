@@ -226,16 +226,16 @@ class TournamentResultManager:
     async def _wait_all(self):
         await asyncio.gather(*map(lambda x: x["task"], self.pending_tx_tasks.values()))
 
-    async def start_game(self, game_id, timestamp, players):
+    async def start_game(self, tournament_id, timestamp, players):
         await self.__transact(
-            "add_game", game_id, timestamp, players)
+            "add_game", tournament_id, timestamp, players)
 
-    async def save_sub_game(self, game_id, sub_game_info):
+    async def save_sub_game(self, tournament_id, sub_game_info):
         await self.__transact(
-            "add_sub_game", game_id, sub_game_info)
+            "add_sub_game", tournament_id, sub_game_info)
 
-    async def get_tournament(self, game_id):
-        return await self.__call("get_tournament", game_id)
+    async def get_tournament(self, tournament_id):
+        return await self.__call("get_tournament", tournament_id)
 
     async def get_all_tournaments(self):
         # TODO: 요청 최적화 필요
