@@ -7,6 +7,7 @@ from datetime import datetime
 import os
 from .roommanager import RoomManager
 from .enums import GameType
+import uuid
 
 from channels.layers import get_channel_layer
 
@@ -26,7 +27,7 @@ class TournamentManager:
         if self._initialized:
             return
         self.tournaments = {}  # tournament_id로 Tournament 인스턴스 관리
-        self.tournament_id = 0
+        self.tournament_id = uuid.uuid4().int & (1 << 32) - 1
 
     async def create_tournament(self, tournament_users, channel_layer):
         tournament = await self.Tournament.create(
@@ -72,11 +73,13 @@ class TournamentManager:
             if len(self.winners) == 2:
                 game_event = asyncio.Event()
                 game_event.clear()
-                gid = await self.room_manager.start_game(GameType.SUB_GAME, self.winners, game_event)
+                gid = await self.room_manager.start_game(
+                    GameType.SUB_GAME, self.winners, game_event
+                )
                 await game_event.wait()
                 final_game = self.room_manager.get_game_instance(gid)
                 score = final_game.get_scores()
-                self.save_subgame(score, 1)
+                await self.save_subgame(score, 1)
                 await self.channel_layer.group_send(
                     self.tournament_name,
                     {
@@ -99,27 +102,34 @@ class TournamentManager:
             await self.add_players_to_tournament(tournament_users)
             user_ids = [user[0] for user in self.tournament_users]
             self.tournament_result_manager = await TournamentResultManager.instance()
-            self.tournament_result_manager.start_game(
-                datetime.now().timestamp(), self.tournament_id, user_ids
+            print(
+                "\033[95m" + f"timestamp: {int(datetime.now().timestamp())}" + "\033[0m"
+            )
+            await self.tournament_result_manager.start_game(
+                self.tournament_id, int(datetime.now().timestamp()), user_ids
             )
             return self
 
         async def save_subgame(self, score, game_id):
-            game_info = [game_id] + scores
-            self.tournament_result_manager.save_sub_game(
-                self.tournament_id, game_info)
+            game_info = [game_id] + score
+            print("\033[95m" + f"save subgame: {game_info}" + "\033[0m")
+            await self.tournament_result_manager.save_sub_game(
+                self.tournament_id, game_info
+            )
 
         async def start_subgame(self, users, game_id):
             print("start_subgame: ", users)
             game_event = asyncio.Event()
             game_event.clear()
-            gid = await self.room_manager.start_game(GameType.SUB_GAME, users, game_event)
+            gid = await self.room_manager.start_game(
+                GameType.SUB_GAME, users, game_event
+            )
             await game_event.wait()
             print("end_subgame gid: ", gid)
             game = self.room_manager.get_game_instance(gid)
             winner_id = game.get_winner()
             score = game.get_scores()
-            self.save_subgame(score, game_id)
+            await self.save_subgame(score, game_id)
             if len(self.winners) < 2:
                 for user in self.tournament_users:
                     if user[0] == winner_id:
@@ -128,15 +138,13 @@ class TournamentManager:
 
         async def add_players_to_tournament(self, players):
             tasks = [
-                self.channel_layer.group_add(
-                    self.tournament_name, channel_name)
+                self.channel_layer.group_add(self.tournament_name, channel_name)
                 for _, channel_name, _ in players
             ]
             try:
                 await asyncio.gather(*tasks)
             except Exception as e:
-                print(
-                    f"An error occurred while adding players to tournament: {e}")
+                print(f"An error occurred while adding players to tournament: {e}")
 
         def tournament_info(self):
             return {
