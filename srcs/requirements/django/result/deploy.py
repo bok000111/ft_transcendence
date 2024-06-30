@@ -12,9 +12,8 @@ from web3.utils.caching import SimpleCache
 from web3.types import RPCEndpoint
 from solcx import compile_standard, install_solc
 
-abi_path = Path(__file__).parent/"contracts" / \
-    "TournamentContract.abi.json"
-sol_path = Path(__file__).parent/"contracts"/"TournamentContract.sol"
+abi_path = Path(__file__).parent / "contracts" / "TournamentContract.abi.json"
+sol_path = Path(__file__).parent / "contracts" / "TournamentContract.sol"
 
 
 class TournamentResultManager:
@@ -59,9 +58,18 @@ class TournamentResultManager:
             self.private_key = os.getenv("HARDHAT_PRIVATE_KEY")
             self.contract_address = os.getenv("HARDHAT_CONTRACT_ADDRESS")
 
-        if any(x is None for x in
-               (self.chain_address, self.chain_id, self.private_key, self.endpoint)
-               ) or not self.chain_id.isdecimal():
+        if (
+            any(
+                x is None
+                for x in (
+                    self.chain_address,
+                    self.chain_id,
+                    self.private_key,
+                    self.endpoint,
+                )
+            )
+            or not self.chain_id.isdecimal()
+        ):
             raise ValueError("Please set .env file.")
 
         self.chain_id = int(self.chain_id)
@@ -84,7 +92,9 @@ class TournamentResultManager:
 
         # 미들웨어 추가
         account = self.w3.eth.account.from_key(self.private_key)
-        self.w3.middleware_onion.add(await async_construct_sign_and_send_raw_middleware(account))
+        self.w3.middleware_onion.add(
+            await async_construct_sign_and_send_raw_middleware(account)
+        )
         self.w3.eth.default_account = account.address
 
         cache = SimpleCache(256)
@@ -106,16 +116,23 @@ class TournamentResultManager:
         )
 
         def should_cache_fn(method, params, _):
-            if method == "eth_call" and self.contract.decode_function_input(
-                    params[0]["data"])[0].fn_name == "get_tournament":
+            if (
+                method == "eth_call"
+                and self.contract.decode_function_input(params[0]["data"])[0].fn_name
+                == "get_tournament"
+            ):
                 return True
             if method in CACHE_WHITELIST:
                 return True
             return False
 
-        self.w3.middleware_onion.add(await async_construct_simple_cache_middleware(
-            cache, CACHE_WHITELIST, should_cache_fn,
-        ))
+        self.w3.middleware_onion.add(
+            await async_construct_simple_cache_middleware(
+                cache,
+                CACHE_WHITELIST,
+                should_cache_fn,
+            )
+        )
 
         self.nonce = await self.w3.eth.get_transaction_count(self.chain_address)
 
@@ -125,14 +142,15 @@ class TournamentResultManager:
             self.__backup_abi()
             await self.__deploy_contract()
         else:
-            with open(abi_path, 'r', encoding="utf-8") as file:
+            with open(abi_path, "r", encoding="utf-8") as file:
                 self.abi = file.read()
         self.contract = self.w3.eth.contract(
-            address=self.contract_address, abi=self.abi)
+            address=self.contract_address, abi=self.abi
+        )
 
         self._ainit = True
 
-    @ classmethod
+    @classmethod
     def _reset(cls):
         cls._instance = None
         cls._init = False
@@ -147,19 +165,29 @@ class TournamentResultManager:
         with open(sol_path, "rt", encoding="utf-8") as file:
             tournament_sol_data = file.read()
 
-        compiled_sol = compile_standard({
-            "language": "Solidity",
-            "sources": {"TournamentContract.sol": {"content": tournament_sol_data}},
-            "settings": {
-                "outputSelection": {
-                    "*": {
-                        "*": ["abi", "metadata", "evm.bytecode", "evm.bytecode.sourceMap"]
+        compiled_sol = compile_standard(
+            {
+                "language": "Solidity",
+                "sources": {"TournamentContract.sol": {"content": tournament_sol_data}},
+                "settings": {
+                    "outputSelection": {
+                        "*": {
+                            "*": [
+                                "abi",
+                                "metadata",
+                                "evm.bytecode",
+                                "evm.bytecode.sourceMap",
+                            ]
+                        }
                     }
-                }
+                },
             },
-        }, solc_version=solc_version)
+            solc_version=solc_version,
+        )
 
-        contract_info = compiled_sol["contracts"]["TournamentContract.sol"]["TournamentContract"]
+        contract_info = compiled_sol["contracts"]["TournamentContract.sol"][
+            "TournamentContract"
+        ]
         self.abi = contract_info["abi"]
         self.bytecode = contract_info["evm"]["bytecode"]["object"]
 
@@ -179,6 +207,7 @@ class TournamentResultManager:
         tx_hash = await tournament.constructor().transact(tx)
         tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 1)
         self.contract_address = tx_receipt["contractAddress"]
+        print("contract address: ", self.contract_address)
         self.nonce = nonce + 1
 
     def __backup_abi(self):
@@ -227,12 +256,12 @@ class TournamentResultManager:
         await asyncio.gather(*map(lambda x: x["task"], self.pending_tx_tasks.values()))
 
     async def start_game(self, tournament_id, timestamp, players):
-        await self.__transact(
-            "add_game", tournament_id, timestamp, players)
+        print("\033[95m" + "start game" + "\033[0m")
+        await self.__transact("add_game", tournament_id, timestamp, players)
 
     async def save_sub_game(self, tournament_id, sub_game_info):
-        await self.__transact(
-            "add_sub_game", tournament_id, sub_game_info)
+        print("\033[95m" + "save sub game" + "\033[0m")
+        await self.__transact("add_sub_game", tournament_id, sub_game_info)
 
     async def get_tournament(self, tournament_id):
         return await self.__call("get_tournament", tournament_id)

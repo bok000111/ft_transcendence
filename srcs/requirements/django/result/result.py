@@ -24,13 +24,16 @@ class SubGame:
         }
 
     def __str__(self):
-        return (f"Players: {self.players}, Game Type: {self.game_type}"
-                f", Score: {self.score}, Winner: {self.winner}")
+        return (
+            f"Players: {self.players}, Game Type: {self.game_type}"
+            f", Score: {self.score}, Winner: {self.winner}"
+        )
 
 
 class TournamentResult:
     def __init__(self, raw_data):
         split_data = raw_data.split(",")
+        self.sub_games = []
         self.__parse(split_data)
         self.sub_games.sort(key=lambda x: x.game_id)
 
@@ -43,8 +46,6 @@ class TournamentResult:
     #     return result
 
     def __user_id_to_username(self, user_id):
-        # return await sync_to_async(User.objects.get)(id=user_id).username
-        # return sync_to_async(User.objects.get(id=user_id).username)()
         try:
             return get_user_model().objects.get(pk=user_id).username
         except get_user_model().DoesNotExist:
@@ -57,7 +58,6 @@ class TournamentResult:
         # players = [int(id) for id in split_data[1:5]]
 
         sub_games_data = split_data[5:]
-        self.sub_games = []
         for i in range(0, len(sub_games_data), 3):
             game_id = int(sub_games_data[i])
             score = [int(sub_games_data[i + 1]), int(sub_games_data[i + 2])]
@@ -73,13 +73,11 @@ class TournamentResult:
             sub_game = SubGame(sub_players, game_id, game_type, score)
             self.sub_games.append(sub_game)
 
-        final_game_data = sub_games_data[:3]
+        final_game_data = sub_games_data[-3:]
         final_game_id = int(final_game_data[0])
         final_score = [int(final_game_data[1]), int(final_game_data[2])]
-        semi_final_winners = [
-            self.sub_games[0].winner, self.sub_games[1].winner]
-        final_game = SubGame(semi_final_winners,
-                             final_game_id, "final", final_score)
+        semi_final_winners = [self.sub_games[0].winner, self.sub_games[1].winner]
+        final_game = SubGame(semi_final_winners, final_game_id, "final", final_score)
         self.sub_games.append(final_game)
 
     def to_dict(self):
@@ -89,9 +87,11 @@ class TournamentResult:
         }
 
     def __str__(self):
-        return (f"Timestamp: {self.timestamp}, Sub Games[0]: "
-                f"{self.sub_games[0]}, Sub Games[1]: {self.sub_games[1]}"
-                f", Sub Games[2]: {self.sub_games[2]}")
+        return (
+            f"Timestamp: {self.timestamp}, Sub Games[0]: "
+            f"{self.sub_games[0]}, Sub Games[1]: {self.sub_games[1]}"
+            f", Sub Games[2]: {self.sub_games[2]}"
+        )
 
     def __repr__(self):
         return f"Timestamp: {self.timestamp}, Sub Games: {self.sub_games}"
