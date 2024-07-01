@@ -11,18 +11,29 @@ export default class SubPage extends Page {
          * auth_success인 경우 정상적으로 route
          */
         const page_path = nextChildName.split("/")[0];
-        nextChildName = "auth_page/login_subpage";
+
         const access_token_from_url = new URLSearchParams(window.location.hash.slice(1)).get("access_token");
         if (access_token_from_url) {
             window.localStorage.setItem("access_token", access_token_from_url);
             window.location.hash = "";
         }
         if (window.localStorage.getItem("access_token")) {
-            await meAPI.request().then(() => {
+            try {
+                await meAPI.request();
                 info.myID = meAPI.recvData.data.user.id;
                 info.myUsername = meAPI.recvData.data.user.username;
-                nextChildName = "main_page/main_subpage";
-            }).catch(() => { nextChildName = "auth_page/login_subpage"; });
+                if (page_path === "auth_page") {
+                    alert("already logged in");
+                    nextChildName = "main_page/main_subpage";
+                }
+            }
+            catch {
+                if (page_path !== "auth_page") {
+                    if (this.selfName !== "login_subpage" && this.selfName != "signup_subpage")
+                        alert("login required");
+                    nextChildName = "auth_page/login_subpage";
+                }
+            }
         }
         this.requestShift(nextChildName);
         if (replace) {
