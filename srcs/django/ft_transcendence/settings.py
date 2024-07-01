@@ -36,14 +36,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:4242",
     "https://localhost:4242",
     "https://127.0.0.1:4242",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://localhost:8000",
-    "https://127.0.0.1:8000",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://localhost:5500",
-    "https://127.0.0.1:5500",
 ]
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
@@ -54,14 +46,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:4242",
     "https://localhost:4242",
     "https://127.0.0.1:4242",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "https://localhost:8000",
-    "https://127.0.0.1:8000",
-    "http://localhost:5500",
-    "http://127.0.0.1:5500",
-    "https://localhost:5500",
-    "https://127.0.0.1:5500",
 ]
 CORS_ALLOW_METHODS = [
     *default_methods,
@@ -83,21 +67,23 @@ INSTALLED_APPS = [
     "user",  # 유저 관리
     "result",  # 결과 페이지 - 블록체인으로 관리
     "channels",  # channels - websocket
-    "django.contrib.auth",
+    "django.contrib.auth",  # JWT 사용으로 세션은 사용 안하지만 보안기능 사용
     "django.contrib.contenttypes",
-    "django.contrib.sessions",
+    # "django.contrib.sessions",  # JWT 사용으로 세션 사용 안함
     "django.contrib.staticfiles",
 ]
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    # "django.contrib.sessions.middleware.SessionMiddleware",  # JWT 사용으로 세션 사용 안함
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
+    # "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "user.middleware.JWTAuthMiddleware",
 ]
+
 ROOT_URLCONF = "ft_transcendence.urls"
 CHANNEL_URLCONF = "ws.routing"
 WSGI_APPLICATION = "ft_transcendence.wsgi.application"
@@ -119,7 +105,7 @@ DATABASES = {
 if os.getenv("VIRTUAL_ENV") is None:
     DATABASES["default"]["HOST"] = "localhost"
 
-# Password validation
+# Password, User, Authentication
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
 # 개발시에는 속도를 위해 MD5 사용
 if DEBUG:
@@ -141,28 +127,40 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 AUTH_USER_MODEL = "user.User"
-SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
-SESSION_COOKIE_SAMESITE = "Lax"
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
+AUTHENTICATION_BACKENDS = [
+    "user.backends.JWTAuthenticationBackend",
+]
+
+# Session
+# SESSION_ENGINE = "django.contrib.sessions.backends.signed_cookies"
+# SESSION_COOKIE_SAMESITE = "Lax"
+# SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_HTTPONLY = True
+
+# JWT
+JWT_ALGORITHM = "HS256"  # HMAC SHA-256
+JWT_SECRET_KEY = SECRET_KEY  # use django secret key
+JWT_REFRESH_TOKEN_LIFETIME = 60 * 60 * 24 * 30  # 30 days
+JWT_ACCESS_TOKEN_LIFETIME = 60 * 60  # 1 hour
+
 SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Templates
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "ft_transcendence/templates"],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-            ],
-        },
-    },
-]
+# TEMPLATES = [
+#     {
+#         "BACKEND": "django.template.backends.django.DjangoTemplates",
+#         "DIRS": [BASE_DIR / "ft_transcendence/templates"],
+#         "APP_DIRS": True,
+#         "OPTIONS": {
+#             "context_processors": [
+#                 "django.template.context_processors.debug",
+#                 "django.template.context_processors.request",
+#                 "django.contrib.auth.context_processors.auth",
+#             ],
+#         },
+#     },
+# ]
 
 
 # Internationalization

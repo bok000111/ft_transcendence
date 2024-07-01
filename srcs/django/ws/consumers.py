@@ -16,15 +16,15 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         super().__init__(*args, **kwargs)
 
         self.lock = asyncio.Lock()
-        self.waiting: GameType = None
-        self.playing: int = None
+        self.waiting: GameType | None = None
+        self.playing: int | None = None
 
     async def connect(self):
         """
         websocket 연결 시 호출
         lock 사용하여 async-safe
         """
-        await self.accept()
+        await self.accept("jwt.access_token")
 
     async def disconnect(self, code):
         """
@@ -63,9 +63,12 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         Returns:
             None
         """
-        try:
-            action = WebSocketActionType.from_str(content.get("action"))
-        except ValueError:
+
+        if self.scope["user"].is_anonymous:
+            await self.send_error(4001, "Unauthorized")
+            return None
+
+        if (action := WebSocketActionType.from_str(content.get("action"))) is None:
             await self.send_error(400, "Invalid action")
             return None
 

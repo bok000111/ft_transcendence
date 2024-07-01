@@ -13,10 +13,10 @@ const STATE = {
 export class GameSocket {
     ws;
     handler = {
-        wait: (data) => {},
-        start: (data) => {},
-        game: (data) => {},
-        end: (data) => {},
+        wait: (data) => { },
+        start: (data) => { },
+        game: (data) => { },
+        end: (data) => { },
     };
     url;
 
@@ -26,11 +26,12 @@ export class GameSocket {
     }
 
     setup() {
-        this.ws = new WebSocket(this.url);
+        this.ws = new WebSocket(this.url, ['jwt.access_token', 'jwt.access_token.' + window.localStorage.getItem("access_token")]);
         this.ws.addEventListener("open", () => {
             this.ws.addEventListener("message", ({ data }) => {
                 const obj = JSON.parse(data);
-    
+                console.log(obj);
+
                 this.handler[obj.action](obj.data);
             });
             this.send(JSON.stringify({
@@ -73,7 +74,7 @@ export class GameSocket {
     }
 
     unmount(action) {
-        this.handler[action] = (data) => {};
+        this.handler[action] = (data) => { };
     }
 };
 
