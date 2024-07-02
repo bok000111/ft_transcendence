@@ -51,18 +51,20 @@
     <div class="modal" id="loginModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
             <div class="modal-content" id="my-modal-content">
-                <div class="modal-body">
-                    <div class="modal-inner-header inner-padding">
-                        <div class="modal-title">Enter Verification Code</div>
+                <form>
+                    <div class="modal-body">
+                        <div class="modal-inner-header inner-padding">
+                            <div class="modal-title">Enter Verification Code</div>
+                        </div>
+                        <div class="modal-inner-body inner-padding">
+                            <input type="text" placeholder="code">
+                        </div>
+                        <div class="modal-inner-footer inner-padding">
+                            <button type="submit">apply</button>
+                            <button id="closeBtn" type="button" data-dismiss="modal">close</button>
+                        </div>
                     </div>
-                    <div class="modal-inner-body inner-padding">
-                        <input type="text" placeholder="code">
-                    </div>
-                    <div class="modal-inner-footer inner-padding">
-                        <button type="submit">apply</button>
-                        <button id="closeBtn" type="button" data-dismiss="modal">close</button>
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
