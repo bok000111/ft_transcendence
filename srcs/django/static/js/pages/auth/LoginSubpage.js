@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { BASE_WS_URL, loginAPI, updateAccessToken } from "../../models/API.js";
+import { BASE_WS_URL, loginAPI, jwtAPI, updateAccessToken } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -8,13 +8,36 @@ class LoginSubpage extends SubPage {
     $oauthbtn;
     $loginbtn;
     $signupbtn;
+    $loginModal;
     loginModal;
     response;
 
-    connectSocket() {
-        this.sock = new WebSocket(this.url, ['jwt.access_token', 'jwt.access_token.' + window.localStorage.getItem("access_token")]);
-        this.sock.addEventListener("open",)
-    }
+    loginModalSubmitHandler = async (event) => {
+        event.preventDefault();
+
+        try {
+            jwtAPI.sendData = {
+                code: this.$loginModal.querySelector("input").value,
+            };
+            await jwtAPI.request();
+            this.loginModal.hide();
+            updateAccessToken(jwtAPI.recvData.data.access_token);
+            this.route("main_page/main_subpage");
+        }
+        catch {
+            alert("Authentication failed..");
+            this.loginModal.hide();
+            // 로그인은 성공했으나
+            // 2FA 실패 시 바로 닫아버리기..? -> 팀 전체가 같이 얘기 해야하는 부분
+        }
+    };
+
+    // 인증코드 창 닫는 버튼
+    loginModalCloseHandler = () => {
+        this.loginModal.hide();
+        // 만약 요청보내서 이메일 기껏 날려줬는데 입력 안하고 나가는 상황에서 추가
+        // 로 처리해야하는 부분이 있나?
+    };
 
     async init() {
         this.$elem.innerHTML = `
@@ -46,7 +69,8 @@ class LoginSubpage extends SubPage {
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
-        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), {});
+        this.$loginModal = this.$elem.querySelector("#loginModal");
+        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), { backdrop: "static", keyboard: false });
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
@@ -61,8 +85,8 @@ class LoginSubpage extends SubPage {
                 await loginAPI.request();
                 info.myID = loginAPI.recvData.data.user.id;
                 info.myUsername = loginAPI.recvData.data.user.username;
-                this.loginModal.hide();
-                this.route("main_page/main_subpage");
+                this.$loginModal.addEventListener("submit", this.loginModalSubmitHandler);
+                this.loginModal.show();
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;

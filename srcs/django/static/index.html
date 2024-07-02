@@ -52,7 +52,16 @@
         <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
             <div class="modal-content" id="my-modal-content">
                 <div class="modal-body">
-                    <h1 style="text-align: center;">Logging in ...</h1>
+                    <div class="modal-inner-header inner-padding">
+                        <div class="modal-title">Enter Verification Code</div>
+                    </div>
+                    <div class="modal-inner-body inner-padding">
+                        <input type="text" placeholder="code">
+                    </div>
+                    <div class="modal-inner-footer inner-padding">
+                        <button type="submit">apply</button>
+                        <button id="closeBtn" type="button" data-dismiss="modal">close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -63,13 +72,13 @@
             <div class="modal-content" id="my-modal-content">
                 <form>
                     <div class="modal-body">
-                        <div class="modal-inner-header nickname-modal-inner">
+                        <div class="modal-inner-header inner-padding">
                             <div class="modal-title">Enter your nickname</div>
                         </div>
-                        <div class="modal-inner-body nickname-modal-inner">
+                        <div class="modal-inner-body inner-padding">
                             <input type="text" id="nickname" placeholder="nickname">
                         </div>
-                        <div class="modal-inner-footer nickname-modal-inner">
+                        <div class="modal-inner-footer inner-padding">
                             <button type="submit">apply</button>
                             <button id="closeBtn" type="button" data-dismiss="modal">close</button>
                         </div>
