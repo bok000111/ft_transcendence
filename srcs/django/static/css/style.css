@@ -16,6 +16,7 @@
     background-color: #f8f9fa;
     padding: 20px;
 }
+
 .score-cell, .vs-cell {
     display: flex;
     justify-content: center;
@@ -106,7 +107,7 @@
 }
 
 .co_main {
-    box-sizing: border-box;;
+    box-sizing: border-box;
     width: 1440px;
     height: 1024px;
     background: #006AB6;
@@ -243,7 +244,7 @@
     color: rgb(255, 255, 255);
 }
 
-.nickname-modal-inner {
+.inner-padding {
     padding: 5% 10%;
 }
 

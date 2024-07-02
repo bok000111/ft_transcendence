@@ -84,6 +84,11 @@ export const signupAPI = new API(
     "POST"
 );
 
+export const jwtAPI = new API(
+    "/api/2fa/",
+    "POST"
+);
+
 /**
  * POST
  * /api/logout/
