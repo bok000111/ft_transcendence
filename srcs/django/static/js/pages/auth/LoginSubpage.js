@@ -8,6 +8,7 @@ class LoginSubpage extends SubPage {
     $oauthbtn;
     $loginbtn;
     $signupbtn;
+    $loginModalCloseBtn;
     $loginModal;
     loginModal;
     response;
@@ -26,9 +27,6 @@ class LoginSubpage extends SubPage {
         }
         catch {
             alert("Authentication failed..");
-            this.loginModal.hide();
-            // 로그인은 성공했으나
-            // 2FA 실패 시 바로 닫아버리기..? -> 팀 전체가 같이 얘기 해야하는 부분
         }
     };
 
@@ -69,13 +67,13 @@ class LoginSubpage extends SubPage {
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
-        this.$loginModal = this.$elem.querySelector("#loginModal");
+        this.$loginModal = document.querySelector("#loginModal");
         this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), { backdrop: "static", keyboard: false });
+        this.$loginModalCloseBtn = this.$loginModal.querySelector("#closeBtn");
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
             // 모달 띄우기
-            this.loginModal.show();
 
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
@@ -106,6 +104,8 @@ class LoginSubpage extends SubPage {
             this.parent.parent.init(); // may be removed later
             this.parent.parent.checkLoggedIn(); // may be removed later
         });
+
+        this.$loginModalCloseBtn.addEventListener("click", this.loginModalCloseHandler);
     }
 
     fini() {
