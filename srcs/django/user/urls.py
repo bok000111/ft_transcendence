@@ -9,4 +9,5 @@ urlpatterns = [
     path("me/", views.my_info_view, name="myinfo"),
     path("refresh/", views.refresh_token_view, name="refresh"),
     path("csrf/", views.csrf_view, name="csrf"),
+    path("2fa/", views.verify_code, name="verify"),
 ]

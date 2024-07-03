@@ -209,6 +209,16 @@ OAUTH_42_CLIENT_SECRET = os.getenv("OAUTH_42_CLIENT_SECRET")
 OAUTH_42_REDIRECT_URI = os.getenv("OAUTH_42_REDIRECT_URI")
 OAUTH_42_TOKEN_URL = os.getenv("OAUTH_42_TOKEN_URL")
 
+# Email 2FA
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_PORT = os.getenv("EMAIL_PORT")
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+DEFAULT_FROM_EMAIL = "ft.transcendence.42.42@gmail.com"
+OTP_CODE_EXPIRE_SECONDS = 60 * 5  # 5 minutes
+
 # Silence system check
 # self-signed certificate를 사용하면서 hsts를 사용하면 브라우저에서 접속이 안될 수 있어서 비활성화
 SILENCED_SYSTEM_CHECKS = ["security.W004"]

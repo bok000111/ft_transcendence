@@ -29,9 +29,6 @@ class JWTAuthBackend(BaseBackend):
         """
         Create a new Refresh Token and Access Token
         """
-        if user.is_anonymous:
-            return None
-
         if (refresh_token := request.COOKIES.get("refresh_token", None)) is not None:
             token_user = auth_token(refresh_token)
             if token_user:
