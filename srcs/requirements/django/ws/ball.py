@@ -80,5 +80,5 @@ class Ball:
 
         vel_x = round(self.speed * math.cos(radian), 2)
         vel_y = round(self.speed * math.sin(radian), 2)
-        # self.vel = {"x": vel_x, "y": vel_y}
-        self.vel = {"x": 8, "y": 6}
+        self.vel = {"x": vel_x, "y": vel_y}
+        # self.vel = {"x": 8, "y": 6}
