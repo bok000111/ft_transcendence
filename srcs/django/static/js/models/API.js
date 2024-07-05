@@ -9,10 +9,25 @@
  * status code의 경우에는 http response의 status code로 들어온다. ( fail + error )
  */
 
-let csrftoken = null;
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 
 export const updateAccessToken = (token) => {
-    if (token === null || token === undefined) {
+    if (token === null || token === undefined || token === "") {
         window.localStorage.removeItem("access_token");
         return;
     }
@@ -56,12 +71,11 @@ class API {
         }
 
         const response = await fetch(this.uri, httpRequest);
+        if (response.headers.get("X-Access-Token") !== null)
+            updateAccessToken(response.headers.get("X-Access-Token"));
         this.recvData = await response.json();
         if (!response.ok) {
             throw new Error(this.recvData.message);
-        }
-        if (this.recvData?.data?.access_token) {
-            updateAccessToken(this.recvData.data.access_token);
         }
     }
 };
@@ -106,17 +120,6 @@ export const meAPI = new API(
     "GET"
 );
 
-export const csrfTokenAPI = new API(
-    "/api/user/csrf/",
-    "GET"
-);
-
-if (csrftoken === null) {
-    csrfTokenAPI.request().then(() => {
-        csrftoken = csrfTokenAPI.recvData.data.csrftoken;
-        console.log(`csrftoken: ${csrftoken}`);
-    });
-}
 /**
  * <*** WebSocket ***>
  * /api/tournament/id/
