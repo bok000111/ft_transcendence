@@ -218,8 +218,8 @@ class MainSubpage extends SubPage {
         });
 
         this.$nicknameModal.addEventListener("submit", this.nicknameModalSubmitHandler);
-        this.$nicknameModal.querySelector("#closeBtn").addEventListener("click", this.nicknameModalCloseHandler);
-        this.$waitingModal.querySelector("#closeBtn").addEventListener("click", this.waitingModalCloseHandler);
+        this.$nicknameModal.querySelector(".closeBtn").addEventListener("click", this.nicknameModalCloseHandler);
+        this.$waitingModal.querySelector(".closeBtn").addEventListener("click", this.waitingModalCloseHandler);
     }
 
     fini() {
