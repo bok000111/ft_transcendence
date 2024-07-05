@@ -3,8 +3,8 @@ from api.utils import JsendResponse
 from user.forms import UserCreateModelForm, UserLoginForm
 from user.backends import JWTAuthBackend
 
-from django.core.cache import cache
 from django.views.decorators.http import require_POST, require_GET
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 from django.contrib.auth import get_user_model
 
@@ -83,6 +83,7 @@ def logout_view(request):
 
 
 @require_GET
+@ensure_csrf_cookie
 def my_info_view(request):
     if request.user.is_anonymous:
         return JsendResponse({"user": None},
@@ -99,11 +100,6 @@ def refresh_token_view(request):
 
     # 재발급은 미들웨어에서 처리해서 바로 보내면 됨
     return JsendResponse({}, message="ok", status=200)
-
-
-@require_GET
-def csrf_view(request):
-    return JsendResponse({"csrftoken": get_token(request)}, status=200)
 
 
 @require_POST
