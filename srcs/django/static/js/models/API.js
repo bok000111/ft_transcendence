@@ -52,7 +52,7 @@ class API {
     async request() {
         let access_token = window.localStorage.getItem("access_token");
         let http_body = null;
-        let headers = { "X-CSRFToken": csrftoken, };
+        let headers = { "X-CSRFToken": getCookie('csrftoken') };
 
         if (access_token) {
             headers["Authorization"] = `Bearer ${access_token}`;
