@@ -3,6 +3,7 @@
 from user.utils import generate_jwt, auth_token, verify_jwt
 from django.contrib.auth.backends import BaseBackend
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
 
 User = get_user_model()
 
@@ -34,7 +35,9 @@ class JWTAuthBackend(BaseBackend):
             if token_user:
                 # TODO: blacklist refresh token and access token
                 pass
-        request.COOKIES["access_token"] = generate_jwt(user)
+        user.is_access_token_modified = True
+        user.access_token = generate_jwt(user)
+        request.user = user
         request.COOKIES["refresh_token"] = generate_jwt(user, is_refresh=True)
         return None
 
@@ -46,10 +49,7 @@ class JWTAuthBackend(BaseBackend):
         deprecated_access_token = request.COOKIES.get("refresh_token", None)
         deprecated_refresh_token = request.COOKIES.get("refresh_token", None)
         # TODO: blacklist deprecated_tokens
-        request.COOKIES["access_token"] = None
+        request.user.access_token = None
         request.COOKIES["refresh_token"] = None
-        return None
-
-    # TODO: 만들긴 해야함
-    def get_user(self, user_id):
+        request.user = AnonymousUser()
         return None

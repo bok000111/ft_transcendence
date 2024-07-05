@@ -16,7 +16,6 @@ class JWTChannelAuthMiddleware(BaseMiddleware):
         scope = dict(scope)
 
         for protocol in scope.get("subprotocols", []):
-            print(protocol)
             if protocol.startswith("jwt.access_token."):
                 token = protocol[17:]
                 scope["access_token"] = token

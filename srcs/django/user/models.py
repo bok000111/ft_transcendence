@@ -42,7 +42,6 @@ class User(AbstractUser):
     def send_otp_code(self):
         self.otp_code = self.generate_otp_code()
         self.otp_code_created_at = timezone.now()
-        print(self.otp_code)
         try:
             print(f"Your OTP Code is {self.otp_code}")
             # send_mail(
