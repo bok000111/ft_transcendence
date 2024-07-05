@@ -286,6 +286,6 @@
     padding: 0% 10%;
 }
 
-#closeBtn {
+.closeBtn {
     background-color: rgb(189, 189, 189);
 }

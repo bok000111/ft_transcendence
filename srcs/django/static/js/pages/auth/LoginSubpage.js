@@ -69,7 +69,7 @@ class LoginSubpage extends SubPage {
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
         this.$loginModal = document.querySelector("#loginModal");
         this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), { backdrop: "static", keyboard: false });
-        this.$loginModalCloseBtn = this.$loginModal.querySelector("#closeBtn");
+        this.$loginModalCloseBtn = this.$loginModal.querySelector(".closeBtn");
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
