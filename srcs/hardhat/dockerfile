@@ -1,0 +1,50 @@
+FROM node:lts-alpine3.19 as base
+
+# Set build arguments
+ARG UNAME_M="x86_64"
+ARG USER_NAME=appuser
+ARG USER_ID=1001
+ARG GROUP_NAME=appgroup
+ARG GROUP_ID=1001
+# Set working directory
+WORKDIR /app
+# Install dumb-init
+ADD --chmod=755 \
+    https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_${UNAME_M} \
+    /bin/dumb-init
+# Create a non-root user
+RUN addgroup --gid $GROUP_ID $GROUP_NAME \
+    && adduser --disabled-password \
+    --ingroup $GROUP_NAME \
+    --uid $USER_ID \
+    $USER_NAME
+
+
+# Set builder image
+FROM base as builder
+# Set working directory
+WORKDIR /app/
+# Install base dependencies
+ARG DEV_NODE_DEPS="hardhat"
+RUN apk add --update --no-cache \
+    && npm init -y \
+    && npm install --save-dev $DEV_NODE_DEPS --cache /tmp/empty-cache \
+    && npm upgrade --save-dev --no-audit --no-fund --cache /tmp/empty-cache \
+    && rm -rf /tmp/empty-cache
+
+
+# Set runtime image
+FROM base as runtime
+# Set working directory
+WORKDIR /app/
+# Set non-root user
+USER ${USER_NAME}
+# Copy node modules from builder image
+COPY --from=builder --chown=$USER_ID:$GROUP_ID /app /app
+# Copy source and entrypoint
+COPY --chown=$USER_ID:$GROUP_ID . /app
+# Expose port 8545
+EXPOSE 8545
+# Run hardhat node
+ENTRYPOINT [ "/bin/dumb-init", "--" ]
+CMD [ "npx", "hardhat", "node" ]
