@@ -51,12 +51,13 @@ class TournamentResultManager:
 
         # 디버깅용 로컬 환경 설정이 존재하면 덮어씀
         hardhat_endpoint = os.getenv("HARDHAT_ENDPOINT")
-        if hardhat_endpoint:
+        if hardhat_endpoint is not None:
             self.endpoint = hardhat_endpoint
             self.chain_id = os.getenv("HARDHAT_CHAIN_ID")
             self.chain_address = os.getenv("HARDHAT_ACCOUNT")
             self.private_key = os.getenv("HARDHAT_PRIVATE_KEY")
             self.contract_address = os.getenv("HARDHAT_CONTRACT_ADDRESS")
+            print("\033[95m" + "Using hardhat endpoint" + "\033[0m")
 
         if (
             any(
@@ -157,9 +158,8 @@ class TournamentResultManager:
         cls._ainit = False
 
     def __compile_sol(self):
-        solc_version = os.getenv("SOLC_VERSION")
-        install_solc(solc_version)
-
+        solcx_binary_path = os.getenv(
+            "SOLCX_BINARY_PATH", "/app/solcx")
         if not sol_path.exists():
             raise FileNotFoundError("Cannot find .sol file.")
         with open(sol_path, "rt", encoding="utf-8") as file:
@@ -182,7 +182,7 @@ class TournamentResultManager:
                     }
                 },
             },
-            solc_version=solc_version,
+            solc_binary=solcx_binary_path
         )
 
         contract_info = compiled_sol["contracts"]["TournamentContract.sol"][

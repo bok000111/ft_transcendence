@@ -6,6 +6,7 @@ ARG USER_NAME=appuser
 ARG USER_ID=1000
 ARG GROUP_NAME=appgroup
 ARG GROUP_ID=1000
+ARG SOLCX_BINARY_FILENAME="0.6.12+commit.27d51765"
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
 PYTHONUNBUFFERED=1 \
@@ -13,8 +14,11 @@ PIP_DISABLE_PIP_VERSION_CHECK=1 \
 PIP_NO_CACHE_DIR=1
 # Set working directory
 WORKDIR /app/
-# Install dumb-init
-ADD --chmod=755 https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_${BUILD_ARCH} /bin/dumb-init
+# Install dumb-init and solc
+ADD --chmod=755 https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_${BUILD_ARCH} \
+                /bin/dumb-init
+ADD --chmod=755 https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v${SOLCX_BINARY_FILENAME} \
+                /bin/solcx
 # Create a non-root user and set permissions
 RUN addgroup --gid $GROUP_ID $GROUP_NAME \
     && adduser --disabled-password \
