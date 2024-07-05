@@ -43,6 +43,6 @@ class JWTAuthMiddleware:
 
     def _handle_response(self, request):
         response = self.get_response(request)
-        if request.user.is_authenticated and request.user.is_access_token_modified is True:
+        if getattr(request.user, "is_access_token_modified", False) is True:
             response["X-Access-Token"] = request.user.access_token
         return response
