@@ -99,6 +99,17 @@ class TournamentManager:
                         },
                     },
                 )
+                # group_discard
+                tasks = [
+                    self.channel_layer.group_discard(self.tournament_name, channel_name)
+                    for _, channel_name, _ in self.tournament_users
+                ]
+                try:
+                    await asyncio.gather(*tasks)
+                except (asyncio.TimeoutError, asyncio.CancelledError) as exc:
+                    print(
+                        f"An error occurred while removing players from tournament: {exc}"
+                    )
 
         @classmethod
         async def create(cls, tournament_users, tournament_id, channel_layer):
@@ -110,8 +121,7 @@ class TournamentManager:
             user_ids = [user[0] for user in self.tournament_users]
             self.tournament_result_manager = await TournamentResultManager.instance()
             print(
-                "\033[95m" +
-                f"timestamp: {int(datetime.now().timestamp())}" + "\033[0m"
+                "\033[95m" + f"timestamp: {int(datetime.now().timestamp())}" + "\033[0m"
             )
             await self.tournament_result_manager.start_game(
                 self.tournament_id, int(datetime.now().timestamp()), user_ids
@@ -132,7 +142,8 @@ class TournamentManager:
             game = self.room_manager.get_game_instance(gid)
             await self.channel_layer.group_send(
                 self.tournament_name,
-                {"type": "game_info", "data_type": "result", "message": game.result()})
+                {"type": "game_info", "data_type": "result", "message": game.result()},
+            )
             winner_id = game.get_winner()
             score = game.get_scores()
             await self.save_subgame(score, game_id)
@@ -144,15 +155,13 @@ class TournamentManager:
 
         async def add_players_to_tournament(self, players):
             tasks = [
-                self.channel_layer.group_add(
-                    self.tournament_name, channel_name)
+                self.channel_layer.group_add(self.tournament_name, channel_name)
                 for _, channel_name, _ in players
             ]
             try:
                 await asyncio.gather(*tasks)
             except Exception as e:
-                print(
-                    f"An error occurred while adding players to tournament: {e}")
+                print(f"An error occurred while adding players to tournament: {e}")
 
         def tournament_info(self):
             return {
