@@ -307,6 +307,7 @@ class PongSubpage extends Subpage {
     }
 
     handleKeyUp = (event) => {
+        event.preventDefault();
         if (event.repeat) {
             return ;
         }
@@ -416,6 +417,7 @@ class PongSubpage extends Subpage {
     }
 
     handleKeyDown = (event) => {
+        event.preventDefault();
         if (event.repeat) {
             return ;
         }
