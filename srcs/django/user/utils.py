@@ -44,7 +44,6 @@ def auth_token(token, type="access") -> int | None:
         )
         if payload.get("type", None) != type:
             return None
-        print(payload)
         return payload.get("user_id", None)
     except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, User.DoesNotExist):
         return None

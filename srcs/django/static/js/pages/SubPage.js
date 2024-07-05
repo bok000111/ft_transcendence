@@ -17,22 +17,24 @@ export default class SubPage extends Page {
             window.localStorage.setItem("access_token", access_token_from_url);
             window.location.hash = "";
         }
-        if (window.localStorage.getItem("access_token")) {
-            try {
-                await meAPI.request();
-                info.myID = meAPI.recvData.data.user.id;
-                info.myUsername = meAPI.recvData.data.user.username;
-                if (page_path === "auth_page") {
-                    alert("already logged in");
-                    nextChildName = "main_page/main_subpage";
+        try {
+            await meAPI.request().then(() => {
+                if (meAPI.recvData.data.user === undefined || meAPI.recvData.data.user === null) {
+                    throw new Error(meAPI.recvData.message);
                 }
+            });
+            info.myID = meAPI.recvData.data.user.id;
+            info.myUsername = meAPI.recvData.data.user.username;
+            if (page_path === "auth_page") {
+                alert("already logged in");
+                nextChildName = "main_page/main_subpage";
             }
-            catch {
-                if (page_path !== "auth_page") {
-                    if (this.selfName !== "login_subpage" && this.selfName != "signup_subpage")
-                        alert("login required");
-                    nextChildName = "auth_page/login_subpage";
-                }
+        }
+        catch {
+            if (page_path !== "auth_page") {
+                if (this.selfName !== "login_subpage" && this.selfName != "signup_subpage")
+                    alert("login required");
+                nextChildName = "auth_page/login_subpage";
             }
         }
         this.requestShift(nextChildName);

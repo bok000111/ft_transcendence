@@ -19,17 +19,17 @@ class JWTAuthMiddleware:
         if (access_token := self._get_access_token(request)) is not None:
             user = get_user(access_token)
             if user.is_authenticated:
+                user.access_token = access_token
                 request.user = user
-                request.COOKIES["access_token"] = access_token
-                return self.get_response(request)
+                return self._handle_response(request)
 
         if (refresh_token := request.COOKIES.get("refresh_token")) is not None:
             user, access_token = reissue_token(refresh_token)
             if user is not None:
+                user.access_token = access_token
                 user.is_access_token_modified = True
                 request.user = user
-                request.COOKIES["access_token"] = access_token
-                return self.get_response(request)
+                return self._handle_response(request)
 
         request.user = AnonymousUser()
         return self._handle_response(request)
@@ -43,6 +43,6 @@ class JWTAuthMiddleware:
 
     def _handle_response(self, request):
         response = self.get_response(request)
-        if request.user.is_authenticated and request.user.get("is_access_token_modified", False) is True:
+        if request.user.is_authenticated and request.user.is_access_token_modified is True:
             response["X-Access-Token"] = request.user.access_token
         return response
