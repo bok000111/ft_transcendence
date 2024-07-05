@@ -5,20 +5,20 @@ import SubPage from "../SubPage.js";
 const WIDTH = 1440;
 const HEIGHT = 700;
 const GRID_X = WIDTH / 8;
-const GRID_Y = HEIGHT / 4;
-const RECT_X = GRID_X;
-const RECT_Y = GRID_Y * 2 / 3;
-const FONT = `${RECT_Y / 2}px serif`;
+const GRID_Y = HEIGHT / 6;
+const RECT_X = GRID_X * 1.3;
+const RECT_Y = GRID_Y / 2;
+const FONT = `${GRID_Y / 4}px sans-serif`
 
 const pos = [
     { }, // dummy
     { x: 4, y: 1 },
-    { x: 2, y: 2 },
-    { x: 6, y: 2 },
-    { x: 1, y: 3 },
-    { x: 3, y: 3 },
-    { x: 5, y: 3 },
-    { x: 7, y: 3 },
+    { x: 2, y: 3 },
+    { x: 6, y: 3 },
+    { x: 1, y: 5 },
+    { x: 3, y: 5 },
+    { x: 5, y: 5 },
+    { x: 7, y: 5 },
 ]
 
 class TournamentSubpage extends SubPage {
@@ -31,11 +31,19 @@ class TournamentSubpage extends SubPage {
     }
 
     drawPlayer({ x, y }, { name, lose }) {
-        const rectColor = lose ? "gray" : "white";
+        const rectColor = lose ? "lightgray" : "white";
+        const textColor = lose ? "gray" : "black";
 
         this.ctx.fillStyle = rectColor;
         this.ctx.fillRect(GRID_X * x - RECT_X / 2, GRID_Y * y - RECT_Y / 2, RECT_X, RECT_Y);
-        this.ctx.fillStyle = "black";
+        // 사각형 테두리 그리기
+        if (!lose) {
+            this.ctx.strokeStyle = "black";
+            this.ctx.lineWidth = 5; // 테두리 두께 설정
+            this.ctx.strokeRect(GRID_X * x - RECT_X / 2, GRID_Y * y - RECT_Y / 2, RECT_X, RECT_Y);
+        }
+
+        this.ctx.fillStyle = textColor;
         this.ctx.fillText(name, GRID_X * x, GRID_Y * y);
     }
 
@@ -43,17 +51,61 @@ class TournamentSubpage extends SubPage {
         this.ctx.fillStyle = "#006AB6";
         this.ctx.fillRect(0, 0, this.$cnvs.width, this.$cnvs.height);
 
+        this.ctx.lineWidth = 5;
+
         this.ctx.beginPath();
-        this.ctx.strokeStyle = "black";
-        this.drawLine(2, 1, 6, 1);
-        this.drawLine(2, 1, 2, 2);
-        this.drawLine(1, 2, 3, 2);
-        this.drawLine(3, 2, 3, 3);
-        this.drawLine(1, 2, 1, 3);
-        this.drawLine(6, 1, 6, 2);
-        this.drawLine(5, 2, 7, 2);
-        this.drawLine(7, 2, 7, 3);
-        this.drawLine(5, 2, 5, 3);
+        this.ctx.strokeStyle = info.games.state[2].lose || info.games.state[3].lose ? "#FFFF99" : "black";
+        this.drawLine(4, 1, 4, 2);
+        this.ctx.stroke();
+
+        // pos[2]
+        this.ctx.strokeStyle = info.games.state[3].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 2, 4, 2);
+        this.drawLine(2, 2, 2, 3);
+        this.ctx.stroke();
+
+        // pos[3]
+        this.ctx.strokeStyle = info.games.state[2].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(4, 2, 6, 2);
+        this.drawLine(6, 2, 6, 3);
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = info.games.state[4].lose || info.games.state[5].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 3, 2, 4);
+        this.ctx.stroke();
+        // pos[4]
+        this.ctx.strokeStyle = info.games.state[5].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(1, 4, 2, 4);
+        this.drawLine(1, 4, 1, 5);
+        this.ctx.stroke();
+
+        // pos[5]
+        this.ctx.strokeStyle = info.games.state[4].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(2, 4, 3, 4);
+        this.drawLine(3, 4, 3, 5);
+        this.ctx.stroke();
+
+        this.ctx.strokeStyle = info.games.state[6].lose || info.games.state[7].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(6, 3, 6, 4);
+        this.ctx.stroke();
+        // pos[6]
+        this.ctx.strokeStyle = info.games.state[7].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(5, 4, 5, 5);
+        this.drawLine(5, 4, 6, 4);
+        this.ctx.stroke();
+
+        // pos[7]
+        this.ctx.strokeStyle = info.games.state[6].lose ? "#FFFF99" : "black";
+        this.ctx.beginPath();
+        this.drawLine(6, 4, 7, 4);
+        this.drawLine(7, 4, 7, 5);
         this.ctx.stroke();
 
         this.ctx.font = FONT;

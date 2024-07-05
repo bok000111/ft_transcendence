@@ -3,7 +3,7 @@ class ToastNot {
     $winnerText;
     toastEl;
     toast;
-    
+
     constructor() {
         this.init();
     }
@@ -15,7 +15,7 @@ class ToastNot {
         <div class="toast" id="winner_toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
                 <img src="" class="rounded me-2" alt="">
-                <strong class="me-auto">PONG</strong>
+                <strong class="me-auto">Pong</strong>
                 <small>now</small>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
@@ -27,7 +27,7 @@ class ToastNot {
     makeAlert(winner) {
         this.init();
         this.$winnerText = this.$toastContainer.querySelector("#winner_txt");
-        
+
         let temp_txt = document.createElement("div");
 
         temp_txt.innerHTML = `Winner :`;

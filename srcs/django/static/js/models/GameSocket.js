@@ -17,6 +17,7 @@ export class GameSocket {
         start: (data) => {},
         game: (data) => {},
         end: (data) => {},
+        error: (data) => {},
     };
     url;
 
@@ -48,6 +49,17 @@ export class GameSocket {
             this.unmount("start");
             this.unmount("game");
             this.unmount("close");
+            this.unmount("error");
+            rootPage.curChild.curChild.route("main_page/main_subpage");
+            gamePage.curChild = gamePage.child["pong_subpage"];
+        });
+        this.ws.addEventListener("error", () => {
+            this.ws = null;
+            this.unmount("wait");
+            this.unmount("start");
+            this.unmount("game");
+            this.unmount("close");
+            this.unmount("error");
             rootPage.curChild.curChild.route("main_page/main_subpage");
             gamePage.curChild = gamePage.child["pong_subpage"];
         });

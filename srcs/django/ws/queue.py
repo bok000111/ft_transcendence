@@ -55,6 +55,7 @@ class GameQueue:
             return
         self._queue_manager = {t: self._QueueManager() for t in GameType}
         self._initialized = True
+        self.tournament_manager = TournamentManager()
 
     # TODO: LOCAL 게임 처리 구현
     async def join_queue(
@@ -65,9 +66,18 @@ class GameQueue:
         nickname: str,
     ) -> None:
         async with self._queue_manager[game_type] as manager:
-            if uid in manager:
-                print(f"{game_type.name}: {nickname} is already in queue")
-                return None  # TODO: 이미 대기 중인 경우 에러 보내야함
+            if nickname.isalnum() == False or len(nickname) > 6:
+                print(nickname.isalnum(), len(nickname))
+                print(f"{game_type.name}: {nickname} is invalid")
+                await self.channel_layer.send(
+                    channel_name,
+                    {
+                        "type": "receive_error",
+                        "code": 4000,
+                        "message": "Invalid nickname format",
+                    },
+                )
+                return None  # 닉네임 형식이 잘못된 경우 에러
             manager.append(uid, channel_name, nickname)
             print(f"{game_type.name}: {nickname}({uid}) joined queue")
             print(f"{game_type.name}: {len(manager)} users in queue")
@@ -95,13 +105,24 @@ class GameQueue:
                 )
 
                 if game_type == GameType.TOURNAMENT:
-                    tournament_manager = TournamentManager()
                     # user_ids = [user[0] for user in matched_users]
-                    tournament = await tournament_manager.create_tournament(
-                        matched_users
+                    tournament = await self.tournament_manager.create_tournament(
+                        matched_users, self.channel_layer
                     )
-                    print(f"tournament: {tournament}")
-                    await asyncio.create_task(tournament.start_tournament())
+                    await self.channel_layer.group_send(
+                        tournament.tournament_name,
+                        {
+                            "type": "tournament_info",
+                            "uids": [user[0] for user in tournament.tournament_users],
+                            "message": tournament.tournament_info(),
+                        },
+                    )
+                    asyncio.gather(
+                        tournament.start_subgame(
+                            tournament.tournament_users[:2], 2),
+                        tournament.start_subgame(
+                            tournament.tournament_users[2:], 3),
+                    )
                 else:
                     room_manager = RoomManager()
                     await room_manager.start_game(game_type, matched_users)

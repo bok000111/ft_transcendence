@@ -1,6 +1,8 @@
 import uuid
+import asyncio
 from ws.game import Game
 from ws.enums import GameType
+from channels.layers import get_channel_layer
 
 
 # 싱글톤 패턴 적용
@@ -16,6 +18,7 @@ class RoomManager:
         self._initialized = True
         self.rooms = {}
         self.room_id = 0
+        self.channel_layer = get_channel_layer()
 
     async def create_game(self, game_type, matched_users):
         try:
@@ -26,7 +29,9 @@ class RoomManager:
                 print(f"Warning: Room ID {room_id} already exists")
                 return None
             # matched_user = (uid, channel_name, nickname)
-            self.rooms[room_id] = await Game.create(room_id, game_type, matched_users)
+            self.rooms[room_id] = await Game.create(
+                room_id, game_type, matched_users, self.channel_layer
+            )
 
             return room_id
 
@@ -58,16 +63,19 @@ class RoomManager:
         if gid is None:
             print("Failed to create game")
             return None
-        print('\033[92m' + f"Game created with gid: {gid}" + '\033[0m')
+        print("\033[92m" + f"Game created with gid: {gid}" + "\033[0m")
         game = self.rooms[gid]
         if game is None:
             print("Failed to get game instance")
             return None
-        end_score = 7 if game_type is GameType.NORMAL_4 else 5
-
-        # if game_type != GameType.SUB_GAME:
-        await game.start(end_score)
-        # else:
-        #     await game.send_game_info()
+        end_score = 7 if game_type is GameType.NORMAL_4 or game_type is GameType.SUB_GAME else 5
+        if game_type is GameType.SUB_GAME:
+            event = asyncio.Event()
+            event.clear()
+            game.end_event = event
+            await game.start(end_score)
+            await event.wait()
+        else:
+            await game.start(end_score)
 
         return gid

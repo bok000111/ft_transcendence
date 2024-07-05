@@ -56,13 +56,20 @@ class MainSubpage extends SubPage {
 
     nicknameModalSubmitHandler = (event) => {
         event.preventDefault();
-        if (this.$nickname.value === "???" || this.$nickname.value === "") {
-            alert("Invalid Nickname...");
+
+        if (!(/^[a-zA-Z0-9]+$/.test(this.$nickname.value)) || this.$nickname.value.length > 6 || this.$nickname.value.length <= 0) {
+            alert("only ALPHANUMERIC and 1 <= length <= 6 are allowed!!");
             return;
         }
+
         gameSocket.setup();
 
+        gameSocket.mount("error", (data) => {
+            alert("Unexpected Input!!");
+        });
+
         gameSocket.mount("wait", (data) => {
+            gameSocket.unmount("error");
             if (this.$nicknameModal.classList.contains("show")) {
                 this.nicknameModal.hide();
             }

@@ -220,3 +220,8 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
                 "data": result,
             }
         )
+
+    async def receive_error(self, event):
+        code = int(event["code"])
+        message = event["message"]
+        await self.send_error(code, message)
