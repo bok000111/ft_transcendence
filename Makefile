@@ -1,18 +1,16 @@
 NAME = ft_transcendence
 
-COMPOSE_FILE = ./srcs/docker-compose.yml
-DB_DIR = /goinfre/$(USER)/postgres_data
-STATIC_DIR = /goinfre/$(USER)/static_data
-REQUIREMENTS = ./srcs/requirements/django/requirements.txt
-MANAGE_PY = ./srcs/requirements/django/manage.py
+MANAGE_PY = ./srcs/django/manage.py
 
 all: $(NAME)
 
-$(NAME): mkdir
-	docker compose --profile prod -f $(COMPOSE_FILE) up --build
+$(NAME):
+	@echo "Everything must be launched with a single command line to run an autonomous container provided by Docker ."
+	@echo "서브젝트에 이렇게 돼있어서 평가받을때는 Makefile 안쓰고 docker compose 직접 써야될수도 있음"
+	@docker compose up --build
 
 dev: mkdir
-	docker compose --profile dev -f $(COMPOSE_FILE) up --build
+	docker compose up --build --watch
 
 runserver:
 	@${MANAGE_PY} makemigrations
@@ -20,26 +18,11 @@ runserver:
 	@${MANAGE_PY} runserver
 
 down:
-	docker compose --profile prod -f $(COMPOSE_FILE) down
-
-clean: down
-fclean: clean
-	docker compose --profile prod -f $(COMPOSE_FILE) down --volumes --remove-orphans
-	docker system prune -af --volumes
-	sudo rm -rf $(DB_DIR) $(STATIC_DIR)
-
+	docker compose down
+clean:
+	docker compose down --rmi all --remove-orphans
+fclean:
+	docker compose down --rmi all --remove-orphans --volumes
 re: fclean all
 
-mkdir:
-	mkdir -p $(DB_DIR) $(STATIC_DIR)
-
-req:
-	pip install -r $(REQUIREMENTS) --user -q --no-cache-dir
-
-freeze:
-	pip freeze > $(REQUIREMENTS)
-
-lint:
-	pylint --rcfile=./srcs/.pylintrc ./srcs/requirements/django/*/*.py
-	
 .PHONY: all clean fclean re mkdir req freeze
