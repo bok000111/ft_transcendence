@@ -8,10 +8,6 @@ ARG GROUP_NAME=appgroup
 ARG GROUP_ID=1001
 # Set working directory
 WORKDIR /app
-# Install dumb-init
-ADD --chmod=755 \
-    https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_${UNAME_M} \
-    /bin/dumb-init
 # Create a non-root user
 RUN addgroup --gid $GROUP_ID $GROUP_NAME \
     && adduser --disabled-password \
@@ -25,7 +21,7 @@ FROM base as builder
 # Set working directory
 WORKDIR /app/
 # Install base dependencies
-ARG DEV_NODE_DEPS="hardhat"
+ARG DEV_NODE_DEPS="hardhat tini"
 RUN apk add --update --no-cache \
     && npm init -y \
     && npm install --save-dev $DEV_NODE_DEPS --cache /tmp/empty-cache \
@@ -46,5 +42,5 @@ COPY --chown=$USER_ID:$GROUP_ID . /app
 # Expose port 8545
 EXPOSE 8545
 # Run hardhat node
-ENTRYPOINT [ "/bin/dumb-init", "--" ]
+ENTRYPOINT [ "/sbin/tini", "--" ]
 CMD [ "npx", "hardhat", "node" ]

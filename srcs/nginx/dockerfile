@@ -1,50 +1,44 @@
 FROM alpine:3.19 as base
 
 # Set build arguments
-ARG UNAME_M="x86_64"
-ARG USER_NAME=appuser
-ARG USER_ID=1000
-ARG GROUP_NAME=appgroup
-ARG GROUP_ID=1000
+ARG BUILD_ARCH \
+    USER_NAME \
+    USER_ID \
+    GROUP_NAME \
+    GROUP_ID \
+    BASE_DEPS="nginx openssl"
 # Set working directory
-WORKDIR /app/
-# Install dumb-init
-ADD --chmod=755 https://github.com/Yelp/dumb-init/releases/download/v1.2.5/dumb-init_1.2.5_${UNAME_M} /bin/dumb-init
-# Create a non-root user
+WORKDIR /app
+# Create a non-root user, set permissions, and install base dependencies
 RUN addgroup --gid $GROUP_ID $GROUP_NAME \
     && adduser --disabled-password \
                 --ingroup $GROUP_NAME \
                 --no-create-home \
                 --uid $USER_ID \
-                $USER_NAME
-# Install base dependencies
-ARG BASE_DEPS="nginx openssl"
-RUN apk add --update --no-cache ${BASE_DEPS}
-# Set permissions
-RUN chown -R ${USER_NAME}:${GROUP_NAME} /app /var/lib/nginx /run/nginx
-RUN chmod -R 755 /app /var/lib/nginx /run/nginx
+                $USER_NAME \
+    && apk add --update --no-cache ${BASE_DEPS} \
+    && mkdir -p /var/www/ft \
+    && chown -R ${USER_NAME}:${GROUP_NAME} /app /var/lib/nginx /run/nginx /var/www/ft \
+    && chmod -R 755 /app /var/lib/nginx /run/nginx
 # 이게 맞나???
 
 # Set builder image
 FROM base as builder
 # Set working directory
-WORKDIR /app/
+WORKDIR /app
 # make ssl certificate
 RUN mkdir -p /etc/ssl/certs /etc/ssl/private
 RUN openssl req -x509 -days 365 -nodes -newkey rsa:2048 \
 -keyout /etc/ssl/private/nginx.key \
 -out /etc/ssl/certs/nginx.crt \
 -subj "/C=KR/ST=Seoul/L=Seoul/O=42Seoul/CN=${DOMAIN}"
-# Set permissions
-RUN mkdir -p /var/www/ft/
-RUN chown -R ${USER_NAME}:${GROUP_NAME} /var/www/ft/
 
 # Set runtime image
 FROM base as runtime
 # Set non-root user
 USER ${USER_NAME}
 # Set working directory
-WORKDIR /app/
+WORKDIR /app
 # Copy ssl certificate
 COPY --from=builder --chown=$USER_ID:$GROUP_ID /etc/ssl/certs /etc/ssl/certs
 COPY --from=builder --chown=$USER_ID:$GROUP_ID /etc/ssl/private /etc/ssl/private
@@ -56,6 +50,4 @@ RUN mkdir -p /app/logs \
 # Expose port 443
 EXPOSE 443
 # Run nginx
-ENTRYPOINT [ "/bin/dumb-init", "--" ]
 CMD ["nginx", "-e", "/app/logs/error.log", "-c", "/app/nginx.conf", "-g", "daemon off;"]
-# CMD ["tail", "-f", "/dev/null"]

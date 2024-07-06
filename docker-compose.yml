@@ -5,12 +5,14 @@ services:
     build:
       context: ./srcs/django
       args:
-          BUILD_ARCH: ${BUILD_ARCH:-x86_64}
-          USER_NAME: ${DOCKER_USER_NAME:-appuser}
-          USER_ID: ${DOCKER_USER_ID:-1000}
-          GROUP_NAME: ${DOCKER_GROUP_NAME:-appgroup}
-          GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-          SOLCX_BINARY_FILENAME: ${SOLCX_BINARY_FILENAME:-0.6.12+commit.27d51765}
+          BUILD_ARCH: ${HOST_ARCH:?HOST_ARCH is required}
+          USER_NAME: ${DOCKER_USER:?DOCKER_USER is required}
+          USER_ID: ${DOCKER_USER_ID:?DOCKER_USER_ID is required}
+          GROUP_NAME: ${DOCKER_GROUP:?DOCKER_GROUP is required}
+          GROUP_ID: ${DOCKER_GROUP_ID:?DOCKER_GROUP_ID is required}
+          SOLCX_VERSION: ${SOLCX_VERSION:?SOLCX_VERSION is required}
+          SOLCX_FILENAME: ${SOLCX_FILENAME:?SOLCX_FILENAME is required}
+          SOLCX_BINARY_PATH: ${SOLCX_BINARY_PATH:?SOLCX_BINARY_PATH is required}
     env_file:
       - .env
     networks:
@@ -20,21 +22,21 @@ services:
     depends_on:
       - postgres
     restart: unless-stopped
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./srcs/django
-          target: /app
-        - action: sync+restart
-          path: ./srcs/django/static
-          target: /app/static
-        - action: sync+restart
-          path: ./srcs/django/templates
-          target: /app/templates
-        - action: rebuild
-          path: ./srcs/django/dockerfile
-        - action: rebuild
-          path: ./srcs/django/pyproject.toml
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./srcs/django
+    #       target: /app
+    #     - action: sync+restart
+    #       path: ./srcs/django/static
+    #       target: /app/static
+    #     - action: sync+restart
+    #       path: ./srcs/django/templates
+    #       target: /app/templates
+    #     - action: rebuild
+    #       path: ./srcs/django/dockerfile
+    #     - action: rebuild
+    #       path: ./srcs/django/pyproject.toml
 
   postgres:
     container_name: postgres
@@ -65,15 +67,16 @@ services:
     build:
       context: ./srcs/nginx
       args:
-          BUILD_ARCH: ${BUILD_ARCH:-x86_64}
-          USER_NAME: ${DOCKER_USER_NAME:-appuser}
-          USER_ID: ${DOCKER_USER_ID:-1000}
-          GROUP_NAME: ${DOCKER_GROUP_NAME:-appgroup}
-          GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+          BUILD_ARCH: ${HOST_ARCH:?HOST_ARCH is required}
+          USER_NAME: ${DOCKER_USER:?DOCKER_USER is required}
+          USER_ID: ${DOCKER_USER_ID:?DOCKER_USER_ID is required}
+          GROUP_NAME: ${DOCKER_GROUP:?DOCKER_GROUP is required}
+          GROUP_ID: ${DOCKER_GROUP_ID:?DOCKER_GROUP_ID is required}
     env_file:
       - .env
     ports:
-      - 4242:443
+      - 80:80
+      - 443:443
     volumes:
       - static_data:/var/www/ft
     networks:
@@ -81,30 +84,30 @@ services:
     depends_on:
       - django
     restart: unless-stopped
-    develop:
-      watch:
-        - action: sync+restart
-          path: ./srcs/nginx
-          target: /app
-        - action: rebuild
-          path: ./srcs/nginx/dockerfile
+    # develop:
+    #   watch:
+    #     - action: sync+restart
+    #       path: ./srcs/nginx
+    #       target: /app
+    #     - action: rebuild
+    #       path: ./srcs/nginx/dockerfile
 
-  hardhat:
-    container_name: hardhat
-    image: hardhat:ft
-    build:
-      context: ./srcs/hardhat
-      args:
-          BUILD_ARCH: ${BUILD_ARCH:-x86_64}
-          # USER_NAME: ${DOCKER_USER_NAME:-appuser}
-          # USER_ID: ${DOCKER_USER_ID:-1000}
-          # GROUP_NAME: ${DOCKER_GROUP_NAME:-appgroup}
-          # GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-    networks:
-      - intra
-    ports:
-      - "8545:8545"
-    restart: unless-stopped
+  # hardhat:
+  #   container_name: hardhat
+  #   image: hardhat:ft
+  #   build:
+  #     context: ./srcs/hardhat
+  #     args:
+  #         BUILD_ARCH: ${BUILD_ARCH:-x86_64}
+  #         # USER_NAME: ${DOCKER_USER_NAME:-appuser}
+  #         # USER_ID: ${DOCKER_USER_ID:-1000}
+  #         # GROUP_NAME: ${DOCKER_GROUP_NAME:-appgroup}
+  #         # GROUP_ID: ${DOCKER_GROUP_ID:-1000}
+  #   networks:
+  #     - intra
+  #   ports:
+  #     - "8545:8545"
+  #   restart: unless-stopped
 
 volumes:
   postgres_data:
