@@ -8,10 +8,34 @@
  * 요런 식으로 들어온다.
  * status code의 경우에는 http response의 status code로 들어온다. ( fail + error )
  */
-export const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-console.log(`csrftoken: ${csrftoken}`);
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+
+export const updateAccessToken = (token) => {
+    if (token === null || token === undefined || token === "") {
+        window.localStorage.removeItem("access_token");
+        return;
+    }
+    window.localStorage.setItem("access_token", token);
+    console.log(`access_token: ${token}`);
+};
+
 export const BASE_HOST = "localhost";
-export const BASE_URL = "https://localhost:4242/";
 export const BASE_WS_URL = "wss://localhost:4242/ws/";
 
 class API {
@@ -26,22 +50,29 @@ class API {
     }
 
     async request() {
+        let access_token = window.localStorage.getItem("access_token");
+        let http_body = null;
+        let headers = { "X-CSRFToken": getCookie('csrftoken') };
+
+        if (access_token) {
+            headers["Authorization"] = `Bearer ${access_token}`;
+        }
+        if (this.method === "POST" || this.method === "PUT") {
+            http_body = JSON.stringify(this.sendData);
+            headers["Content-Type"] = "application/json";
+        }
+
         const httpRequest = {
             method: this.method,
-            headers: {
-                "Host": BASE_HOST,
-                "Origin": BASE_URL,
-                "Access-Control-Allow-Origin": BASE_URL,
-                "X-CSRFToken": csrftoken,
-            },
-            // mode: "same-origin",
+            headers: headers,
+            body: http_body,
+            mode: "same-origin",
             credentials: "include",
         }
-        if (this.method === "POST") {
-            httpRequest.body = JSON.stringify(this.sendData);
-            httpRequest.headers["Content-Type"] = "application/json";
-        }
+
         const response = await fetch(this.uri, httpRequest);
+        if (response.headers.get("X-Access-Token") !== null)
+            updateAccessToken(response.headers.get("X-Access-Token"));
         this.recvData = await response.json();
         if (!response.ok) {
             throw new Error(this.recvData.message);
@@ -54,7 +85,7 @@ class API {
  * recvData = {}
  */
 export const loginAPI = new API(
-    `${BASE_URL}api/user/login/`,
+    "/api/user/login/",
     "POST"
 );
 
@@ -63,7 +94,12 @@ export const loginAPI = new API(
  * recvData = {}
  */
 export const signupAPI = new API(
-    `${BASE_URL}api/user/signup/`,
+    "/api/user/signup/",
+    "POST"
+);
+
+export const jwtAPI = new API(
+    "/api/user/2fa/",
     "POST"
 );
 
@@ -75,12 +111,12 @@ export const signupAPI = new API(
  *
 */
 export const logoutAPI = new API(
-    `${BASE_URL}api/user/logout/`,
+    "/api/user/logout/",
     "POST"
 );
 
 export const meAPI = new API(
-    `${BASE_URL}api/user/me/`,
+    "/api/user/me/",
     "GET"
 );
 
@@ -105,6 +141,6 @@ export const meAPI = new API(
  * }
 */
 export const tourResultListAPI = new API(
-    `${BASE_URL}api/result/`,
+    "/api/result/",
     "GET"
 );

@@ -1,7 +1,7 @@
 import { rootPage } from "../pages/RootPage.js";
 import { gamePage } from "../pages/game/GamePage.js";
 import { info } from "./Info.js";
-import { BASE_WS_URL } from "./API.js";
+import { BASE_WS_URL, meAPI } from "./API.js";
 
 const STATE = {
     CONNECTING: 0,
@@ -26,12 +26,14 @@ export class GameSocket {
         this.url = BASE_WS_URL;
     }
 
-    setup() {
-        this.ws = new WebSocket(this.url);
+    async setup() {
+        await meAPI.request();
+        this.ws = new WebSocket(this.url, ['jwt.access_token', 'jwt.access_token.' + window.localStorage.getItem("access_token")]);
         this.ws.addEventListener("open", () => {
             this.ws.addEventListener("message", ({ data }) => {
                 const obj = JSON.parse(data);
-    
+                console.log(obj);
+
                 this.handler[obj.action](obj.data);
             });
             this.send(JSON.stringify({
@@ -85,7 +87,7 @@ export class GameSocket {
     }
 
     unmount(action) {
-        this.handler[action] = (data) => {};
+        this.handler[action] = (data) => { };
     }
 };
 

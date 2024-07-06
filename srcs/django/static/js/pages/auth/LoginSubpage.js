@@ -1,5 +1,5 @@
 import { authPage } from "./AuthPage.js";
-import { loginAPI, BASE_URL, BASE_WS_URL} from "../../models/API.js";
+import { BASE_WS_URL, loginAPI, jwtAPI, updateAccessToken } from "../../models/API.js";
 import { info } from "../../models/Info.js";
 import SubPage from "../SubPage.js";
 
@@ -8,13 +8,34 @@ class LoginSubpage extends SubPage {
     $oauthbtn;
     $loginbtn;
     $signupbtn;
+    $loginModalCloseBtn;
+    $loginModal;
     loginModal;
     response;
 
-    connectSocket() {
-        this.sock = new WebSocket(BASE_WS_URL);
-        this.sock.addEventListener("open", )
-    }
+    loginModalSubmitHandler = async (event) => {
+        event.preventDefault();
+
+        try {
+            jwtAPI.sendData = {
+                code: this.$loginModal.querySelector("input").value,
+            };
+            await jwtAPI.request();
+            this.loginModal.hide();
+            updateAccessToken(jwtAPI.recvData.data.access_token);
+            this.route("main_page/main_subpage");
+        }
+        catch {
+            alert("Authentication failed..");
+        }
+    };
+
+    // 인증코드 창 닫는 버튼
+    loginModalCloseHandler = () => {
+        this.loginModal.hide();
+        // 만약 요청보내서 이메일 기껏 날려줬는데 입력 안하고 나가는 상황에서 추가
+        // 로 처리해야하는 부분이 있나?
+    };
 
     async init() {
         this.$elem.innerHTML = `
@@ -46,12 +67,13 @@ class LoginSubpage extends SubPage {
         this.$loginbtn = this.$elem.querySelector("#loginbtn");
         this.$signupbtn = this.$elem.querySelector("#signupbtn");
         this.$oauthbtn = this.$elem.querySelector("#oauthbtn");
-        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), {});
+        this.$loginModal = document.querySelector("#loginModal");
+        this.loginModal = new bootstrap.Modal(document.querySelector("#loginModal"), { backdrop: "static", keyboard: false });
+        this.$loginModalCloseBtn = this.$loginModal.querySelector(".closeBtn");
 
         this.$loginbtn.addEventListener("click", async (event) => {
             event.preventDefault();
             // 모달 띄우기
-            this.loginModal.show();
 
             loginAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
@@ -61,8 +83,8 @@ class LoginSubpage extends SubPage {
                 await loginAPI.request();
                 info.myID = loginAPI.recvData.data.user.id;
                 info.myUsername = loginAPI.recvData.data.user.username;
-                this.loginModal.hide();
-                this.route("main_page/main_subpage");
+                this.$loginModal.addEventListener("submit", this.loginModalSubmitHandler);
+                this.loginModal.show();
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
@@ -78,12 +100,14 @@ class LoginSubpage extends SubPage {
         // oauth -> should be modified
         // now always 
         this.$oauthbtn.addEventListener("click", () => {
-            window.location.href = `${BASE_URL}oauth/login/`;
+            window.location.href = "/oauth/login/";
             this.parent.parent.init(); // may be removed later
             this.parent.parent.checkLoggedIn(); // may be removed later
         });
+
+        this.$loginModalCloseBtn.addEventListener("click", this.loginModalCloseHandler);
     }
-    
+
     fini() {
         this.$elem.innerHTML = ``;
     }

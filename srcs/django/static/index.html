@@ -1,4 +1,3 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,10 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href='/css/style.css'>
 
     <!-- for bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 
 <body>
@@ -51,9 +51,20 @@
     <div class="modal" id="loginModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" id="my-modal-dialog">
             <div class="modal-content" id="my-modal-content">
-                <div class="modal-body">
-                    <h1 align="center">Logging in ...</h1>
-                </div>
+                <form>
+                    <div class="modal-body">
+                        <div class="modal-inner-header inner-padding">
+                            <div class="modal-title">Enter Verification Code</div>
+                        </div>
+                        <div class="modal-inner-body inner-padding">
+                            <input type="text" placeholder="code">
+                        </div>
+                        <div class="modal-inner-footer inner-padding">
+                            <button type="submit">apply</button>
+                            <button class="closeBtn" type="button" data-dismiss="modal">close</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -63,15 +74,15 @@
             <div class="modal-content" id="my-modal-content">
                 <form>
                     <div class="modal-body">
-                        <div class="modal-inner-header nickname-modal-inner">
+                        <div class="modal-inner-header inner-padding">
                             <div class="modal-title">Enter your nickname</div>
                         </div>
-                        <div class="modal-inner-body nickname-modal-inner">
+                        <div class="modal-inner-body inner-padding">
                             <input type="text" id="nickname" placeholder="nickname">
                         </div>
-                        <div class="modal-inner-footer nickname-modal-inner">
+                        <div class="modal-inner-footer inner-padding">
                             <button type="submit">apply</button>
-                            <button id="closeBtn" type="button" data-dismiss="modal">close</button>
+                            <button class="closeBtn" type="button" data-dismiss="modal">close</button>
                         </div>
                     </div>
                 </form>
@@ -90,7 +101,7 @@
                         <div id="waiting-status"></div>
                     </div>
                     <div class="modal-inner-footer">
-                        <button id="closeBtn" type="button" data-dismiss="modal">leave</button>
+                        <button class="closeBtn" type="button" data-dismiss="modal">leave</button>
                     </div>
                 </div>
             </div>
@@ -99,11 +110,12 @@
 
     <div id="toast-container"></div>
 
-    {% csrf_token %}
-    <script src="{% static "js/main.js" %}" type="module"></script>
+    <script src="/js/main.js" type="module"></script>
 
     <!-- for bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
 </body>
 
 </html>
