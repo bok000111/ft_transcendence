@@ -10,11 +10,13 @@ from result.deploy import TournamentResultManager
 
 class TournamentResultView(View):
     async def get(self, request):
-        raw_datas = await (await TournamentResultManager.instance()).get_all_tournaments()
+        raw_datas = await (
+            await TournamentResultManager.instance()
+        ).get_all_tournaments()
         results = await database_sync_to_async(
             lambda: [TournamentResult(raw_data) for raw_data in raw_datas]
         )()
-        results.sort(key=lambda x: x.timestamp)
+        results.sort(key=lambda x: x.timestamp, reverse=True)
 
         response_data = {
             "status": "success",

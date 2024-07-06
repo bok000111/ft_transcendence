@@ -58,7 +58,6 @@ class TournamentResultManager:
             self.private_key = os.getenv("HARDHAT_PRIVATE_KEY")
             self.contract_address = os.getenv("HARDHAT_CONTRACT_ADDRESS")
             print("\033[95m" + "Using hardhat endpoint" + "\033[0m")
-
         if (
             any(
                 x is None
@@ -158,8 +157,7 @@ class TournamentResultManager:
         cls._ainit = False
 
     def __compile_sol(self):
-        solcx_binary_path = os.getenv(
-            "SOLCX_BINARY_PATH", "/app/solcx")
+        solcx_binary_path = os.getenv("SOLCX_BINARY_PATH", "/app/solcx")
         if not sol_path.exists():
             raise FileNotFoundError("Cannot find .sol file.")
         with open(sol_path, "rt", encoding="utf-8") as file:
@@ -182,13 +180,15 @@ class TournamentResultManager:
                     }
                 },
             },
-            solc_binary=solcx_binary_path
+            solc_binary=solcx_binary_path,
         )
 
         contract_info = compiled_sol["contracts"]["TournamentContract.sol"][
             "TournamentContract"
         ]
         self.abi = contract_info["abi"]
+        with open(abi_path, "w", encoding="utf-8") as f:
+            json.dump(self.abi, f, ensure_ascii=False, indent=4)
         self.bytecode = contract_info["evm"]["bytecode"]["object"]
 
     async def __deploy_contract(self):
@@ -207,8 +207,7 @@ class TournamentResultManager:
         tx_hash = await tournament.constructor().transact(tx)
         tx_receipt = await self.w3.eth.wait_for_transaction_receipt(tx_hash, 120, 1)
         self.contract_address = tx_receipt["contractAddress"]
-        print("\033[95m" + "contract address: ",
-              self.contract_address + "\033[0m")
+        print("\033[95m" + "contract address: ", self.contract_address + "\033[0m")
         self.nonce = nonce + 1
 
     def __backup_abi(self):
@@ -272,3 +271,11 @@ class TournamentResultManager:
         # 여기 요청이 너무 많으면 429 Too Many Requests 에러 발생할 수 있음
         tournaments = await self.__call("get_valid_tournaments")
         return await asyncio.gather(*map(self.get_tournament, tournaments))
+
+
+# async def a():
+#     a = await TournamentResultManager.instance()
+#     print(a)
+
+
+# asyncio.run(a())
