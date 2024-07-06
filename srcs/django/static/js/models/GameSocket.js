@@ -32,7 +32,7 @@ export class GameSocket {
         this.ws.addEventListener("open", () => {
             this.ws.addEventListener("message", ({ data }) => {
                 const obj = JSON.parse(data);
-                console.log(obj);
+                // console.log(obj);
 
                 this.handler[obj.action](obj.data);
             });

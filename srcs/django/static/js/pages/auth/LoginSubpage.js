@@ -23,6 +23,7 @@ class LoginSubpage extends SubPage {
             await jwtAPI.request();
             this.loginModal.hide();
             updateAccessToken(jwtAPI.recvData.data.access_token);
+            (this.$loginModal.querySelector(".modal-inner-body")).innerHTML = `<input type="text" placeholder="code">`;
             this.route("main_page/main_subpage");
         }
         catch {
@@ -33,6 +34,7 @@ class LoginSubpage extends SubPage {
     // 인증코드 창 닫는 버튼
     loginModalCloseHandler = () => {
         this.loginModal.hide();
+        (this.$loginModal.querySelector(".modal-inner-body")).innerHTML = `<input type="text" placeholder="code">`;
         // 만약 요청보내서 이메일 기껏 날려줬는데 입력 안하고 나가는 상황에서 추가
         // 로 처리해야하는 부분이 있나?
     };
@@ -90,6 +92,7 @@ class LoginSubpage extends SubPage {
                 // location.href = location.origin + location.pathname;
                 alert(`Login: ${e.message}`);
                 this.loginModal.hide();
+                (this.$loginModal.querySelector(".modal-inner-body")).innerHTML = `<input type="text" placeholder="code">`;
             }
         });
 

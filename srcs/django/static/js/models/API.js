@@ -32,7 +32,7 @@ export const updateAccessToken = (token) => {
         return;
     }
     window.localStorage.setItem("access_token", token);
-    console.log(`access_token: ${token}`);
+    // console.log(`access_token: ${token}`);
 };
 
 export const BASE_HOST = "localhost";
