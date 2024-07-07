@@ -12,11 +12,6 @@ $(NAME):
 dev: mkdir
 	docker compose up --build --watch
 
-runserver:
-	@${MANAGE_PY} makemigrations
-	@${MANAGE_PY} migrate
-	@${MANAGE_PY} runserver
-
 down:
 	docker compose down
 clean:
@@ -25,4 +20,4 @@ fclean:
 	docker compose down --rmi all --remove-orphans --volumes
 re: fclean all
 
-.PHONY: all clean fclean re mkdir req freeze
+.PHONY: all clean fclean re down
