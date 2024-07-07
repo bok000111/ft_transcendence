@@ -65,7 +65,12 @@ class MainSubpage extends SubPage {
         gameSocket.setup();
 
         gameSocket.mount("error", (data) => {
-            alert("Unexpected Input!!");
+            if (data.message) {
+                alert(data.message);
+            }
+            else {
+                alert("Try again later!");
+            }
         });
 
         gameSocket.mount("wait", (data) => {

@@ -40,6 +40,10 @@ class SignupSubpage extends SubPage {
 
         this.$form.addEventListener("submit", async (event) => {
             event.preventDefault();
+            if (this.$form.querySelector("#username").value.length > 12 || this.$form.querySelector("#username").value.length <= 0) {
+                alert("Signup: bad request");
+                return;
+            }
             signupAPI.sendData = {
                 email: this.$form.querySelector("#email").value,
                 password: this.$form.querySelector("#password").value,
