@@ -43,14 +43,13 @@ class User(AbstractUser):
         self.otp_code = self.generate_otp_code()
         self.otp_code_created_at = timezone.now()
         try:
-            print(f"Your OTP Code is {self.otp_code}")
-            # send_mail(
-            #     "OTP Code",
-            #     f"Your OTP Code is {self.otp_code}",
-            #     settings.DEFAULT_FROM_EMAIL,
-            #     recipient_list=[self.email],
-            #     fail_silently=False,
-            # )
+            send_mail(
+                "OTP Code",
+                f"Your OTP Code is {self.otp_code}",
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[self.email],
+                fail_silently=False,
+            )
         except SMTPException:
             return False
         else:
