@@ -17,8 +17,7 @@ class JWTAuthMiddleware:
 
     def __call__(self, request):
         if (access_token := self._get_access_token(request)) is not None:
-            user = get_user(access_token)
-            if user.is_authenticated:
+            if (user := get_user(access_token)) is not None and user.is_authenticated:
                 user.access_token = access_token
                 request.user = user
                 return self._handle_response(request)

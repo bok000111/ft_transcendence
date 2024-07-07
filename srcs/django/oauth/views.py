@@ -5,7 +5,6 @@ from user.backends import JWTAuthBackend
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.shortcuts import redirect
-from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_GET
 from django.views.generic import View
 

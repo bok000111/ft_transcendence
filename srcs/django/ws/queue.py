@@ -25,6 +25,9 @@ class GameQueue:
 
         def __len__(self):
             return len(self.queue)
+        
+        def __contains__(self, uid: int):
+            return uid in self.queue
 
         def append(self, uid: int, channel_name: str, nickname: str):
             self.queue.append(uid)
@@ -66,6 +69,17 @@ class GameQueue:
         nickname: str,
     ) -> None:
         async with self._queue_manager[game_type] as manager:
+            if uid in manager:
+                print(f"{game_type.name}: {uid} is already in queue")
+                await self.channel_layer.send(
+                    channel_name,
+                    {
+                        "type": "receive_error",
+                        "code": 4000,
+                        "message": "Already in queue",
+                    },
+                )
+                return None
             if nickname.isalnum() == False or len(nickname) > 8:
                 print(nickname.isalnum(), len(nickname))
                 print(f"{game_type.name}: {nickname} is invalid")
@@ -91,8 +105,6 @@ class GameQueue:
                 matched_users = [
                     manager.popleft() for _ in range(game_type.max_player())
                 ]
-
-                # 매칭된 유저들 중 중복된 유저가 있는지 확인
 
                 # 매칭된 유저들을 대기열에서 제거
                 await asyncio.gather(
