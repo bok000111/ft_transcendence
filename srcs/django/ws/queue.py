@@ -66,7 +66,7 @@ class GameQueue:
         nickname: str,
     ) -> None:
         async with self._queue_manager[game_type] as manager:
-            if nickname.isalnum() == False or len(nickname) > 6:
+            if nickname.isalnum() == False or len(nickname) > 8:
                 print(nickname.isalnum(), len(nickname))
                 print(f"{game_type.name}: {nickname} is invalid")
                 await self.channel_layer.send(
