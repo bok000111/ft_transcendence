@@ -1,0 +1,304 @@
+.none {
+    display: none;
+}
+
+.hidden {
+    visibility: hidden;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.scoreboard {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    padding: 20px;
+}
+
+.score-cell, .vs-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 20px;
+    background-color: #e9ecef;
+}
+.vs-cell {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.nickname {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px 5px 0 0;
+}
+
+.score {
+    background-color: #28a745;
+    color: white;
+    padding: 10px;
+    border-radius: 0 0 5px 5px;
+}
+
+#pong_player_area {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+#tour_list {
+    max-height: 700px;
+    max-width: 814px;
+    overflow-y: auto;
+    margin: 0 auto;
+}
+
+#tour_list .accordion-item {
+    background-color: transparent;
+}
+
+#tour_list .accordion-button {
+    background-color: transparent;
+    color: white;
+}
+
+#tour_list .accordion-body {
+    background-color: transparent;
+    color: white;
+}
+
+#custom_btn::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23ffffff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+.font_white {
+    color: white;
+}
+
+.game_bg {
+    position: relative;
+    width: 1440px;
+    height: 1024px;
+    background: #96C757;
+}
+
+.co_main .co_frame .co_line2,
+.co_main .co_frame .co_line3,
+.co_main .co_frame .co_line5,
+.co_main .co_frame .co_ball1,
+.co_main .co_frame .co_ball2,
+.co_main .co_frame .co_ball3 {
+    position: absolute;
+    z-index: -1;
+}
+
+.main-page .col .btn {
+    border: 2px solid black;
+}
+
+.auth-page,
+.main-page,
+.tour-lobby-page,
+.tour-result-page,
+.game-page,
+.normal-page {
+    position: relative;
+    z-index: 1;
+}
+
+.co_main {
+    box-sizing: border-box;
+    width: 1440px;
+    height: 1024px;
+    background: #006AB6;
+    border: 1px solid #000000;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+.co_frame2 {
+    position: absolute;
+    width: 1440px;
+    height: 1024px;
+    left: 0px;
+    top: 0px;
+    filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
+}
+
+.co_line2 {
+    position: absolute;
+    width: 1440px;
+    height: 0px;
+    left: 0px;
+    top: 100px;
+    border: 10px solid #FFFFFF;
+}
+
+/* Line 3 */
+.co_line3 {
+    position: absolute;
+    width: 1440px;
+    height: 0px;
+    left: 0px;
+    top: 924px;
+    border: 10px solid #FFFFFF;
+}
+
+
+/* Line 5 */
+.co_line5 {
+    position: absolute;
+    width: 1440px;
+    height: 0px;
+    left: 0px;
+    top: 512px;
+    border: 10px solid #FFFFFF;
+}
+
+/* ball */
+.co_ball1 {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    left: 98px;
+    top: 171px;
+    background: #FCCA1B;
+    box-shadow: 10px -10px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 50%;
+}
+
+.co_ball2 {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    left: 1161px;
+    top: 333px;
+    background: #FCCA1B;
+    box-shadow: 10px -10px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 50%;
+}
+
+/* ball */
+.co_ball3 {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    left: 430px;
+    top: 683px;
+    background: #FCCA1B;
+    box-shadow: 10px -10px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 50%;
+}
+
+.z_highest {
+    z-index: 9999;
+}
+
+.listContainer {
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid black;
+    justify-content: center;
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+}
+
+#titlePong {
+    color: white;
+    text-shadow:
+        3px 3px 0 #000, -3px -3px 0 #000,
+        3px -3px 0 #000, -3px 3px 0 #000,
+        3px 0 0 #000, -3px 0 0 #000,
+        0 3px 0 #000, 0 -3px 0 #000,
+        3px 3px 0 #000, -3px -3px 0 #000,
+        3px -3px 0 #000, -3px 3px 0 #000,
+        3px 0 0 #000, -3px 0 0 #000,
+        0 3px 0 #000, 0 -3px 0 #000;
+    margin-left: 180px;
+}
+
+.right-triangle {
+    position: absolute;
+    left: 448px;
+    width: 0px;
+    height: 0px;
+    background-color: transparent;
+    border-top: 0px solid transparent;
+    border-right: 992px solid rgba(11, 5, 64, 0.8);
+    border-left: 0px;
+    border-bottom: 360px solid transparent;
+    z-index: 1;
+ }
+
+/*********** Tournament design ***********/
+
+.sub-title {
+    text-align: center;
+    font-size: 40px;
+    font-weight: bold;
+    color: #ffffff;
+    text-shadow:-3px -3px 0 #000,0 -3px 0 #000,3px -3px 0 #000,3px 0 0 #000,3px 3px 0 #000,0 3px 0 #000,-3px 3px 0 #000,-3px 0 0 #000;
+}
+
+/*********** Modal design ***********/
+
+#my-modal-dialog {
+    max-width: 50%;
+}
+
+#my-modal-content {
+    text-align: center;
+    border-radius: 2rem / 2rem;
+    background-color: rgb(150, 199, 87, 0.8);
+    color: rgb(255, 255, 255);
+}
+
+.inner-padding {
+    padding: 5% 10%;
+}
+
+.modal-inner-header {
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.modal-inner-body input {
+    font-size: 20px;
+    font-weight: normal;
+    border-radius: 2rem / 2rem;
+    width: 100%;
+    border: none;
+    text-align: center;
+    color: #000000;
+}
+
+.modal-inner-body div {
+    padding: 0 0 5% 0;
+    font-size: 30px;
+}
+
+.modal-inner-footer {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.modal-inner-footer button {
+    color: #ffffff;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    border-radius: 2rem / 2rem;
+    border: none;
+    background-color: #006AB6;
+    margin: 0% 5%;
+    padding: 0% 10%;
+}
+
+.closeBtn {
+    background-color: rgb(189, 189, 189);
+}

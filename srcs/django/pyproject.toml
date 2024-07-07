@@ -1,0 +1,35 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=42", "wheel"]
+
+[tools.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["./"]
+
+[project]
+dependencies = [
+  "django==5.0.6",
+  "channels[daphne]==4.1.0",
+  "channels-redis==4.2.0",
+  "django-cors-headers==4.4.0",
+  "PyJWT==2.8.0",
+  "psycopg[binary]==3.1.19",
+  "tzdata==2024.1",
+  "py-solc-x==2.0.3",
+  "web3==6.20.0",
+]
+name = "ft-transcendence"
+requires-python = ">= 3.11"
+version = "0.0.1"
+
+[project.optional-dependencies]
+dev = [
+  "python-dotenv",
+  "pylint",
+  "pylint-django",
+  "pylint-plugin-utils",
+  "factory-boy",
+  "Faker",
+]

@@ -1,0 +1,68 @@
+FROM alpine:3.19 as base
+
+# Set build arguments
+ARG BUILD_ARCH \
+    USER_NAME \
+    USER_ID \
+    GROUP_NAME \
+    GROUP_ID \
+    SOLCX_VERSION \
+    SOLCX_FILENAME \
+    SOLCX_BINARY_PATH \
+    BASE_DEPS="python3 tini"
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1
+# Set working directory
+WORKDIR /app
+# Install and solc
+ADD --chmod=755 https://binaries.soliditylang.org/linux-amd64/solc-linux-amd64-v${SOLCX_FILENAME} \
+                ${SOLCX_BINARY_PATH}
+# Create a non-root user, set permissions, and install base dependencies
+RUN addgroup --gid $GROUP_ID $GROUP_NAME \
+    && adduser --disabled-password \
+                --ingroup $GROUP_NAME \
+                --no-create-home \
+                --uid $USER_ID \
+                $USER_NAME \
+    && apk add --update --no-cache ${BASE_DEPS} \
+    && mkdir -p /var/www/ft \
+    && chown -R ${USER_NAME}:${GROUP_NAME} /var/www/ft ${SOLCX_BINARY_PATH} \
+    && chmod -R 755 /var/www/ft ${SOLCX_BINARY_PATH}
+
+
+# Set builder image
+FROM base as builder
+# Set working directory
+WORKDIR /app
+# Install build dependencies
+ARG BUILD_DEPS="gcc musl-dev libffi-dev python3-dev"
+RUN --mount=type=bind,source=pyproject.toml,target=/app/pyproject.toml \
+    apk add --no-cache ${BUILD_DEPS} \
+    && python3 -m venv /app/venv \
+    && /app/venv/bin/pip install setuptools \
+    && /app/venv/bin/pip install /app \
+    && apk del ${BUILD_DEPS}
+
+
+# Set runtime image
+FROM base as runtime
+# Set working directory
+WORKDIR /app
+# Set non-root user
+USER ${USER_NAME}
+# Set environment variables
+ENV VIRTUAL_ENV="/app/venv" \
+    PATH="/app/venv/bin:$PATH"
+# Copy the virtual environment from the builder image
+COPY --from=builder --chown=$USER_ID:$GROUP_ID /app/venv /app/venv
+# Copy source and entrypoint
+COPY --chown=$USER_ID:$GROUP_ID . /app
+COPY --chown=$USER_ID:$GROUP_ID --chmod=755 ./entrypoint.sh /app/entrypoint.sh
+# Expose port 8000
+EXPOSE 8000
+# Test and run daphne
+ENTRYPOINT [ "/sbin/tini", "--" ]
+CMD ["/app/entrypoint.sh"]

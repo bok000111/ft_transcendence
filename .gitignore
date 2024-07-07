@@ -1,2 +1,6 @@
-srcs/requirements/django/venv
-srcs/postgres_data
+**/__pycache__
+**/migrations/*
+!**/__init__.py
+**.env
+**.env.dev
+venv/
