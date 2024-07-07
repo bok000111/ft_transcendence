@@ -30,7 +30,6 @@ class MainConsumer(AsyncJsonWebsocketConsumer):
         """
         websocket 연결 해제 시 호출
         """
-        # print(f"disconnect / type: {self.waiting}")
         if self.waiting is not None:
             async with self.lock:
                 await GameQueue().leave_queue(

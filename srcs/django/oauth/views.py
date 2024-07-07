@@ -26,7 +26,6 @@ def oauth_callback(request):
         return redirect("/")
     code = request.GET.get("code")
     if not code:
-        print("no code")
         return redirect("oauth_login")
 
     user_model = get_user_model()
