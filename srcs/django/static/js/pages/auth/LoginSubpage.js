@@ -82,11 +82,11 @@ class LoginSubpage extends SubPage {
                 password: this.$form.querySelector("#password").value,
             };
             try {
+                this.$loginModal.addEventListener("submit", this.loginModalSubmitHandler);
+                this.loginModal.show();
                 await loginAPI.request();
                 info.myID = loginAPI.recvData.data.user.id;
                 info.myUsername = loginAPI.recvData.data.user.username;
-                this.$loginModal.addEventListener("submit", this.loginModalSubmitHandler);
-                this.loginModal.show();
             }
             catch (e) {
                 // location.href = location.origin + location.pathname;
