@@ -6,7 +6,8 @@ ARG BUILD_ARCH \
     USER_ID \
     GROUP_NAME \
     GROUP_ID \
-    DEV_NODE_DEPS="hardhat tini"
+    APK_DEPS="tini" \
+    NODE_DEPS="hardhat"
 # Set working directory
 WORKDIR /app
 # Create a non-root user
@@ -14,17 +15,17 @@ RUN addgroup --gid $GROUP_ID $GROUP_NAME \
     && adduser --disabled-password \
     --ingroup $GROUP_NAME \
     --uid $USER_ID \
-    $USER_NAME
+    $USER_NAME \
+    && apk add --update --no-cache $APK_DEPS
 
 
 # Set builder image
 FROM base as builder
 # Set working directory
-WORKDIR /app/
+WORKDIR /app
 # Install base dependencies
-RUN apk add --update --no-cache \
-    && npm init -y \
-    && npm install --save-dev $DEV_NODE_DEPS --cache /tmp/empty-cache \
+RUN npm init -y \
+    && npm install --save-dev $NODE_DEPS --cache /tmp/empty-cache \
     && npm upgrade --save-dev --no-audit --no-fund --cache /tmp/empty-cache \
     && rm -rf /tmp/empty-cache
 
@@ -42,4 +43,5 @@ COPY --chown=$USER_ID:$GROUP_ID . /app
 # Expose port 8545
 EXPOSE 8545
 # Run hardhat node
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["npx", "hardhat", "node"]
