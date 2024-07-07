@@ -36,7 +36,7 @@ export const updateAccessToken = (token) => {
 };
 
 export const BASE_HOST = "localhost";
-export const BASE_WS_URL = "wss://localhost:4242/ws/";
+export const BASE_WS_URL = `wss://${window.location.hostname}/ws/`;
 
 class API {
     uri;
