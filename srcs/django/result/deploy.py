@@ -272,10 +272,3 @@ class TournamentResultManager:
         tournaments = await self.__call("get_valid_tournaments")
         return await asyncio.gather(*map(self.get_tournament, tournaments))
 
-
-# async def a():
-#     a = await TournamentResultManager.instance()
-#     print(a)
-
-
-# asyncio.run(a())

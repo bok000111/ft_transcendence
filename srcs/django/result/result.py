@@ -49,7 +49,7 @@ class TournamentResult:
         try:
             return get_user_model().objects.get(pk=user_id).username
         except get_user_model().DoesNotExist:
-            print(f"User with id {user_id} does not exist.")
+            # print(f"User with id {user_id} does not exist.")
             return "Unknown"
 
     def __parse(self, split_data):
