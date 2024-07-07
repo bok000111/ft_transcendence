@@ -8,7 +8,7 @@ const GRID_X = WIDTH / 8;
 const GRID_Y = HEIGHT / 6;
 const RECT_X = GRID_X * 1.3;
 const RECT_Y = GRID_Y / 2;
-const FONT = `${GRID_Y / 4}px sans-serif`
+const FONT = `${GRID_Y / 5}px sans-serif`
 
 const pos = [
     { }, // dummy
