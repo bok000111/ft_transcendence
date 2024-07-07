@@ -8,6 +8,7 @@ from channels.layers import get_channel_layer
 # 싱글톤 패턴 적용
 class RoomManager:
     _instance = None
+    _initialized = False
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -15,10 +16,11 @@ class RoomManager:
         return cls._instance
 
     def __init__(self) -> None:
-        self._initialized = True
-        self.rooms = {}
-        self.room_id = 0
-        self.channel_layer = get_channel_layer()
+        if self._initialized is False:
+            self._initialized = True
+            self.rooms = {}
+            self.room_id = 0
+            self.channel_layer = get_channel_layer()
 
     async def create_game(self, game_type, matched_users):
         try:
@@ -46,17 +48,17 @@ class RoomManager:
             return None
         return self.rooms[room_id]
 
-    def remove_room(self, room_id):
-        if room_id in self.rooms:
-            del self.rooms[room_id]
-            print(f"Info: Room ID {room_id} removed")
-        else:
-            print(f"Warning: Room ID {room_id} not found")
+    # def remove_room(self, room_id):
+    #     if room_id in self.rooms:
+    #         del self.rooms[room_id]
+    #         print(f"Info: Room ID {room_id} removed")
+    #     else:
+    #         print(f"Warning: Room ID {room_id} not found")
 
-    def check_status(self, room_id):
-        if room_id not in self.rooms:
-            return None
-        return self.rooms[room_id].status
+    # def check_status(self, room_id):
+    #     if room_id not in self.rooms:
+    #         return None
+    #     return self.rooms[room_id].status
 
     async def start_game(self, game_type, matched_users):
         gid = await self.create_game(game_type, matched_users)
