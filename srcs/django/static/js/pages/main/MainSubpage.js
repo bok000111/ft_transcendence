@@ -57,8 +57,8 @@ class MainSubpage extends SubPage {
     nicknameModalSubmitHandler = (event) => {
         event.preventDefault();
 
-        if (!(/^[a-zA-Z0-9]+$/.test(this.$nickname.value)) || this.$nickname.value.length > 6 || this.$nickname.value.length <= 0) {
-            alert("only ALPHANUMERIC and 1 <= length <= 6 are allowed!!");
+        if (!(/^[a-zA-Z0-9]+$/.test(this.$nickname.value)) || this.$nickname.value.length > 8 || this.$nickname.value.length <= 0) {
+            alert("only ALPHANUMERIC and 1 <= length <= 8 are allowed!!");
             return;
         }
 
