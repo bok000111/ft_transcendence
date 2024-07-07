@@ -1,11 +1,12 @@
 FROM node:lts-alpine3.19 as base
 
 # Set build arguments
-ARG UNAME_M="x86_64"
-ARG USER_NAME=appuser
-ARG USER_ID=1001
-ARG GROUP_NAME=appgroup
-ARG GROUP_ID=1001
+ARG BUILD_ARCH \
+    USER_NAME \
+    USER_ID \
+    GROUP_NAME \
+    GROUP_ID \
+    DEV_NODE_DEPS="hardhat tini"
 # Set working directory
 WORKDIR /app
 # Create a non-root user
@@ -21,7 +22,6 @@ FROM base as builder
 # Set working directory
 WORKDIR /app/
 # Install base dependencies
-ARG DEV_NODE_DEPS="hardhat tini"
 RUN apk add --update --no-cache \
     && npm init -y \
     && npm install --save-dev $DEV_NODE_DEPS --cache /tmp/empty-cache \
@@ -32,7 +32,7 @@ RUN apk add --update --no-cache \
 # Set runtime image
 FROM base as runtime
 # Set working directory
-WORKDIR /app/
+WORKDIR /app
 # Set non-root user
 USER ${USER_NAME}
 # Copy node modules from builder image
@@ -42,5 +42,4 @@ COPY --chown=$USER_ID:$GROUP_ID . /app
 # Expose port 8545
 EXPOSE 8545
 # Run hardhat node
-ENTRYPOINT [ "/sbin/tini", "--" ]
-CMD [ "npx", "hardhat", "node" ]
+CMD ["npx", "hardhat", "node"]

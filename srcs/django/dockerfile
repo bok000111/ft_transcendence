@@ -29,7 +29,8 @@ RUN addgroup --gid $GROUP_ID $GROUP_NAME \
                 $USER_NAME \
     && apk add --update --no-cache ${BASE_DEPS} \
     && mkdir -p /var/www/ft \
-    && chown -R ${USER_NAME}:${GROUP_NAME} /var/www/ft
+    && chown -R ${USER_NAME}:${GROUP_NAME} /var/www/ft ${SOLCX_BINARY_PATH} \
+    && chmod -R 755 /var/www/ft ${SOLCX_BINARY_PATH}
 
 
 # Set builder image

@@ -92,22 +92,22 @@ services:
     #     - action: rebuild
     #       path: ./srcs/nginx/dockerfile
 
-  # hardhat:
-  #   container_name: hardhat
-  #   image: hardhat:ft
-  #   build:
-  #     context: ./srcs/hardhat
-  #     args:
-  #         BUILD_ARCH: ${BUILD_ARCH:-x86_64}
-  #         # USER_NAME: ${DOCKER_USER_NAME:-appuser}
-  #         # USER_ID: ${DOCKER_USER_ID:-1000}
-  #         # GROUP_NAME: ${DOCKER_GROUP_NAME:-appgroup}
-  #         # GROUP_ID: ${DOCKER_GROUP_ID:-1000}
-  #   networks:
-  #     - intra
-  #   ports:
-  #     - "8545:8545"
-  #   restart: unless-stopped
+  hardhat:
+    container_name: hardhat
+    image: hardhat:ft
+    build:
+      context: ./srcs/hardhat
+      args:
+          BUILD_ARCH: ${HOST_ARCH:?HOST_ARCH is required}
+          USER_NAME: ${DOCKER_USER:?DOCKER_USER is required}
+          USER_ID: ${DOCKER_USER_ID:?DOCKER_USER_ID is required}
+          GROUP_NAME: ${DOCKER_GROUP:?DOCKER_GROUP is required}
+          GROUP_ID: ${DOCKER_GROUP_ID:?DOCKER_GROUP_ID is required}
+    networks:
+      - intra
+    ports:
+      - "8545:8545"
+    restart: unless-stopped
 
 volumes:
   postgres_data:

@@ -45,7 +45,7 @@ def auth_token(token, type="access") -> int | None:
         if payload.get("type", None) != type:
             return None
         return payload.get("user_id", None)
-    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, User.DoesNotExist):
+    except (jwt.ExpiredSignatureError, jwt.InvalidTokenError, jwt.InvalidSignatureError):
         return None
 
 
@@ -86,13 +86,17 @@ def refresh_jwt(token):
 
 
 def get_user(token):
-    if (user_id := auth_token(token)) is not None:
-        return User.objects.get(pk=user_id)
-    return AnonymousUser()
+    try:
+        if (user_id := auth_token(token)) is not None:
+            return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return AnonymousUser()
 
 
 @database_sync_to_async
 def aget_user(token):
-    if (user_id := auth_token(token)) is not None:
-        return User.objects.get(pk=user_id)
-    return AnonymousUser()
+    try:
+        if (user_id := auth_token(token)) is not None:
+            return User.objects.get(pk=user_id)
+    except User.DoesNotExist:
+        return AnonymousUser()
