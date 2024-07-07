@@ -44,14 +44,14 @@ class LoginSubpage extends SubPage {
             <div class="container z_highest">
                 <div class="row justify-content-center mt-5">
                     <div class="col-md-6 col-lg-4">
-                        <h3 class="text-center">Login</h3>
+                        <h3 class="text-center font_white">Login</h3>
                         <form>
                             <div class="mb-3 mt-4">
-                                <label for="email" class="form-label">Email</label>
+                                <label for="email" class="form-label font_white">Email</label>
                                 <input type="email" class="form-control" id="email" placeholder="Enter your email">
                             </div>
                             <div class="mb-3 mt-4">
-                                <label for="password" class="form-label">Password</label>
+                                <label for="password" class="form-label font_white">Password</label>
                                 <input type="password" class="form-control" id="password" placeholder="Enter your password">
                             </div>
                             <div class="mb-3 mt-4 d-flex gap-2">
