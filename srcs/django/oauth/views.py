@@ -1,9 +1,11 @@
 import requests
+import os
 
 from user.backends import JWTAuthBackend
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 from django.shortcuts import redirect
 from django.views.decorators.http import require_GET
 
@@ -11,7 +13,7 @@ from django.views.decorators.http import require_GET
 @require_GET
 def oauth_login(request):
     if request.user.is_authenticated:
-        return redirect("/")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
     return redirect(
         f"{settings.OAUTH_42_URL}?client_id={settings.OAUTH_42_CLIENT_ID}"
         f"&redirect_uri={settings.OAUTH_42_REDIRECT_URI}&response_type=code"
@@ -21,10 +23,10 @@ def oauth_login(request):
 @require_GET
 def oauth_callback(request):
     if request.user.is_authenticated:
-        return redirect("/")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
     code = request.GET.get("code")
     if not code:
-        return redirect("oauth_login")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
 
     user_model = get_user_model()
 
@@ -39,11 +41,11 @@ def oauth_callback(request):
     response = requests.post(settings.OAUTH_42_TOKEN_URL, data=token_data, timeout=5)
     response_data = response.json()
     if response.status_code != 200:
-        return redirect("oauth_login")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
 
     access_token = response_data.get("access_token")
     if not access_token:
-        return redirect("oauth_login")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
 
     info_url = "https://api.intra.42.fr/v2/me"
 
@@ -52,25 +54,36 @@ def oauth_callback(request):
     )
 
     if response.status_code != 200:
-        return redirect("oauth_login")
+        return redirect(f"https://{os.getenv('HOST_NAME')}")
 
     user_data = response.json()
     email = user_data.get("email")
     username = user_data.get("login")
 
-    try:
-        user = user_model.objects.get(email=email, username=username, oauth=True)
-    except user_model.DoesNotExist:
+    user = user_model.objects.filter(
+        email=email, username=username, is_oauth_user=True
+    ).first()
+    if user is not None:
+        # oauth 사용자가 이미 가입되어 있으면 로그인 처리
+        JWTAuthBackend().login(request, user)
+    else:
+        # oauth 사용자가 가입되어 있지 않으면 회원가입 처리
         try:
-            user = user_model.objects.create_user(
-                email=email, username=username, oauth=True
+            user = user_model.objects.create(
+                email=email, username=username, is_oauth_user=True
             )
-        except user_model.IntegrityError:
-            return redirect("oauth_login")
-        user.set_unusable_password()
-        user.save()
+            user.set_unusable_password()
+            user.save()
+            JWTAuthBackend().login(request, user)
+        except IntegrityError:
+            return redirect(f"https://{os.getenv('HOST_NAME')}")
 
-    JWTAuthBackend().login(request, user)
-    response = redirect(f"/#access_token={request.COOKIES.get('access_token')}")
-    response.set_cookie("refresh_token", request.COOKIES.get("refresh_token"))
+    response = redirect(f"https://{os.getenv('HOST_NAME')}")
+    response.set_cookie(
+        "refresh_token",
+        request.COOKIES.get("refresh_token"),
+        secure=True,
+        httponly=True,
+        samesite="Lax",
+    )
     return response

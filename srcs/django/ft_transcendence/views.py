@@ -1,5 +1,6 @@
-from django.shortcuts import render
+import os
+from django.shortcuts import redirect
 
 
-def index(request):
-    return render(request, "index.html")
+def index(_):
+    return redirect(f"https://{os.getenv('HOST_NAME')}")

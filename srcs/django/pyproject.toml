@@ -2,12 +2,6 @@
 build-backend = "setuptools.build_meta"
 requires = ["setuptools>=42", "wheel"]
 
-[tools.setuptools]
-include-package-data = true
-
-[tool.setuptools.packages.find]
-where = ["./"]
-
 [project]
 dependencies = [
   "django==5.0.6",
@@ -20,9 +14,51 @@ dependencies = [
   "py-solc-x==2.0.3",
   "web3==6.20.0",
 ]
+
 name = "ft-transcendence"
 requires-python = ">= 3.11"
 version = "0.0.1"
+
+[tools.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["./"]
+
+[tool.pylint]
+load-plugins = ["pylint_django"]
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "too-few-public-methods",
+    "no-member",
+    "no-self-use"
+]
+
+[tool.pylint.'DESIGN']
+max-attributes = 10
+
+[tool.pylint.'FORMAT']
+max-line-length = 100
+
+[tool.pylint.'TYPECHECK']
+ignored-modules = [
+    "django",
+    "django.db.models",
+    "django.core",
+    "django.conf",
+    "django.http",
+    "django.shortcuts",
+    "django.urls",
+    "django.utils",
+    "django.contrib"
+]
+
+[tool.pylint.'VARIABLES']
+additional-builtins = ["_"]
 
 [project.optional-dependencies]
 dev = [

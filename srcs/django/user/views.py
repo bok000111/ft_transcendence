@@ -6,6 +6,7 @@ from user.backends import JWTAuthBackend
 from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth import get_user_model
+from django.db import IntegrityError
 
 User = get_user_model()
 
@@ -13,13 +14,31 @@ User = get_user_model()
 @require_POST
 def sign_up_view(request):
     if request.content_type != "application/json":
-        return JsendResponse({"errors": "invalid content type"}, message="invalid content type", status=400)
+        return JsendResponse(
+            {"errors": "invalid content type"},
+            message="invalid content type",
+            status=400,
+        )
     if request.user.is_authenticated:
-        return JsendResponse({"auth": "already logged in"}, message="already logged in", status=400)
-    json_data = json.loads(request.body)
+        return JsendResponse(
+            {"auth": "already logged in"}, message="already logged in", status=400
+        )
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsendResponse(
+            {"errors": "invalid json"}, message="invalid json", status=400
+        )
     form = UserCreateModelForm(json_data)
     if form.is_valid():
-        new_user = form.save()
+        try:
+            new_user = form.save()
+        except IntegrityError:
+            return JsendResponse(
+                {"errors": "email already exists"},
+                message="email already exists",
+                status=400,
+            )
         return JsendResponse({"user": new_user}, message="user created", status=201)
     return JsendResponse({"errors": form.errors}, message="bad request", status=400)
 
@@ -27,37 +46,44 @@ def sign_up_view(request):
 @require_POST
 def login_view(request):
     if request.content_type != "application/json":
-        return JsendResponse({"errors": "invalid content type"}, message="invalid content type", status=400)
+        return JsendResponse(
+            {"errors": "invalid content type"},
+            message="invalid content type",
+            status=400,
+        )
     if request.user.is_authenticated:
         return JsendResponse(
             {"user": request.user}, message="already logged in", status=200
         )
 
-    json_data = json.loads(request.body)
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsendResponse(
+            {"errors": "invalid json"}, message="invalid json", status=400
+        )
     form = UserLoginForm(json_data)
     if form.is_valid():
         user = JWTAuthBackend().authenticate(
             email=form.cleaned_data["email"],
             password=form.cleaned_data["password"],
         )
-        if user is None:
+        if user.is_anonymous:
             return JsendResponse(
                 {"auth": "invalid credentials"},
                 message="invalid credentials",
                 status=400,
             )
 
-        # 바로 로그인 하지 않고 이메일로 인증코드를 보내는 방식으로 변경
-        if user.send_otp_code():
+        if user.send_otp_code() is False:
             return JsendResponse(
-                {"user": user},
-                status=200,
-            )  # 프론트에서 필요해서 일단 보냄
-        # return JsendResponse({"auth": "verify code sent"}, status=200)
+                {"auth": "failed to send code"},
+                message="failed to send code",
+                status=400,
+            )
         return JsendResponse(
-            {"auth": "failed to send code"},
-            message="failed to send code",
-            status=500,
+            {"user": user},
+            status=200,
         )
     return JsendResponse(
         {"auth": "invalid credentials"},
@@ -84,8 +110,7 @@ def logout_view(request):
 @ensure_csrf_cookie
 def my_info_view(request):
     if request.user.is_anonymous:
-        return JsendResponse({"user": None},
-                             message="not logged in", status=200)
+        return JsendResponse({"user": None}, message="not logged in", status=200)
     return JsendResponse({"user": request.user}, status=200)
 
 
@@ -107,7 +132,12 @@ def verify_code(request):
     if request.user.is_authenticated:
         return JsendResponse({"auth": "already logged in"}, status=400)
 
-    json_data = json.loads(request.body)
+    try:
+        json_data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return JsendResponse(
+            {"errors": "invalid json"}, message="invalid json", status=400
+        )
     code = json_data.get("code")
 
     if (user := User.verify_otp_code(code)) is None:
@@ -115,8 +145,7 @@ def verify_code(request):
 
     JWTAuthBackend().login(request, user)
     refresh_token = request.COOKIES.get("refresh_token")
-    response = JsendResponse(
-        {"user": user}, status=200)
+    response = JsendResponse({"user": user}, status=200)
     response.set_cookie(
         "refresh_token", refresh_token, secure=True, httponly=True, samesite="Lax"
     )
