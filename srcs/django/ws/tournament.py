@@ -1,15 +1,10 @@
 import asyncio
-from asgiref.sync import sync_to_async
-from django.contrib.auth import get_user_model
-from random import shuffle
-from result.deploy import TournamentResultManager
 from datetime import datetime
-import os
-from .roommanager import RoomManager
-from .enums import GameType
 import uuid
-
-from channels.layers import get_channel_layer
+from django.contrib.auth import get_user_model
+from result.deploy import TournamentResultManager
+from ws.roommanager import RoomManager
+from ws.enums import GameType
 
 User = get_user_model()
 

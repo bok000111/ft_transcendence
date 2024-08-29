@@ -1,7 +1,6 @@
-from user.utils import aget_user
-
-from django.contrib.auth.models import AnonymousUser
 from channels.middleware import BaseMiddleware
+from django.contrib.auth.models import AnonymousUser
+from user.utils import aget_user
 
 
 class JWTChannelAuthMiddleware(BaseMiddleware):

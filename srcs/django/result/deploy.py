@@ -10,7 +10,7 @@ from web3.middleware import async_construct_simple_cache_middleware
 from web3.middleware.signing import async_construct_sign_and_send_raw_middleware
 from web3.utils.caching import SimpleCache
 from web3.types import RPCEndpoint
-from solcx import compile_standard, install_solc
+from solcx import compile_standard
 
 abi_path = Path(__file__).parent / "contracts" / "TournamentContract.abi.json"
 sol_path = Path(__file__).parent / "contracts" / "TournamentContract.sol"
@@ -248,10 +248,6 @@ class TournamentResultManager:
     async def __call(self, func, *args):
         return await getattr(self.contract.functions, func)(*args).call()
 
-    async def __retry(self, func, *args, attempts=3):
-        # 어떻게 만들지..
-        pass
-
     async def _wait_all(self):
         await asyncio.gather(*map(lambda x: x["task"], self.pending_tx_tasks.values()))
 
@@ -271,4 +267,3 @@ class TournamentResultManager:
         # 여기 요청이 너무 많으면 429 Too Many Requests 에러 발생할 수 있음
         tournaments = await self.__call("get_valid_tournaments")
         return await asyncio.gather(*map(self.get_tournament, tournaments))
-

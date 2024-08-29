@@ -1,8 +1,8 @@
 import uuid
 import asyncio
+from channels.layers import get_channel_layer
 from ws.game import Game
 from ws.enums import GameType
-from channels.layers import get_channel_layer
 
 
 # 싱글톤 패턴 적용

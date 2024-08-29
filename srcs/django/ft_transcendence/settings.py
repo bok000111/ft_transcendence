@@ -23,11 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEBUG = os.getenv("DJANGO_DEBUG") == "True"
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
-
-# TODO: 나중에 환경변수로 변경
-ALLOWED_HOSTS = [
-    os.getenv("HOST_NAME")
-]
+# SECURITY SETTINGS
+ALLOWED_HOSTS = [os.getenv("HOST_NAME")]
+# HTTPS
+SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# CSRF - Cross Site Request Forgery
 CSRF_TRUSTED_ORIGINS = [
     f"http://{os.getenv('HOST_NAME')}",
     f"https://{os.getenv('HOST_NAME')}",
@@ -35,8 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
 CSRF_COOKIE_HTTPONLY = False
 CSRF_COOKIE_SECURE = True
 CSRF_COOKIE_SAMESITE = "Lax"
-
-CORS_ALLOW_CREDENTIALS = True
+# CORS - Cross Origin Resource Sharing
 CORS_ALLOWED_ORIGINS = [
     f"http://{os.getenv('HOST_NAME')}",
     f"https://{os.getenv('HOST_NAME')}",
@@ -49,6 +49,12 @@ CORS_ALLOW_HEADERS = (
     "access-control-allow-origin",
     "origin",
 )
+CORS_ALLOW_CREDENTIALS = True
+# JWT
+JWT_ALGORITHM = "HS256"  # HMAC SHA-256
+JWT_SECRET_KEY = SECRET_KEY  # use django secret key
+JWT_REFRESH_TOKEN_LIFETIME = 60 * 60 * 24 * 30  # 30 days
+JWT_ACCESS_TOKEN_LIFETIME = 60 * 60  # 1 hour
 
 # Application definition
 INSTALLED_APPS = [
@@ -110,17 +116,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTH_USER_MODEL = "user.User"
 AUTHENTICATION_BACKENDS = [
-    "user.backends.JWTAuthenticationBackend",
+    "user.backends.JWTAuthBackend",
 ]
-
-# JWT
-JWT_ALGORITHM = "HS256"  # HMAC SHA-256
-JWT_SECRET_KEY = SECRET_KEY  # use django secret key
-JWT_REFRESH_TOKEN_LIFETIME = 60 * 60 * 24 * 30  # 30 days
-JWT_ACCESS_TOKEN_LIFETIME = 60 * 60  # 1 hour
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
@@ -175,5 +172,7 @@ DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER")
 OTP_CODE_EXPIRE_SECONDS = 60 * 5  # 5 minutes
 
 # Silence system check
-# self-signed certificate를 사용하면서 hsts를 사용하면 브라우저에서 접속이 안될 수 있어서 비활성화
-SILENCED_SYSTEM_CHECKS = ["security.W004"]
+SILENCED_SYSTEM_CHECKS = [
+    "security.W004",  # self-signed certificate를 사용하면서 hsts를 사용하면 브라우저에서 접속이 안될 수 있어서 비활성화
+    "auth.W004",  # User의 USERNAME_FIELD가 unique하지 않아도 되도록 비활성화 UniqueConstraint로 대체
+]

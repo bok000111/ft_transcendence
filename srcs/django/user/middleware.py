@@ -1,10 +1,6 @@
 from user.utils import reissue_token, get_user
 
-from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
-
-JWT_ALGORITHM = settings.JWT_ALGORITHM
-SECRET_KEY = settings.SECRET_KEY
 
 
 class JWTAuthMiddleware:
@@ -17,16 +13,14 @@ class JWTAuthMiddleware:
 
     def __call__(self, request):
         if (access_token := self._get_access_token(request)) is not None:
-            if (user := get_user(access_token)) is not None and user.is_authenticated:
-                user.access_token = access_token
+            if (user := get_user(access_token)).is_authenticated:
+                user.set_access_token(access_token)
                 request.user = user
                 return self._handle_response(request)
 
         if (refresh_token := request.COOKIES.get("refresh_token")) is not None:
-            user, access_token = reissue_token(refresh_token)
+            user = reissue_token(refresh_token)
             if user is not None:
-                user.access_token = access_token
-                user.is_access_token_modified = True
                 request.user = user
                 return self._handle_response(request)
 
@@ -34,7 +28,7 @@ class JWTAuthMiddleware:
         return self._handle_response(request)
 
     def _get_access_token(self, request):
-        if auth_header := request.headers.get("Authorization", None):
+        if auth_header := request.headers.get("authorization"):
             token_type, _, token = auth_header.partition(" ")
             if token_type == "Bearer" and token is not None:
                 return token
@@ -42,6 +36,13 @@ class JWTAuthMiddleware:
 
     def _handle_response(self, request):
         response = self.get_response(request)
-        if getattr(request.user, "is_access_token_modified", False) is True:
-            response["X-Access-Token"] = request.user.access_token
+        # If the access token is modified, set the new access token in the response
+        if request.user.is_authenticated is False:
+            response.delete_cookie("refresh_token")
+            response["X-Access-Token"] = None
+        elif request.user.is_access_token_modified:
+            response["X-Access-Token"] = request.user.get_access_token()
         return response
+
+
+# user/middleware.py

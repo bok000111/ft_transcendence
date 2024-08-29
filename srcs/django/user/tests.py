@@ -1,6 +1,6 @@
 import asyncio
-from user.factories import UserFactory, SignUpFactory, faker
 from asgiref.sync import sync_to_async
+from user.factories import UserFactory, SignUpFactory, faker
 from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model

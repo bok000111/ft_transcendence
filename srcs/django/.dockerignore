@@ -3,6 +3,10 @@
 **/*dockerfile
 **/.dockerignore
 **/.pylintrc
-**/*tests.py
-**/*factories.py
+**/tests.py
+**/factories.py
 **/__pycache__
+**/migrations/*
+!**/__init__.py
+ft_transcendence.egg-info
+build

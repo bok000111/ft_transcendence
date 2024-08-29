@@ -1,9 +1,9 @@
 import asyncio
 from collections import deque
+from channels.layers import get_channel_layer
 from ws.enums import GameType
 from ws.roommanager import RoomManager
 from django.contrib.auth import get_user_model
-from channels.layers import get_channel_layer
 from .tournament import TournamentManager
 
 
@@ -25,9 +25,6 @@ class GameQueue:
 
         def __len__(self):
             return len(self.queue)
-        
-        def __contains__(self, uid: int):
-            return uid in self.queue
 
         def append(self, uid: int, channel_name: str, nickname: str):
             self.queue.append(uid)
@@ -80,7 +77,7 @@ class GameQueue:
                     },
                 )
                 return None
-            if nickname.isalnum() == False or len(nickname) > 8:
+            if nickname.isalnum() is False or len(nickname) > 8:
                 print(nickname.isalnum(), len(nickname))
                 print(f"{game_type.name}: {nickname} is invalid")
                 await self.channel_layer.send(
