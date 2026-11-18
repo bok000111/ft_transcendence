@@ -72,3 +72,19 @@ graph TB;
     C --> E
     C --> F
 ```
+
+## 로컬 실행
+
+Docker와 Docker Compose가 필요합니다. 프로젝트 루트의 `.env`에 `HOST_NAME`, `DJANGO_SECRET_KEY`, `POSTGRES_*`, `REDIS_*`, `OAUTH_42_*` 값을 준비합니다. 빌드에 쓰이는 `DOCKER_*`, `HOST_ARCH`, `SOLCX_*` 값은 `docker-compose.yml`을 참고합니다. Django 환경 변수는 `srcs/django/ft_transcendence/settings.py`에 있습니다.
+
+설정을 마친 뒤 프로젝트 루트에서 실행합니다.
+
+```sh
+docker compose up --build
+```
+
+Django와 Nginx, PostgreSQL, Redis, Hardhat이 함께 시작됩니다.
+
+## 제가 맡은 작업
+
+팀 프로젝트에서 백엔드를 맡았습니다. Pong과 사용자 데이터 API를 구현하고 JWT 인증과 Compose 배포를 정리했습니다. [Pong](https://github.com/bok000111/ft_transcendence/pull/4), [사용자 API](https://github.com/bok000111/ft_transcendence/pull/15), [JWT](https://github.com/bok000111/ft_transcendence/pull/55), [배포](https://github.com/bok000111/ft_transcendence/pull/54)
